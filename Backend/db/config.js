@@ -1,5 +1,3 @@
-
-const { MongoClient, ServerApiVersion }  = require('mongodb');
 const dotenv = require("dotenv");
 
 dotenv.config({ path: "../.env" });
@@ -10,22 +8,19 @@ if (!url) {
   throw new Error("MONGO_URI is undefined. Check your .env file location.");
 }
 
-const client = new MongoClient(url, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-});
+const mongoose = require("mongoose");
 
-async function run() {
+const connectDB = async () => {
   try {
-    await client.connect();
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    await client.close();
-  }
-}
+    await mongoose.connect(process.env.MONGO_URI, {
+      dbName: "JewelTrack",
+    });
 
-run().catch(console.error);
+    console.log("MongoDB connected successfully");
+  } catch (error) {
+    console.error("MongoDB connection failed:", error.message);
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB;
