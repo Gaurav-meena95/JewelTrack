@@ -1,33 +1,31 @@
-require('dotenv').config();
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
-// const url = process.env.uri
-// console.log("not found : ", url);
-const url = "mongodb+srv://gauravmeena2024_db_user:4X2C2XReBQvDb154@jeweltrack.vs42aaj.mongodb.net/?appName=JewelTrack"
+const { MongoClient, ServerApiVersion }  = require('mongodb');
+const dotenv = require("dotenv");
 
-// console.log(uri, 'dkjfbd')
+dotenv.config({ path: "../.env" });
 
+const url = process.env.MONGO_URI;
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+if (!url) {
+  throw new Error("MONGO_URI is undefined. Check your .env file location.");
+}
+
 const client = new MongoClient(url, {
-
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    }
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
 });
 
 async function run() {
-    try {
-        // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
-        // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
-    } finally {
-        // Ensures that the client will close when you finish/error
-        await client.close();
-    }
+  try {
+    await client.connect();
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } finally {
+    await client.close();
+  }
 }
-run().catch(console.dir);
+
+run().catch(console.error);
