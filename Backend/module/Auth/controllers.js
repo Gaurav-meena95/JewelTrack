@@ -1,4 +1,4 @@
-const User = require('../../db/models/user.js')
+const User = require('./userdb.js')
 const sec_key = process.env.sec_key
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
@@ -62,7 +62,7 @@ exports.login = async (req, res) => {
                 const jwtToken = await jwt.sign(
                     { id: existing.id, email: existing.email, role: existing.role },
                     sec_key,
-                    { expiresIn: '5Sec' }
+                    { expiresIn: '1h' }
                 )
                 const refreshToken = await jwt.sign(
                     { id: existing.id, email: existing.email, role: existing.role },
