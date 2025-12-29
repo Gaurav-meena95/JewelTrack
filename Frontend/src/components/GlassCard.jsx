@@ -12,14 +12,14 @@ const GlassCard = ({
 
         <component
             className={`
-            backdrop-blur-md bg-card/40  border border-border/50
-            rounded-xl transition-all duration-300
+            backdrop-blur-md bg-card/80  border border-border/50 
+            rounded-2xl transition-all duration-300
             ${hover ? 'cursor-pointer hover:shadow-[0_0_20px_#D4AF3740] hover:translate-y-1 ' : ''}
             ${className}`}
             onClick={onClick}
             {...(hover
                 ? {
-                    whileHover: { y: -4 },
+                    whileHover: { y: 4 },
                     transition: { duration: 0.3 },
                 }
                 : {})}
