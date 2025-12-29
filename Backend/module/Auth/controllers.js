@@ -5,9 +5,13 @@ const jwt = require('jsonwebtoken')
 
 exports.signup = async (req, res) => {
     try {
-        const { name, email, phone, password, role } = req.body
+        const {shopName, name, email, phone, password, role } = req.body
+        console.log('dfjnvfnlj')
+        // if (validationInput({shopName, name, email, phone, password, role })){
+        //     return res.status(401).json({ 'Error': 'All filed Required' })
+        // }
 
-        if (!name || !email || !phone || !password || !role) {
+        if (!shopName || !name || !email || !phone || !password || !role) {
             return res.status(401).json({ 'Error': 'All filed Required' })
         }
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -29,7 +33,7 @@ exports.signup = async (req, res) => {
         }
         const hashedPassword = await bcrypt.hash(password, 10)
         const newUser = await User.create({
-            name,email,phone,
+            shopName,name,email,phone,
             password: hashedPassword,role,
         });
         return res.status(201).json({

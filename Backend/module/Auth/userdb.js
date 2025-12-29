@@ -2,7 +2,10 @@ const mongoose = require('mongoose')
 
 const user = new mongoose.Schema(
     {
-
+        shopName:{
+            type:String,
+            required:true
+        },
         name: {
             type: String,
             required: true

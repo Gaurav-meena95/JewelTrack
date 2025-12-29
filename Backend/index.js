@@ -4,6 +4,10 @@ const app = express()
 app.use(express.json())
 const cors = require('cors')
 const connectDB = require('./db/config')
+app.use(cors({
+    origin:'http://localhost:5174/?',
+    credentials:true
+}))
 
 const authRoutes = require('./module/Auth/routes')
 const customers = require('./module/Shopkeeper/Billing/routes')

@@ -1,12 +1,15 @@
-import React, { useState } from 'react'
-import { ArrowLeft, Gem } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { ArrowLeft, Eye, EyeOff, Gem } from 'lucide-react'
 import { motion } from 'motion/react'
 import ThemeToggle from '../ThemeToggle'
 
 const Signup = () => {
-    const[error,setError] = useState('')
-    const [loading,setLoading] = useState(false)
-    
+    const [error, setError] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [showPassword, setshowPassword] = useState(false)
+    const [confiemshowPassword, setconfiemshowPassword] = useState(false)
+
+    const backend = 'http://localhost:3000/api'
     const [formdata, setFormdata] = useState({
         shopName: '',
         name: '',
@@ -19,9 +22,34 @@ const Signup = () => {
     const handelChange = (e) => {
         setFormdata({ ...formdata, [e.target.name]: e.target.value })
     }
-    const handelSubmit = (e) => {
+    const handelSubmit = async (e) => {
         e.preventDefault()
         setError('')
+        if (formdata.phone.length != 10) {
+            setError('Phone number must be exactly 10 digits')
+            console.log('Phone number must be exactly 10 digits')
+
+            return
+        }
+        if (formdata.password != formdata.confirmPassword) {
+            setError('Passwords do not match')
+            console.log('Passwords do not match')
+            return
+        }
+        setLoading(true)
+        try {
+            const res = await fetch(`${backend}/auth/signup`, {
+                method: 'POST',
+                headers: { 'content-Type': 'application/json' },
+                body: { ...formdata }
+            })
+            const data = await res.json()
+            console.log(data)
+            setLoading(false)
+
+        } catch (error) {
+
+        }
     }
 
 
@@ -106,29 +134,51 @@ const Signup = () => {
                     </div>
                     <div className='space-y2 my-3'>
                         <label htmlFor="Password">Password</label>
-                        <input type="password"
-                            onChange={handelChange}
-                            name='password'
-                            value={formdata.password}
-                            id='Password'
-                            placeholder="•••••••••"
-                            className='p-2 rounded-[5px] w-full bg-input/90 mt-1 backdrop-blur-sm border border-border/80 focus:border-[#513b01] focus:ring-amber-500 transition-all'
-                        />
+                        <div className='relative'>
+                            <input type={showPassword ? "text" : 'password'}
 
+                                onChange={handelChange}
+                                name='password'
+                                value={formdata.password}
+                                id='Password'
+                                placeholder="•••••••••"
+                                className='p-2 pr-10 rounded-[5px] w-full bg-input/90 mt-1 backdrop-blur-sm border border-border/80 focus:border-[#513b01] focus:ring-amber-500 transition-all'
+                            />
+                            <button
+                                onClick={() => setshowPassword(!showPassword)}
+                                className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer'>
+                                {showPassword ?
+                                    <Eye size={18} /> :
+                                    <EyeOff size={18} />}
+                            </button>
+                        </div>
                     </div>
-                    <div className='space-y2 my-3'>
+                    <div className="space-y-2 my-3">
                         <label htmlFor="confirmPassword">Confirm Password</label>
-                        <input type="password"
-                            onChange={handelChange}
-                            name='confirmPassword'
-                            value={formdata.confirmPassword}
-                            id='confirmPassword'
-                            placeholder="•••••••••"
-                            className='p-2 rounded-[8px] w-full bg-input/90 mt-1 backdrop-blur-sm border border-border/80 focus:border-[#513b01] focus:ring-amber-500 transition-all'
-                        />
+
+                        <div className="relative">
+                            <input
+                                type={confiemshowPassword ? "text" : "password"}
+                                onChange={handelChange}
+                                name="confirmPassword"
+                                value={formdata.confirmPassword}
+                                id="confirmPassword"
+                                placeholder="•••••••••"
+                                className="p-2 pr-10 rounded-[8px] w-full bg-input/90 mt-1 backdrop-blur-sm 
+                                border border-border/80 focus:border-[#513b01] focus:ring-amber-500 transition-all"
+                            />
+
+                            <button
+                                type="button"
+                                onClick={() => setconfiemshowPassword(!confiemshowPassword)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer"
+                            >
+                                {confiemshowPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                            </button>
+                        </div>
                     </div>
                     <div className='space-y2 my-5 text-center'>
-                        <button className='w-full p-2 rounded-[8px] bg-[#eab71eec]'>Create Shop Account</button>
+                        <button className='w-full p-2 rounded-[8px] bg-[#eab71eec] cursor-pointer'>Create Shop Account</button>
                     </div>
                 </form>
                 <div className='mt-5 text-center'>
