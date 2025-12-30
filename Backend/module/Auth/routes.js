@@ -4,8 +4,11 @@ const {signup} = require('./controllers')
 const {login} =require('./controllers')
 const {verifyUserMiddleware} = require('./middleware')
 
-router.post('/signup',verifyUserMiddleware,signup)
-router.post('/login',verifyUserMiddleware,login)
+router.post('/signup',signup)
+router.post('/login',login)
+router.get('/me',verifyUserMiddleware,(req,res)=>{
+    res.status(200).json(req.user)
+})
 
 module.exports = router
 

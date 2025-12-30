@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import { ArrowLeft, Eye, EyeOff, Gem } from 'lucide-react'
+import { ArrowLeft, ClockFading, Eye, EyeOff, Gem } from 'lucide-react'
 import { motion } from 'motion/react'
 import ThemeToggle from '../ThemeToggle'
+import {useNavigate} from 'react-router-dom'
 
 const Signup = () => {
+    const negivate = useNavigate()
+    const [role,setRole] = useState('shopkeeper')
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
     const [showPassword, setshowPassword] = useState(false)
     const [confiemshowPassword, setconfiemshowPassword] = useState(false)
 
-    const backend = 'http://localhost:3000/api'
+    // const backend = 'http://localhost:3000/api'
     const [formdata, setFormdata] = useState({
         shopName: '',
         name: '',
@@ -38,17 +41,27 @@ const Signup = () => {
         }
         setLoading(true)
         try {
-            const res = await fetch(`${backend}/auth/signup`, {
+            const res = await fetch(`http://localhost:3000/api/auth/signup`, {
                 method: 'POST',
-                headers: { 'content-Type': 'application/json' },
-                body: { ...formdata }
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...formdata ,role}),
+                credentials: 'include'
             })
             const data = await res.json()
+            if (!res.ok) throw new Error(data.message || 'Signup Failed')
+            
+            if(data.token) localStorage.setItem('accessToken' ,data.token)
+            if(data.refreshToken) localStorage.setItem('refreshToken' ,data.refreshToken)
+            if(data.user) localStorage.setItem('user' ,JSON.stringify(data.user))
+
             console.log(data)
             setLoading(false)
-
+ 
         } catch (error) {
-
+            console.log(error)
+            setError(error.message)
+        }finally{
+            setLoading(false)
         }
     }
 
