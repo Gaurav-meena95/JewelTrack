@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 
 exports.signup = async (req, res) => {
     try {
-        const {shopName, name, email, phone, password, role } = req.body
+        const { shopName, name, email, phone, password, role } = req.body
         console.log('dfjnvfnlj')
         // if (validationInput({shopName, name, email, phone, password, role })){
         //     return res.status(401).json({ 'Error': 'All filed Required' })
@@ -26,15 +26,15 @@ exports.signup = async (req, res) => {
         }
 
         const exsiting = await User.findOne({
-            $or:[{email},{phone}]
+            $or: [{ email }, { phone }]
         });
         if (exsiting) {
             return res.status(400).json({ message: 'User is already exists' })
         }
         const hashedPassword = await bcrypt.hash(password, 10)
         const newUser = await User.create({
-            shopName,name,email,phone,
-            password: hashedPassword,role,
+            shopName, name, email, phone,
+            password: hashedPassword, role,
         });
         return res.status(201).json({
             message: 'Signup successful',
@@ -49,12 +49,23 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const { email, password, role, phone } = req.body
-        if (!email || !phone || !password || !role) {
-            return res.status(401).json({ 'Error': 'All filed Required' })
+        if (role === 'admin') {
+            if (!email || !password || !role) {
+                return res.status(401).json({ 'Error': 'All filed Required' })
+            }
+        } else {
+            if (!email || !phone || !password || !role) {
+                return res.status(401).json({ 'Error': 'All filed Required' })
+            }
+            
         }
-        console.log(email,password,role,phone)
+        const existing = await User.findOne({ 
+            $and:[
+               { $or:[{ email}, {phone} ]},
+               {role}
+            ]
+        })
 
-        const existing = await User.findOne({ email, role, phone })
 
         if (!existing) {
             console.log('User not found:', { email, role });

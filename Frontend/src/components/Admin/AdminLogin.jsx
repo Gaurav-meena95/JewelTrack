@@ -5,9 +5,9 @@ import ThemeToggle from '../ThemeToggle'
 import { ArrowLeft, Eye, EyeOff, Gem } from 'lucide-react'
 import { motion } from 'motion/react'
 
-const Login = () => {
-    const negivate = useNavigate()
-    const [role, setRole] = useState('shopkeeper')
+const AdminLogin = () => {
+ const negivate = useNavigate()
+    const [role,setRole] = useState('shopkeeper')
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
     const [showPassword, setshowPassword] = useState(false)
@@ -15,7 +15,7 @@ const Login = () => {
 
     // const backend = 'http://localhost:3000/api'
     const [formdata, setFormdata] = useState({
-        phone: '',
+        email: '',
         password: ''
     })
 
@@ -34,20 +34,20 @@ const Login = () => {
             const res = await fetch(`http://localhost:3000/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...formdata, role }),
+                body: JSON.stringify({ ...formdata ,role}),
                 credentials: 'include'
             })
             const data = await res.json()
             if (!res.ok) throw new Error(data.message || 'Signup Failed')
-
-            if (data.token) localStorage.setItem('accessToken', data.token)
-            if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken)
-            if (data.user) localStorage.setItem('user', JSON.stringify(data.user))
-
+            
+            if(data.token) localStorage.setItem('accessToken' ,data.token)
+            if(data.refreshToken) localStorage.setItem('refreshToken' ,data.refreshToken)
+            if(data.user) localStorage.setItem('user' ,JSON.stringify(data.user))
+ 
         } catch (error) {
             console.log(error)
             setError(error.message)
-        } finally {
+        }finally{
             setLoading(false)
         }
     }
@@ -63,7 +63,7 @@ const Login = () => {
             </div>
 
             <Link
-                to='/'
+            to='/'
                 className="absolute top-6 left-6 flex items-center gap-2 text-muted-foreground hover:text-[#c8b11c] transition-colors"
             >
                 <ArrowLeft className="h-5 w-5" />
@@ -81,18 +81,18 @@ const Login = () => {
                     <span className='text-[#d2a907] text-3xl'>Jewel Track</span>
                 </div>
                 <div className='text-center mb-2'>
-                    <h1 className='text-2xl mb-2'>Shopkeeper Login</h1>
+                    <h1 className='text-2xl mb-2'>Admin Login</h1>
                     <p className='text-muted-foreground'>Welcome back! Please enter your credentials</p>
                 </div>
                 <form onSubmit={handelSubmit} className='mt-5'>
                     <div className='space-y2 my-3'>
-                        <label htmlFor="phoneNumber">Phone or Email</label>
+                        <label htmlFor="phoneNumber"> Email or Phone </label>
                         <input type="text"
                             onChange={handelChange}
                             name='phone'
                             value={formdata.phone}
                             id='phoneNumber'
-                            placeholder="Email or Phone"
+                            placeholder="Email or phone"
                             className='p-2 rounded-[8px] w-full bg-input/90 mt-1 backdrop-blur-sm border border-border/80 focus:border-[#513b01] focus:ring-amber-500 transition-all'
                         />
 
@@ -119,14 +119,9 @@ const Login = () => {
                         </div>
                     </div>
                     <div className='space-y2 my-5 text-center'>
-                        <button onClick={() => setRole('shopkeeper')} className='w-full p-2 rounded-[8px] bg-[#eab71eec] cursor-pointer'>Sign in</button>
+                        <button onClick={()=>setRole('shopkeeper')} className='w-full p-2 rounded-[8px] bg-[#eab71eec] cursor-pointer'>Sign in</button>
                     </div>
                 </form>
-                <div className='mt-5 text-center'>
-                    <span className='text-muted-foreground'>Don't have an account? </span>
-                    <Link to='/signup' className='text-[#e7ba35] cursor-pointer hover:underline'>Create Shop Account</Link>
-                </div>
-
 
             </motion.div>
 
@@ -135,4 +130,4 @@ const Login = () => {
     )
 }
 
-export { Login }
+export  {AdminLogin}

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { ArrowLeft, ClockFading, Eye, EyeOff, Gem } from 'lucide-react'
 import { motion } from 'motion/react'
 import ThemeToggle from '../ThemeToggle'
-import {useNavigate} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 
 const Signup = () => {
     const negivate = useNavigate()
@@ -75,12 +75,13 @@ const Signup = () => {
                 <ThemeToggle />
             </div>
 
-            <button
+            <Link
+            to='/login'
                 className="absolute top-6 left-6 flex items-center gap-2 text-muted-foreground hover:text-[#c8b11c] transition-colors"
             >
                 <ArrowLeft className="h-5 w-5" />
                 Back to Login
-            </button>
+            </Link>
             <motion.div
                 initial={{ opacity: 0, y: -40 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -196,7 +197,7 @@ const Signup = () => {
                 </form>
                 <div className='mt-5 text-center'>
                     <span className='text-muted-foreground'>Already have an account? </span>
-                    <button className='text-[#e7ba35] cursor-pointer hover:underline'>Sign In</button>
+                    <Link to='/login' className='text-[#e7ba35] cursor-pointer hover:underline'>Sign In</Link>
                 </div>
 
 

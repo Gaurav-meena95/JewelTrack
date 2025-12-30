@@ -3,9 +3,12 @@ import { ArrowRight, BarChart3, Calculator, Clock, Gem, IndianRupee, Package, Sh
 import ThemeToggle from './ThemeToggle'
 import { motion, useScroll } from 'motion/react';
 import { GlassCard } from './GlassCard';
+import {Link,useNavigate} from 'react-router-dom'
 
 const Landing = () => {
     const [currentslide, setCurrentslide] = useState(0)
+
+    const navigate = useNavigate()
     const jewelryShowcase = [
         {
             image: 'https://images.unsplash.com/photo-1758995116142-c626a962a682?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBnb2xkJTIwcmluZyUyMGpld2Vscnl8ZW58MXx8fHwxNzY2OTE4MTY2fDA&ixlib=rb-4.1.0&q=80&w=1080',
@@ -66,14 +69,15 @@ const Landing = () => {
                     </div>
                     <div className='flex items-center gap-4'>
                         <ThemeToggle />
-                        <button
+                        <Link
+                        to='/login'
                             className='hover:text-[#d2a907] hover:bg-[#e6a2046e] px-2 py-1 rounded'
                         >
                             Shopkeeper login
-                        </button>
-                        <button className='hover:text-[#d2a907] hover:bg-[#e6a2046e] px-2 py-1 rounded'>
+                        </Link>
+                        <Link to='/admin' className='hover:text-[#d2a907] hover:bg-[#e6a2046e] px-2 py-1 rounded'>
                             Admin
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </header>
