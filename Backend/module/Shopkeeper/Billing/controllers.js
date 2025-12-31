@@ -46,7 +46,6 @@ const getBillingProfile = async (req, res) => {
             return res.status(404).json({ message: "Customer not found register user" });
         }
         const bills = await Bill.find({ customerId: existingUser._id })
-        console.log('yfyufg',bills)
 
         return res.status(200).json({
             message: 'Customer profile fetched successfully',

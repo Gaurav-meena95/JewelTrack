@@ -15,7 +15,7 @@ const Login = () => {
 
     // const backend = 'http://localhost:3000/api'
     const [formdata, setFormdata] = useState({
-        phone: '',
+        email: '',
         password: ''
     })
 
@@ -89,7 +89,7 @@ const Login = () => {
                         <label htmlFor="phoneNumber">Phone or Email</label>
                         <input type="text"
                             onChange={handelChange}
-                            name='phone'
+                            name='UserData'
                             value={formdata.phone}
                             id='phoneNumber'
                             placeholder="Email or Phone"

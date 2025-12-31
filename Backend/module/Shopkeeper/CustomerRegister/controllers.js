@@ -1,12 +1,13 @@
+const { validationInput } = require('../../../utils/utils')
 const Customer = require('./db')
 
 const registerCustomer = async (req, res) => {
 
     try {
         const { name, email, phone, father_name, address } = req.body
-        console.log(name, email, phone, father_name, address)
-        if (!name || !phone || !father_name || !address) {
-            return res.status(401).json({ message: 'All fileds are Required ' })
+        const value = validationInput({ name, email, phone, father_name, address })
+        if (value) {
+            return res.status(403).json({ message: `Check missing value ${value}` })
         }
         const existing = await Customer.findOne({ phone })
         if (existing) {

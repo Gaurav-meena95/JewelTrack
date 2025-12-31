@@ -2,17 +2,14 @@ const User = require('./userdb.js')
 const sec_key = process.env.sec_key
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const { validationInput } = require('../../utils/utils.js')
 
 exports.signup = async (req, res) => {
     try {
         const { shopName, name, email, phone, password, role } = req.body
-        console.log('dfjnvfnlj')
-        // if (validationInput({shopName, name, email, phone, password, role })){
-        //     return res.status(401).json({ 'Error': 'All filed Required' })
-        // }
-
-        if (!shopName || !name || !email || !phone || !password || !role) {
-            return res.status(401).json({ 'Error': 'All filed Required' })
+        const value = validationInput({ shopName, name, email, phone, password, role })
+        if (value) {
+            return res.status(403).json({ message: `Check missing value ${value}` })
         }
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             return res.status(401).json({ message: "Invalid Email Address" })
@@ -48,25 +45,12 @@ exports.signup = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
-        const { email, password, role, phone } = req.body
-        if (role === 'admin') {
-            if (!email || !password || !role) {
-                return res.status(401).json({ 'Error': 'All filed Required' })
-            }
-        } else {
-            if (!email || !phone || !password || !role) {
-                return res.status(401).json({ 'Error': 'All filed Required' })
-            }
-            
+        const { email, password, role } = req.body
+        const value = validationInput({ email, password, role })
+        if (value) {
+            return res.status(403).json({ message: `Check missing value ${value}` })
         }
-        const existing = await User.findOne({ 
-            $and:[
-               { $or:[{ email}, {phone} ]},
-               {role}
-            ]
-        })
-
-
+        const existing = await User.findOne({ email, role })
         if (!existing) {
             console.log('User not found:', { email, role });
             return res.status(404).json({ message: "User not found or Check your Role " })
