@@ -4,6 +4,7 @@ const Collateral = require('../Colletral/db')
 
 const createCollatral = async(req, res) => {
     try {
+        const {phone} = req.query
         const { description, jewellery, image, price, interestRate, status } = req.body
         const value = validationInput({ description, jewellery, image, price, interestRate, status })
         if (value) {

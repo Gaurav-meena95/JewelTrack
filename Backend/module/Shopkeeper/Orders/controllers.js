@@ -1,10 +1,75 @@
+const { validationInput } = require('../../../utils/utils')
 const Order = require('../Orders/db')
+const Customer = require('../CustomerRegister/db')
 
-const creteOrder = (req,res)=>{
+const createOrders = async(req, res) => {
     try {
-        
+        const {phone} = req.query
+        const { description, jewellery, image, AdvancePayment, Total, status ,size} = req.body
+        const value = validationInput({ description, jewellery, image, AdvancePayment, Total, status ,size})
+        if (value) {
+            return res.status(403).json({ message: `Check missing value ${value}` })
+        }
+        const existing = await Customer.findOne({ phone })
+        if (existing) {
+            return res.status(400).json({ message: 'customer is already exist' })
+        }
+        const RemaningAmount = Total - AdvancePayment
+        const newOrders = await Order.create({ description, jewellery, image, AdvancePayment, Total, status ,size,RemaningAmount})
+        return res.status(201).json({message:'Orders create successfully'},newOrders)
+
     } catch (error) {
         console.log(error)
+        return res.status(500).json({message : 'Internal Server Error'})
+
     }
 }
-module.exports = {creteOrder}
+
+const updateOrders = async (req, res) => {
+    try {
+        const {phone} = req.query
+        const { description, jewellery, image, AdvancePayment, Total, status ,size} = req.body
+        const existing = await Customer.findOne({ phone })
+        if (!existing){
+            return res.status(402).json({message:'customer Orders doest not exist'})
+        }
+        const RemaningAmount = Total - AdvancePayment
+        const updated =  await Order.updateOne(
+            { _id: existing._id }, 
+            {description, jewellery, image, AdvancePayment, Total, status ,size,RemaningAmount}
+        )
+        return res.status(200).json({message:"Order upadate successfully",updated})
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({message : 'Internal Server Error'})
+    }
+
+}
+const deleteOrders =  async (req, res) => {
+    try {
+        const {phone} = req.query
+        const existing = Customer.findOne({ phone })
+        if (!existing){
+            return res.status(402).json({message:'customer Orders doest not exist'})
+        }
+        await Order.deleteOne({_id:existing._id})
+        return res.status({message :'Orders successfully deleted'})
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({message : 'Internal Server Error'})
+    }
+
+}
+const allOrders = async(req, res) => {
+    try {
+        const allOrders  = await Order.find() 
+        return res.status({message:"All Orders are :",allOrders})
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({message : 'Internal Server Error'})
+    }
+
+}
+
+
+module.exports = { createOrders, updateOrders, deleteOrders, allOrders }

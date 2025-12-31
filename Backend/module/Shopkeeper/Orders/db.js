@@ -17,21 +17,28 @@ const orderSchema = new mongoose.Schema(
             default: []
         },
         AdvancePayment: {
-            type: String,
-            required: true
+            type: Number,
+            required: true,
+            min:0
         },
         Total: {
-            type: String,
-            required: true
+            type: Number,
+            required: true,
+            min:0
         },
         status: {
             type: String,
-            enum: ['request', 'accept','progress','compelete'],
-            default: 'active'
+            enum: ['request', 'accept', 'progress', 'complete'],
+            default: 'request'
         },
         size:{
             type: String,
             required: true
+        },
+        RemaningAmount:{
+            type:Number,
+            required:true,
+            default:0
         }
     },
     {
