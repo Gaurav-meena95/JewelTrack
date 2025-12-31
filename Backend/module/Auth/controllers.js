@@ -3,10 +3,11 @@ const sec_key = process.env.sec_key
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { validationInput } = require('../../utils/utils.js')
+const { models } = require('mongoose')
 
-exports.signup = async (req, res) => {
+const signup = async (req, res) => {
     try {
-        const { shopName, name, email, phone, password, role } = req.body
+        const { shopName, name, email, phone,add, password, role } = req.body
         const value = validationInput({ shopName, name, email, phone, password, role })
         if (value) {
             return res.status(403).json({ message: `Check missing value ${value}` })
@@ -43,7 +44,8 @@ exports.signup = async (req, res) => {
     }
 }
 
-exports.login = async (req, res) => {
+
+const login = async (req, res) => {
     try {
         const { email, password, role } = req.body
         const value = validationInput({ email, password, role })
@@ -87,3 +89,43 @@ exports.login = async (req, res) => {
         res.status(500).json({ message: 'Login Faild', 'error': error.message })
     }
 }
+const setting =  async(req,res)=>{
+     try {
+        const { shopName, name, email, phone, password, role } = req.body
+        const value = validationInput({ shopName, name, email, phone, password, role })
+        if (value) {
+            return res.status(403).json({ message: `Check missing value ${value}` })
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.status(401).json({ message: "Invalid Email Address" })
+
+        }
+        if (!/^\d{10}$/.test(phone)) {
+            return res.status(400).json({ message: "Phone number must be exactly 10 digits" });
+        }
+        if (!/(?=.*[!@#$%^&*])(?=.{8,})/.test(password)) {
+            return res.status(400).json({ message: "Password must be at least 8 characters long and contain one special character" });
+        }
+
+        const exsiting = await User.findOne({
+            $or: [{ email }, { phone }]
+        });
+        if (exsiting) {
+            return res.status(400).json({ message: 'User is already exists' })
+        }
+        const hashedPassword = await bcrypt.hash(password, 10)
+        const newUser = await User.create({
+            shopName, name, email, phone,
+            password: hashedPassword, role,
+        });
+        return res.status(201).json({
+            message: 'Signup successful',
+            user: newUser
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ msg: "Internal Server Error" })
+    }
+}
+
+module.exports = {signup,login,setting}

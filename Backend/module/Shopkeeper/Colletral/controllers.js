@@ -2,68 +2,77 @@ const { validationInput } = require("../../../utils/utils")
 const Customer = require('../CustomerRegister/db')
 const Collateral = require('../Colletral/db')
 
-const createCollatral = async(req, res) => {
+const createCollatral = async (req, res) => {
     try {
-        const {phone} = req.query
+        const { phone } = req.query
         const { description, jewellery, image, price, interestRate, status } = req.body
         const value = validationInput({ description, jewellery, image, price, interestRate, status })
         if (value) {
             return res.status(403).json({ message: `Check missing value ${value}` })
         }
-        const existing =await Customer.findOne({ phone })
-        if (existing) {
-            return res.status(400).json({ message: 'customer is already exist' })
+        const existing = await Customer.findOne({ phone })
+        if (!existing) {
+            return res.status(400).json({ message: 'User is not exist!' });
         }
-        const newCollatral = await Collateral.create({ description, jewellery, image, price, interestRate, status })
+        const newCollatral = await Collateral.create({customerId:existing._id ,description, jewellery, image, price, interestRate, status })
+        return res.status(200).json({message:'collatral create successfully',newCollatral})
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({message : 'Internal Server Error'})
+        return res.status(500).json({ message: 'Internal Server Error' })
 
     }
 }
+
 
 const updateCollatral = async (req, res) => {
     try {
-        const {phone} = req.query
+        const { phone ,collatral_id} = req.query
         const { description, jewellery, image, price, interestRate, status } = req.body
         const existing = await Customer.findOne({ phone })
-        if (!existing){
-            return res.status(402).json({message:'customer collatral doest not exist'})
+        if (!existing) {
+            return res.status(402).json({ message: 'customer collatral doest not exist' })
         }
-        const updated =  await Collateral.updateOne(
-            { _id: existing._id }, 
-            {description, jewellery, image, price, interestRate, status}
+        const exsitingCollateral = await Collateral.find({_id:collatral_id})
+        const updated = await Collateral.updateOne(
+            { _id: exsitingCollateral[0]._id },
+            { description, jewellery, image, price, interestRate, status }
         )
-        return res.status(200).json({message:"Collateral upadate successfully",updated})
+        return res.status(200).json({ message: "Collateral upadate successfully", updated })
     } catch (error) {
         console.log(error)
-        return res.status(500).json({message : 'Internal Server Error'})
+        return res.status(500).json({ message: 'Internal Server Error' })
     }
 
 }
-const deleteCollatral =  async (req, res) => {
+const deleteCollatral = async (req, res) => {
     try {
-        const {phone} = req.query
+        const { phone,collatral_id } = req.query
         const existing = Customer.findOne({ phone })
-        if (!existing){
-            return res.status(402).json({message:'customer collatral doest not exist'})
+        if (!existing) {
+            return res.status(402).json({ message: 'customer collatral doest not exist' })
         }
-        await Collateral.deleteOne({_id:existing._id})
-        return res.status({message :'collatral successfully deleted'})
+        const exsitingCollateral = await Collateral.find({_id:collatral_id})
+        if (!exsitingCollateral){
+            return res.status(401).json({message:'collatral does not exist'})
+        }
+
+       const deleted =  await Collateral.deleteOne({ _id: exsitingCollateral[0]._id })
+        return res.status(200).json({ message: 'collatral successfully deleted' ,deleted})
     } catch (error) {
         console.log(error)
-        return res.status(500).json({message : 'Internal Server Error'})
+        return res.status(500).json({ message: 'Internal Server Error' })
     }
 
 }
-const allCollatral = async(req, res) => {
+const allCollatral = async (req, res) => {
     try {
-        const allcollatrals  = await Collateral.find() 
-        return res.status({message:"All collatral are :",allcollatrals})
+        const allcollatrals = await Collateral.find()
+        return res.status(200).json({ message: "All collatral are :", allcollatrals })
+
     } catch (error) {
         console.log(error)
-        return res.status(500).json({message : 'Internal Server Error'})
+        return res.status(500).json({ message: 'Internal Server Error' })
     }
 
 }

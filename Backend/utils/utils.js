@@ -1,5 +1,4 @@
 const validationInput = (data) => {
-    console.log('validfation')
     try {
         for (let i in data){
             if (data[i] == undefined){
