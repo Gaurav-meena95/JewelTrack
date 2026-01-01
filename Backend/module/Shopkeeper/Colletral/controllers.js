@@ -53,7 +53,7 @@ const deleteCollatral = async (req, res) => {
             return res.status(402).json({ message: 'customer collatral doest not exist' })
         }
         const exsitingCollateral = await Collateral.find({_id:collatral_id})
-        if (!exsitingCollateral){
+        if (exsitingCollateral.length === 0){
             return res.status(401).json({message:'collatral does not exist'})
         }
 
@@ -67,8 +67,14 @@ const deleteCollatral = async (req, res) => {
 }
 const allCollatral = async (req, res) => {
     try {
+        const {phone,name} = req.query
         const allcollatrals = await Collateral.find()
+        const spacificCollatral = await Collateral.find({phone})
+        if (!spacificCollatral.length === 0){
+            return res.status(200).json({ message: "All collatral are :", spacificCollatral })
+        }
         return res.status(200).json({ message: "All collatral are :", allcollatrals })
+
 
     } catch (error) {
         console.log(error)

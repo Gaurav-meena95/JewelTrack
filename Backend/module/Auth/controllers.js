@@ -7,7 +7,7 @@ const { models } = require('mongoose')
 
 const signup = async (req, res) => {
     try {
-        const { shopName, name, email, phone,add, password, role } = req.body
+        const { shopName, name, email, phone, password, role } = req.body
         const value = validationInput({ shopName, name, email, phone, password, role })
         if (value) {
             return res.status(403).json({ message: `Check missing value ${value}` })
