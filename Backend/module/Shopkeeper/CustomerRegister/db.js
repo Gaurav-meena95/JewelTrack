@@ -18,7 +18,10 @@ const customerSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    address: String
+    address:{
+        type:String,
+        required:true
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Customer', customerSchema)

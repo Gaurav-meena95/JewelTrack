@@ -14,6 +14,7 @@ const customers = require('./module/Shopkeeper/Billing/routes')
 const CustomerRegister = require('./module/Shopkeeper/CustomerRegister/routes')
 const Colletral = require('./module/Shopkeeper/Colletral/routes')
 const JweleOrders = require('./module/Shopkeeper/Orders/routes')
+const JweleInventoryManagment = require('./module/Shopkeeper/Inventory/routes')
 
 
 connectDB();
@@ -25,6 +26,8 @@ app.use('/api/customers',customers)
 app.use('/api/customers',CustomerRegister)
 app.use('/api/customers',Colletral)
 app.use('/api/customers',JweleOrders)
+app.use('/api/shops',JweleInventoryManagment)
+
 
 
 
