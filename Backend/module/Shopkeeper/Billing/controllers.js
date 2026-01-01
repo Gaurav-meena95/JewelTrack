@@ -1,16 +1,37 @@
+const { validationInput } = require('../../../utils/utils')
 const Customer = require('../CustomerRegister/db')
 const Bill = require('./db')
 
 const createBilling = async (req, res) => {
     try {
         const { phone } = req.query
+        const { itemName, metal, purity, weight, ratePerGram, makingChargePercent, gstPercent, manualAdjustment,amountPaid ,paymentMethod} = req.body
         const existingUser = await Customer.findOne({ phone })
         if (!existingUser) {
             return res.status(404).json({ message: "Customer not found register user" });
         }
-        const { itemName, metal, purity, weight, ratePerGram, makingChargePercent, gstPercent, manualAdjustment } = req.body.invoice[0]
+
+        const value = validationInput({amountPaid, itemName, metal, purity, weight, ratePerGram, makingChargePercent, gstPercent, manualAdjustment})
+        if (value){
+            return res.status(401).json({message: `Check missing value ${value}`})
+        }
+
         const basePrice = (weight * ratePerGram)
         const finalPrice = basePrice + (basePrice * (makingChargePercent) / 100) + (basePrice * (gstPercent) / 100) - manualAdjustment
+        console.log(finalPrice)
+        if (amountPaid > finalPrice) {
+            return res.status(401).json({ message: 'Amount paid cannot exceed final price' })
+        }
+        if (amountPaid === 0) {
+            paymentStatus = 'unpaid'
+            remainingAmount = finalPrice
+        } else if (amountPaid < finalPrice) {
+            paymentStatus = 'partially_paid'
+            remainingAmount = finalPrice - amountPaid
+        } else {
+            paymentStatus = 'paid'
+            remainingAmount = 0
+        }
         const createBill = await Bill.create({
             customerId: existingUser._id,
             invoice: {
@@ -23,6 +44,12 @@ const createBilling = async (req, res) => {
                 gstPercent,
                 manualAdjustment,
                 finalPrice
+            },
+            payment: {
+                amountPaid,
+                remainingAmount,
+                paymentStatus,
+                paymentMethod
             }
         })
         console.log('Bill Generate SuccessFully', createBill)
