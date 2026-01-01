@@ -1,8 +1,9 @@
 const express = require('express')
 const router = express.Router()
-const {createBilling, getBillingProfile } = require('./controllers')
+const {createBilling, getBillingProfile, updateBilling } = require('./controllers')
 
 router.post('/bills/create', createBilling)
+router.patch('/bills/update', updateBilling)
 router.get('/bills/me', getBillingProfile)
 
 
