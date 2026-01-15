@@ -1,12 +1,10 @@
 const validationInput = (data) => {
-    try {
-        for (let i in data){
-            if (data[i] == undefined){
-                return i
-            }
+    for (let key in data) {
+        if (data[key] === undefined || data[key] === null || data[key] === '') {
+            return key;
         }
-    } catch (error) {
-        console.log(error)
     }
-}
+    return null;
+};
+
 module.exports = {validationInput}

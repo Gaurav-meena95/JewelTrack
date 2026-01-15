@@ -3,7 +3,6 @@ const sec_key = process.env.sec_key
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { validationInput } = require('../../utils/utils.js')
-const { models } = require('mongoose')
 
 const signup = async (req, res) => {
     try {
@@ -128,4 +127,5 @@ const setting =  async(req,res)=>{
     }
 }
 
-module.exports = {signup,login,setting}
+
+module.exports = {signup,login,setting,adminLogin}
