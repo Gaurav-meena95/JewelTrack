@@ -2,12 +2,17 @@ import { BarChart3, FileText, Gem, LayoutDashboard, LogOut, Package, Settings, S
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import ThemeToggle from '../ThemeToggle';
+import { useNavigate } from 'react-router-dom';
 
-const Dashboard = () => {
+const DashboardLayout = () => {
+
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   // const {user,logout} = useAuth
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [currentPage , setCurrntpage] = useState('dashboard')
+  console.log(currentPage)
   const menuItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { id: 'inventory', icon: Package, label: 'Inventory' },
@@ -55,23 +60,40 @@ const Dashboard = () => {
         </div>
       </header>
 
-      <aside className={`fixed top-16 bg-card/50 p-5`}>
+      <aside className={`
+      fixed top-16 left-0 bottom-0 z-30 bg-card/40 backdrop-blur-md 
+          border-r border-border/50 transition-all duration-300
+          ${sidebarCollapsed ? 'w-20' : 'w-64'}
+          ${mobileSidebarOpen ? 'translate-x-0' : 'translate-x-full'}
+          lg:translate-x-0
+        `}>
         <nav className='p-4 space-y-2'>
           {
             menuItems.map((ele, ind) => {
               const Icon = ele.icon
-              const label = ele.label
-              // const isactive = current == ele.id 
+              const isActive = ele.id === currentPage;
               return (
-                <div key={ind} className=''>
-                  <div className='flex items-center gap-2 px-2 py-3 hover:bg-accent/50'>
-                    <Icon className='h-5 w-5' />
-                    <div>
-                      {label}
-                    </div>
-                  </div>
+                 <button
 
-                </div>
+                key={ele.id}
+                onClick={() => {
+                  setMobileSidebarOpen(false)
+                  setCurrntpage(ele.id);
+                }}
+                className={`
+                  w-full flex items-center gap-3 px-4 py-3 
+                  transition-all duration-200 rounded-2xl
+                  ${isActive 
+                    ? 'bg-[#c7a003a2] text-[#f8cf71] shadow-2xl' 
+                    : 'hover:bg-accent/30 text-foreground'
+                  }
+                `}
+              >
+                <Icon className="h-5 w-5 shrink-0" />
+                {!sidebarCollapsed && (
+                  <span className="truncate">{ele.label}</span>
+                )}
+              </button>
               )
             })
           }
@@ -82,4 +104,4 @@ const Dashboard = () => {
   )
 }
 
-export { Dashboard }
+export { DashboardLayout }

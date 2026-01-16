@@ -4,7 +4,10 @@ import Signup from './components/Auth/Signup'
 import {Routes,Route} from 'react-router-dom'
 import { Login } from './components/Auth/Login'
 import { AdminLogin } from './components/Admin/AdminLogin'
-import { Dashboard } from './components/Shopkeeper/Dashboard'
+import { DashboardLayout } from './components/Shopkeeper/DashboardLayout'
+
+
+
 function App() {
 
   return (
@@ -14,7 +17,7 @@ function App() {
       <Route path='/signup' element={<Signup/>}/>
       <Route path='/login' element={<Login/>}/>
       <Route path='/admin' element={<AdminLogin/>}/> */}
-      <Route path='/dashboard' element={<Dashboard/>}/>
+      <Route path='/dashboard' element={<DashboardLayout/>}/>
     </Routes>
 
     </>
