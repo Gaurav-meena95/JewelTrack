@@ -46,12 +46,16 @@ const signup = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        const { email, password, role } = req.body
-        const value = validationInput({ email, password, role })
+        const { identifier, password, role } = req.body
+        const value = validationInput({ identifier, password, role })
         if (value) {
             return res.status(403).json({ message: `Check missing value ${value}` })
         }
-        const existing = await User.findOne({ email, role })
+        if (identifier.includes('@')){
+
+            const existing = await User.findOne({ email:identifier, role })
+        }
+        const existing = await User.findOne({ phone:identifier, role })
         if (!existing) {
             console.log('User not found:', { email, role });
             return res.status(404).json({ message: "User not found or Check your Role " })
@@ -128,4 +132,4 @@ const setting =  async(req,res)=>{
 }
 
 
-module.exports = {signup,login,setting,adminLogin}
+module.exports = {signup,login,setting}

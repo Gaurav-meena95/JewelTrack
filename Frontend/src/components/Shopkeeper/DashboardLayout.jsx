@@ -2,7 +2,7 @@ import { BarChart3, FileText, Gem, LayoutDashboard, LogOut, Package, Settings, S
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import ThemeToggle from '../ThemeToggle';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate ,Outlet} from 'react-router-dom';
 
 const DashboardLayout = () => {
 
@@ -12,12 +12,11 @@ const DashboardLayout = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [currentPage , setCurrntpage] = useState('dashboard')
-  console.log(currentPage)
   const menuItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { id: 'inventory', icon: Package, label: 'Inventory' },
     { id: 'orders', icon: ShoppingCart, label: 'Orders' },
-    { id: 'girvi', icon: Wallet, label: 'Girvi' },
+    { id: 'colletral', icon: Wallet, label: 'Colletral' },
     { id: 'bills', icon: FileText, label: 'Bills' },
     { id: 'customers', icon: Users, label: 'Customers' },
     { id: 'reports', icon: BarChart3, label: 'Reports' },
@@ -77,6 +76,7 @@ const DashboardLayout = () => {
 
                 key={ele.id}
                 onClick={() => {
+                  navigate(`/dashboard/${ele.id}`)
                   setMobileSidebarOpen(false)
                   setCurrntpage(ele.id);
                 }}
@@ -100,6 +100,9 @@ const DashboardLayout = () => {
         </nav>
 
       </aside>
+       <main className="fixed ml-64 mt-16 p-6 w-full">
+        <Outlet />
+      </main>
     </div>
   )
 }

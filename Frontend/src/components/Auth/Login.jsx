@@ -25,16 +25,12 @@ const Login = () => {
     const handelSubmit = async (e) => {
         e.preventDefault()
         setError('')
-        if (formdata.phone.length != 10) {
-            setError('Phone number must be exactly 10 digits')
-            return
-        }
         setLoading(true)
         try {
             const res = await fetch(`http://localhost:3000/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...formdata, role }),
+                body: JSON.stringify({...formdata, role }),
                 credentials: 'include'
             })
             const data = await res.json()
@@ -43,6 +39,12 @@ const Login = () => {
             if (data.token) localStorage.setItem('accessToken', data.token)
             if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken)
             if (data.user) localStorage.setItem('user', JSON.stringify(data.user))
+            setLoading(false)
+            if (data.user.role === 'shopkeeper'){
+                negivate('/dashboard')
+            }
+            
+
 
         } catch (error) {
             console.log(error)
@@ -89,7 +91,7 @@ const Login = () => {
                         <label htmlFor="phoneNumber">Phone or Email</label>
                         <input type="text"
                             onChange={handelChange}
-                            name='UserData'
+                            name='identifier'
                             value={formdata.phone}
                             id='phoneNumber'
                             placeholder="Email or Phone"
@@ -120,6 +122,9 @@ const Login = () => {
                     </div>
                     <div className='space-y2 my-5 text-center'>
                         <button onClick={() => setRole('shopkeeper')} className='w-full p-2 rounded-[8px] bg-[#eab71eec] cursor-pointer'>Sign in</button>
+                    </div>
+                    <div className='text-red-800'>
+                        {error}
                     </div>
                 </form>
                 <div className='mt-5 text-center'>

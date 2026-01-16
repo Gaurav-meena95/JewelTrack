@@ -31,7 +31,6 @@ const Signup = () => {
         if (formdata.phone.length != 10) {
             setError('Phone number must be exactly 10 digits')
             console.log('Phone number must be exactly 10 digits')
-
             return
         }
         if (formdata.password != formdata.confirmPassword) {
@@ -56,6 +55,9 @@ const Signup = () => {
 
             console.log(data)
             setLoading(false)
+            if(data.user.role === "shopkeeper"){
+                negivate('/dashboard')
+            }
  
         } catch (error) {
             console.log(error)
@@ -193,6 +195,9 @@ const Signup = () => {
                     </div>
                     <div className='space-y2 my-5 text-center'>
                         <button className='w-full p-2 rounded-[8px] bg-[#eab71eec] cursor-pointer'>Create Shop Account</button>
+                    </div>
+                    <div className='text-red-700'>
+                        {error}
                     </div>
                 </form>
                 <div className='mt-5 text-center'>
