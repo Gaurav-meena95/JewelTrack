@@ -2,16 +2,17 @@ import { BarChart3, FileText, Gem, LayoutDashboard, LogOut, Package, Settings, S
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import ThemeToggle from '../ThemeToggle';
-import { useNavigate ,Outlet} from 'react-router-dom';
+import { useNavigate, Outlet } from 'react-router-dom';
 
 const DashboardLayout = () => {
+
 
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   // const {user,logout} = useAuth
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [currentPage , setCurrntpage] = useState('dashboard')
+  const [currentPage, setCurrntpage] = useState('dashboard')
   const menuItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { id: 'inventory', icon: Package, label: 'Inventory' },
@@ -22,14 +23,13 @@ const DashboardLayout = () => {
     { id: 'reports', icon: BarChart3, label: 'Reports' },
     { id: 'settings', icon: Settings, label: 'Settings' },
   ];
+  //get user details form loacalStorage 
+  const {name,shopName} = JSON.parse(localStorage.getItem('user'))
 
-  const fetchShopkeeperDetails = async () => {
-    try {
-      const response = await fetch('')
-    } catch (error) {
-      console.log(error)
-    }
+const handelLogout = ()=>{
+    navigate('/login')
   }
+
   return (
     <div>
       <header className='fixed top-0 left-0 right-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border/50'>
@@ -43,18 +43,13 @@ const DashboardLayout = () => {
           </div>
           <div className='flex items-center gap-4 '>
 
-            <div>
-              <Link
-                to='/login'
-                className='hover:text-[#d2a907] hover:bg-[#e6a2046e] px-2 py-1 rounded'
-              >
-                Shopkeeper
-              </Link>
-              <p className='text-muted-foreground'></p>
+            <div className='px-2 py-1 rounded'>
+              {name}
+              <p className='text-muted-foreground'>{shopName} </p>
             </div>
 
             <ThemeToggle />
-            <LogOut />
+            <LogOut onClick={handelLogout} />
           </div>
         </div>
       </header>
@@ -72,35 +67,35 @@ const DashboardLayout = () => {
               const Icon = ele.icon
               const isActive = ele.id === currentPage;
               return (
-                 <button
+                <button
 
-                key={ele.id}
-                onClick={() => {
-                  navigate(`/dashboard/${ele.id}`)
-                  setMobileSidebarOpen(false)
-                  setCurrntpage(ele.id);
-                }}
-                className={`
+                  key={ele.id}
+                  onClick={() => {
+                    navigate(`/dashboard/${ele.id}`)
+                    setMobileSidebarOpen(false)
+                    setCurrntpage(ele.id);
+                  }}
+                  className={`
                   w-full flex items-center gap-3 px-4 py-3 
                   transition-all duration-200 rounded-2xl
-                  ${isActive 
-                    ? 'bg-[#c7a003a2] text-[#f8cf71] shadow-2xl' 
-                    : 'hover:bg-accent/30 text-foreground'
-                  }
+                  ${isActive
+                      ? 'bg-[#c7a003a2] text-[#f8cf71] shadow-2xl'
+                      : 'hover:bg-accent/30 text-foreground'
+                    }
                 `}
-              >
-                <Icon className="h-5 w-5 shrink-0" />
-                {!sidebarCollapsed && (
-                  <span className="truncate">{ele.label}</span>
-                )}
-              </button>
+                >
+                  <Icon className="h-5 w-5 shrink-0" />
+                  {!sidebarCollapsed && (
+                    <span className="truncate">{ele.label}</span>
+                  )}
+                </button>
               )
             })
           }
         </nav>
 
       </aside>
-       <main className="fixed ml-64 mt-16 p-6 w-full">
+      <main className="fixed ml-64 mt-16 p-6 w-full">
         <Outlet />
       </main>
     </div>

@@ -51,11 +51,14 @@ const login = async (req, res) => {
         if (value) {
             return res.status(403).json({ message: `Check missing value ${value}` })
         }
+        let existing ;
         if (identifier.includes('@')){
-
-            const existing = await User.findOne({ email:identifier, role })
+             existing = await User.findOne({ email:identifier, role })
+            console.log('object',existing)
+        }else{
+            const existing = await User.findOne({ phone:identifier, role })
         }
-        const existing = await User.findOne({ phone:identifier, role })
+        
         if (!existing) {
             console.log('User not found:', { email, role });
             return res.status(404).json({ message: "User not found or Check your Role " })

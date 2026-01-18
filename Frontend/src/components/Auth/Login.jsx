@@ -30,20 +30,19 @@ const Login = () => {
             const res = await fetch(`http://localhost:3000/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({...formdata, role }),
+                body: JSON.stringify({ ...formdata, role }),
                 credentials: 'include'
             })
             const data = await res.json()
             if (!res.ok) throw new Error(data.message || 'Signup Failed')
 
-            if (data.token) localStorage.setItem('accessToken', data.token)
-            if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken)
+            if (data.token) localStorage.setItem('x-access-token', data.token)
+            if (data.refreshToken) localStorage.setItem('x-refresh-token', data.refreshToken)
             if (data.user) localStorage.setItem('user', JSON.stringify(data.user))
             setLoading(false)
-            if (data.user.role === 'shopkeeper'){
-                negivate('/dashboard')
-            }
-            
+            if (data.user.role === 'shopkeeper') negivate('/dashboard')
+
+
 
 
         } catch (error) {
@@ -121,7 +120,7 @@ const Login = () => {
                         </div>
                     </div>
                     <div className='space-y2 my-5 text-center'>
-                        <button onClick={() => setRole('shopkeeper')} className='w-full p-2 rounded-[8px] bg-[#eab71eec] cursor-pointer'>Sign in</button>
+                        <button onClick={() => setRole('shopkeeper')} className='w-full p-2 rounded-[8px] bg-[#eab71eec] cursor-pointer'>{loading ? 'Signing in... ':" Sign In"}</button>
                     </div>
                     <div className='text-red-800'>
                         {error}
