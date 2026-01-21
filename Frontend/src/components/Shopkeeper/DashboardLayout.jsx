@@ -1,4 +1,4 @@
-import { BarChart3, FileText, Gem, LayoutDashboard, LogOut, Package, Settings, ShoppingCart, Users, Wallet } from 'lucide-react';
+import { BarChart3, FileText, Gem, LayoutDashboard, LogOut, Menu, Package, Settings, ShoppingCart, Users, Wallet, X } from 'lucide-react';
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import ThemeToggle from '../ThemeToggle';
@@ -33,19 +33,27 @@ const handelLogout = ()=>{
   return (
     <div>
       <header className='fixed top-0 left-0 right-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border/50'>
-        <div className=' flex items-center justify-between py-4  px-6 '>
-          <div className=''>
-            <div className='flex items-center gap-2'>
-              <Gem className='text-[#d2a907] h-7 w-8' />
-              <span className='text-[#d2a907] text-2xl'>Jewel Track</span>
+        <div className=' flex items-center justify-between py-1  px-6 '>
+          <div className='flex items-center gap-4'>
+            <button
+              onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+              className="lg:hidden"
+            >
+              {mobileSidebarOpen ? <X /> : <Menu />}
+            </button>
+            <div className='hidden lg:flex items-center gap-2'>
+              <Gem className='text-[#d2a907] h-5 w-6' />
+              <span className='text-[#d2a907] text-xl'> Jewel Track</span>
+            </div>
+            <div className="lg:hidden">
+              <h2 className="capitalize">{currentPage}</h2>
             </div>
 
           </div>
           <div className='flex items-center gap-4 '>
-
-            <div className='px-2 py-1 rounded'>
-              {name}
-              <p className='text-muted-foreground'>{shopName} </p>
+            <div className="text-right hidden md:block">
+              <p className="text-sm">{name}</p>
+              <p className="text-xs text-muted-foreground">{shopName}</p>
             </div>
 
             <ThemeToggle />
@@ -55,10 +63,11 @@ const handelLogout = ()=>{
       </header>
 
       <aside className={`
-      fixed top-16 left-0 bottom-0 z-30 bg-card/40 backdrop-blur-md 
-          border-r border-border/50 transition-all duration-300
+      fixed top-16 left-0 bottom-0 z-30
+          bg-card/40 backdrop-blur-md border-r border-border/50
+          transition-all duration-300
           ${sidebarCollapsed ? 'w-20' : 'w-64'}
-          ${mobileSidebarOpen ? 'translate-x-0' : 'translate-x-full'}
+          ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0
         `}>
         <nav className='p-4 space-y-2'>
@@ -85,9 +94,7 @@ const handelLogout = ()=>{
                 `}
                 >
                   <Icon className="h-5 w-5 shrink-0" />
-                  {!sidebarCollapsed && (
                     <span className="truncate">{ele.label}</span>
-                  )}
                 </button>
               )
             })
@@ -95,8 +102,21 @@ const handelLogout = ()=>{
         </nav>
 
       </aside>
-      <main className="fixed ml-64 mt-16 p-6 w-full">
+
+      {mobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-20 lg:hidden"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+      <main className={`
+          pt-16 min-h-screen
+          transition-all duration-300
+          ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}
+        `}>
+        <div className='p-6'>
         <Outlet />
+        </div>
       </main>
     </div>
   )
