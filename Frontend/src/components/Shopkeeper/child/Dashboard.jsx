@@ -1,10 +1,20 @@
 import { IndianRupee, Package, ShoppingCart, Wallet } from 'lucide-react';
-import React from 'react'
+import React, { useState } from 'react'
 import { GlassCard } from '../../GlassCard';
 
 import { delay, motion } from 'motion/react';
 
 const Dashboard = () => {
+  const [loading,setLoading] = useState(false)
+
+  const {_id} = JSON.parse(localStorage.getItem('user'))
+
+  const fetchingShopkeeperData = ()=>{
+    setLoading(true)
+    // const response = fetch('http://localhost:3000/api/')
+
+  }
+  // fetchingShopkeeperData()
 
   const stats = [
     {
@@ -60,22 +70,16 @@ const Dashboard = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: indx * 0.1 }}
             >
-              <div className=' p-5 backdrop-blur-md bg-card/40 border border-border/50 rounded-2xl transition-all duration-300 hover:translate-y-1'>
-
-                  <Icon className={`h-6 w-6 text-foreground bg-accent/50 p-3 rounded-lg`} />
-
-
+              <div className=' space-y-2 backdrop-blur-md bg-card/40 border border-border/50 rounded-2xl transition-all duration-300 hover:translate-y-1 p-8'>
+                  <Icon className="h-8 w-8 bg-accent/60 p-2 rounded" />
                 <h3 className="text-muted-foreground text-sm mb-1">
                   {stat.title}
                 </h3>
 
-                <p>
+                <p className='text-2xl'>
                   {stat.value}
                 </p>
               </div>
-
-
-
             </motion.div>
           )
         })}

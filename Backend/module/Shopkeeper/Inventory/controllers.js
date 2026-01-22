@@ -5,19 +5,16 @@ const  Inventory= require('./db')
 
 const createInventory = async (req, res) => {
     try {
-        const {shopkeeper_id} = req.query
+        if (!req.user || !req.user.id){
+            return res.status(401).json({message :'Unauthorized'})
+        }
+        const shopkeeper_id = req.user.id
         const { jewelleryType, totalWeight, quantity ,metalType} = req.body
         const value = validationInput({jewelleryType, totalWeight, quantity ,metalType})
         if (value) {
             return res.status(403).json({ message: `Check missing value ${value}` })
         }
-        const Shopkeeper= await User.find({_id:shopkeeper_id})
-        console.log('shopkeeper' ,Shopkeeper[0]._id)
-        if (!Shopkeeper){
-            return res.status(403).json({message:'shopkeeper does not exist'})
-        }
-
-        const newInventory = await Inventory.create({shopkeeper:Shopkeeper[0]._id,jewelleryType, totalWeight, quantity ,metalType})
+        const newInventory = await Inventory.create({shopkeeperId:shopkeeper_id,jewelleryType, totalWeight, quantity ,metalType})
         return res.status(200).json({message:'Inventory create successfully',newInventory})
 
     } catch (error) {
@@ -26,7 +23,6 @@ const createInventory = async (req, res) => {
 
     }
 }
-
 
 const updateInventory = async (req, res) => {
     try {
@@ -67,12 +63,12 @@ const deleteInventory = async (req, res) => {
 }
 const allInventory = async (req, res) => {
     try {
-        const {shopkeeper_id} = req.query
-        const Shopkeeper= await User.find({_id:shopkeeper_id})
-        if (!Shopkeeper){
-            return res.status(403).json({message:'shopkeeper does not exist'})
+         if (!req.user || !req.user.id){
+            return res.status(401).json({message :'Unauthorized'})
         }
-        const allInventorys = await Inventory.find({shopkeeper:Shopkeeper[0]._id})
+        const shopkeeper_id = req.user.id
+        const Shopkeeper= await User.find({_id:shopkeeper_id})
+        const allInventorys = await Inventory.find({shopkeeperId:shopkeeper_id})
         return res.status(200).json({ message: "All Inventory are :", allInventorys })
 
 

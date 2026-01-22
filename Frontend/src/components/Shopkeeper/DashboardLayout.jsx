@@ -57,7 +57,7 @@ const handelLogout = ()=>{
             </div>
 
             <ThemeToggle />
-            <LogOut onClick={handelLogout} />
+            <LogOut onClick={handelLogout} className='h-8 w-8 hover:bg-accent/40 cursor-pointer p-1  rounded ' />
           </div>
         </div>
       </header>

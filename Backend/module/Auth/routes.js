@@ -5,6 +5,7 @@ const {verifyUserMiddleware} = require('./middleware')
 
 router.post('/signup',signup)
 router.post('/login',login)
+
 router.post('/shopkeeper/setting',setting)
 router.get('/me',verifyUserMiddleware,(req,res)=>{
     res.status(200).json(req.user)

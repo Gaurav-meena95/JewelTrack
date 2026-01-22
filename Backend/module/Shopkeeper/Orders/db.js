@@ -2,6 +2,11 @@ const mongoose = require('mongoose')
 
 const orderSchema = new mongoose.Schema(
     {
+        shopkeeperId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+        },
         customerId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Customer',
@@ -19,26 +24,26 @@ const orderSchema = new mongoose.Schema(
         AdvancePayment: {
             type: Number,
             required: true,
-            min:0
+            min: 0
         },
         Total: {
             type: Number,
             required: true,
-            min:0
+            min: 0
         },
         status: {
             type: String,
             enum: ['request', 'accept', 'progress', 'complete'],
             default: 'request'
         },
-        size:{
+        size: {
             type: String,
             required: true
         },
-        RemaningAmount:{
-            type:Number,
-            required:true,
-            default:0
+        RemaningAmount: {
+            type: Number,
+            required: true,
+            default: 0
         }
     },
     {
@@ -46,4 +51,4 @@ const orderSchema = new mongoose.Schema(
     }
 )
 
-module.exports = mongoose.model('Order',orderSchema)
+module.exports = mongoose.model('Order', orderSchema)

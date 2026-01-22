@@ -47,6 +47,7 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { identifier, password, role } = req.body
+        
         const value = validationInput({ identifier, password, role })
         if (value) {
             return res.status(403).json({ message: `Check missing value ${value}` })

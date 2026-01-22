@@ -4,6 +4,10 @@ const Customer = require('../CustomerRegister/db')
 
 const createOrders = async (req, res) => {
     try {
+        if (!req.user || !req.user.id){
+            return res.status(401).json({message :'Unauthorized'})
+        }
+        const shopkeeper_id = req.user.id
         const { phone } = req.query
         const { jewellery, image, AdvancePayment, Total, status, size } = req.body
         const value = validationInput({ jewellery, image, AdvancePayment, Total, status, size })
@@ -16,7 +20,7 @@ const createOrders = async (req, res) => {
             return res.status(400).json({ message: 'customer is already exist' })
         }
         const RemaningAmount = Total - AdvancePayment
-        const newOrders = await Order.create({ customerId: existing._id, jewellery, image, AdvancePayment, Total, status, size, RemaningAmount })
+        const newOrders = await Order.create({shopkeeperId:shopkeeper_id, customerId: existing._id, jewellery, image, AdvancePayment, Total, status, size, RemaningAmount })
         return res.status(201).json({ message: 'Orders create successfully', newOrders })
 
     } catch (error) {

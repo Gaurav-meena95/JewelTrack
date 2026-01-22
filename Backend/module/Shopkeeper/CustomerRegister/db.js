@@ -1,6 +1,11 @@
 const mongoose = require('mongoose')
 
 const customerSchema = new mongoose.Schema({
+    shopkeeperId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     name: {
         type: String,
         required: true
@@ -12,15 +17,15 @@ const customerSchema = new mongoose.Schema({
     phone: {
         type: String,
         unique: true,
-        maxLength:10
+        maxLength: 10
     },
     email: {
         type: String,
         required: true
     },
-    address:{
-        type:String,
-        required:true
+    address: {
+        type: String,
+        required: true
     }
 }, { timestamps: true });
 

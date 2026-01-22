@@ -4,6 +4,10 @@ const Collateral = require('../Colletral/db')
 
 const createCollatral = async (req, res) => {
     try {
+        if (!req.user || !req.user.id){
+            return res.status(401).json({message :'Unauthorized'})
+        }
+        const shopkeeper_id = req.user.id
         const { phone } = req.query
         const { description, jewellery, image, price, interestRate, status } = req.body
         const value = validationInput({ description, jewellery, image, price, interestRate, status })
@@ -14,7 +18,7 @@ const createCollatral = async (req, res) => {
         if (!existing) {
             return res.status(400).json({ message: 'User is not exist!' });
         }
-        const newCollatral = await Collateral.create({customerId:existing._id ,description, jewellery, image, price, interestRate, status })
+        const newCollatral = await Collateral.create({shopkeeperId :shopkeeper_id, customerId:existing._id ,description, jewellery, image, price, interestRate, status })
         return res.status(200).json({message:'collatral create successfully',newCollatral})
 
     } catch (error) {

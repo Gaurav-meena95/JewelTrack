@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const inventorySchema = new mongoose.Schema(
     {
-        shopkeeper: {
+        shopkeeperId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
             required: true

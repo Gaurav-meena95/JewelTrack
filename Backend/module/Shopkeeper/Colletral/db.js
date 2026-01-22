@@ -3,6 +3,11 @@ const mongoose = require('mongoose')
 const colletralSchema = new mongoose.Schema(
 
   {
+    shopkeeperId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
     customerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Customer',
@@ -32,7 +37,7 @@ const colletralSchema = new mongoose.Schema(
       max: 100
     },
     status: {
-       type: String,
+      type: String,
       enum: ['active', 'closed'],
       default: 'active'
     }
