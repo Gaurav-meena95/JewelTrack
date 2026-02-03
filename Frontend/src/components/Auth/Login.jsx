@@ -13,7 +13,8 @@ const Login = () => {
     const [showPassword, setshowPassword] = useState(false)
 
 
-    // const backend = 'http://localhost:3000/api'
+    const apiUrl = import.meta.env.VITE_API_BASE_KEY
+
     const [formdata, setFormdata] = useState({
         email: '',
         password: ''
@@ -27,12 +28,13 @@ const Login = () => {
         setError('')
         setLoading(true)
         try {
-            const res = await fetch(`http://localhost:3000/api/auth/login`, {
+            console.log('object')
+            const res = await fetch(`${apiUrl}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...formdata, role }),
-                credentials: 'include'
+                body: JSON.stringify({ ...formdata, role })
             })
+
             const data = await res.json()
             if (!res.ok) throw new Error(data.message || 'Signup Failed')
 
@@ -41,9 +43,6 @@ const Login = () => {
             if (data.user) localStorage.setItem('user', JSON.stringify(data.user))
             setLoading(false)
             if (data.user.role === 'shopkeeper') negivate('/dashboard')
-
-
-
 
         } catch (error) {
             console.log(error)
@@ -54,15 +53,12 @@ const Login = () => {
     }
 
 
-
     return (
 
         <div className='min-h-screen bg-background flex items-center justify-center px-6 py-12 relative overflow-hidden'>
-
             <div className="absolute top-6 right-6">
                 <ThemeToggle />
             </div>
-
             <Link
                 to='/'
                 className="absolute top-6 left-6 flex items-center gap-2 text-muted-foreground hover:text-[#c8b11c] transition-colors"
@@ -120,7 +116,7 @@ const Login = () => {
                         </div>
                     </div>
                     <div className='space-y2 my-5 text-center'>
-                        <button onClick={() => setRole('shopkeeper')} className='w-full p-2 rounded-[8px] bg-[#eab71eec] cursor-pointer'>{loading ? 'Signing in... ':" Sign In"}</button>
+                        <button onClick={() => setRole('shopkeeper')} className='w-full p-2 rounded-[8px] bg-[#eab71eec] cursor-pointer'>{loading ? 'Signing in... ' : " Sign In"}</button>
                     </div>
                     <div className='text-red-800'>
                         {error}
@@ -138,5 +134,4 @@ const Login = () => {
         </div>
     )
 }
-
 export { Login }
