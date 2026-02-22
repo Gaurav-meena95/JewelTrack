@@ -64,7 +64,6 @@ const generateNewTokens = (decode) => {
         sec_key,
         { expiresIn: '7d' }
     )
-    console.log('object', accessToken, newRefreshToken)
     return { accessToken, newRefreshToken }
 
 

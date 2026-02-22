@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
+    "ag-charts-community": "^13.1.0",
+    "ag-charts-react": "^13.1.0",
     "dom": "^0.0.3",
     "dotenv": "^17.2.3",
     "lucide-react": "^0.562.0",

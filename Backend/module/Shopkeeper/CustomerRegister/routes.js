@@ -3,7 +3,7 @@ const { registerCustomer, updateCustomer, getCustomer, deleteCustomer } = requir
 const { verifyUserMiddleware } = require('../../Auth/middleware')
 const router = express.Router()
 
-router.use(verifyUserMiddleware)
+
 router.post('/register',registerCustomer)
 router.patch('/register/update',updateCustomer)
 router.get('/register/get',getCustomer)

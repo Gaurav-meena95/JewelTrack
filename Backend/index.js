@@ -12,6 +12,7 @@ const CustomerRegister = require('./module/Shopkeeper/CustomerRegister/routes')
 const Colletral = require('./module/Shopkeeper/Colletral/routes')
 const JweleOrders = require('./module/Shopkeeper/Orders/routes')
 const JweleInventoryManagment = require('./module/Shopkeeper/Inventory/routes')
+const { verifyUserMiddleware } = require('./module/Auth/middleware')
 
 
 connectDB();
@@ -19,6 +20,7 @@ app.get('/',(req,res)=>{
     res.status(200).json('Hello World!')
 })
 app.use('/api/auth',AuthRoutes)
+app.use(verifyUserMiddleware)
 app.use('/api/customers',GenerateBill)
 app.use('/api/customers',CustomerRegister)
 app.use('/api/customers',Colletral)
