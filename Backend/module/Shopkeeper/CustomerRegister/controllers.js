@@ -34,12 +34,15 @@ const getCustomer = async (req, res) => {
             return res.status(401).json({ message: 'Unauthorized' })
         }
         const { phone } = req.query
+        const allCustomer = await Customer.find()
         const existing = await Customer.findOne({ phone })
-        if (!existing) {
-            return res.status(404).json({ message: "Customer not found register user" });
+        if (existing ) {
+            return res.status(201).json({ message: 'Customer fetch  successfully', customer: existing })
+        }else if(allCustomer){
+            return res.status(201).json({ message: 'All Customer fetch  successfully', customer: allCustomer })
         }
+        return res.status(404).json({ message: "Customer not found register user" });
 
-        return res.status(201).json({ message: 'Customer fetch  successfully', customer: existing })
     } catch (error) {
         console.log(error)
         return res.status(500).json({ message: 'Internal Server Error' })
@@ -49,7 +52,7 @@ const updateCustomer = async (req, res) => {
 
     try {
         
-         if (!req.user || !req.user.id) {
+        if (!req.user || !req.user.id) {
             return res.status(401).json({ message: 'Unauthorized' })
         }
         const {id} = req.user
@@ -62,7 +65,7 @@ const updateCustomer = async (req, res) => {
         if (!existing) {
             return res.status(400).json({ message: 'Customer Doesnot  Exist please register' })
         }
-        const updatedCustomer = await Customer.updateOne({ shopkeeperId:id,name, email, phone, father_name, address })
+        const updatedCustomer = await Customer.updateOne({ shopkeeperId:id,name, email , father_name, address })
         console.log('updatedCustomer', updatedCustomer)
 
         return res.status(201).json({ message: 'Customer update successfully', customer: updatedCustomer })

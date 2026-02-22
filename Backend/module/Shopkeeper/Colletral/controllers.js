@@ -17,8 +17,11 @@ const createCollatral = async (req, res) => {
         const existing = await Customer.findOne({ phone })
         if (!existing) {
             return res.status(400).json({ message: 'User is not exist!' });
+
         }
-        const newCollatral = await Collateral.create({shopkeeperId :shopkeeper_id, customerId:existing._id ,description, jewellery, image, price, interestRate, status })
+
+        const newCollatral = await Collateral.create({ phone,shopkeeperId :shopkeeper_id, customerId:existing._id ,description, jewellery, image, price, interestRate, status })
+        console.log('kjfndsf',newCollatral)
         return res.status(200).json({message:'collatral create successfully',newCollatral})
 
     } catch (error) {
@@ -70,14 +73,18 @@ const deleteCollatral = async (req, res) => {
 
 }
 const allCollatral = async (req, res) => {
+    console.log('dffdfdg')
     try {
-        const {phone,name} = req.query
+        console.log('fkdj fkjfkjfkfd')
+        const {phone} = req.query
         const allcollatrals = await Collateral.find()
         const spacificCollatral = await Collateral.find({phone})
-        if (!spacificCollatral.length === 0){
-            return res.status(200).json({ message: "All collatral are :", spacificCollatral })
+        console.log('object' , allcollatrals)
+        if (!(spacificCollatral.length === 0)){
+            return res.status(200).json({ message: `spacificCollatral collatral for :${phone}`, spacificCollatral })
+        }else{
+            return res.status(200).json({ message: "All collatral are :", allcollatrals })
         }
-        return res.status(200).json({ message: "All collatral are :", allcollatrals })
 
 
     } catch (error) {

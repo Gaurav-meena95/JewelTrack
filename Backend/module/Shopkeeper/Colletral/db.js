@@ -40,6 +40,9 @@ const colletralSchema = new mongoose.Schema(
       type: String,
       enum: ['active', 'closed'],
       default: 'active'
+    },
+    phone:{
+      type:Number
     }
   },
   { timestamps: true }

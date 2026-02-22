@@ -1,7 +1,17 @@
 import { Calculator, Cross, Eye, Search } from 'lucide-react'
 import React, { useState } from 'react'
 
-const Colletral = () => {
+
+const Colletral =  () => {
+
+  const VITE_API_BASE_KEY = import.meta.env.VITE_API_BASE_KEY
+  const token = localStorage.getItem('token')
+  const refreshToken = localStorage.getItem('refreshToken')
+  const header = {
+        'Content-Type':'application/json',
+        'Authorization':`JWT ${token}`,
+        'x-refresh-token':refreshToken
+      }
 
   const [showAccount, setShowAccount] = useState(false)
   const [showCalculator, setCalculator] = useState(false)
@@ -18,7 +28,17 @@ const Colletral = () => {
     const intrestAmount =  (formData.basePrice * formData.intrest * days)/(365*100)
     setIntrestAmount(intrestAmount)
   }
+  const fetchAllCollatrol = async () =>{
 
+    const response = await fetch(`${VITE_API_BASE_KEY}/customers/collatral/me`,{
+      method:'GET',
+      headers: header
+    })
+    console.log(response)
+    const data = await response.json()
+    console.log(data)
+  }
+  fetchAllCollatrol()
   return (
 
     // header
@@ -69,7 +89,7 @@ const Colletral = () => {
           </div>
 
 
-          <div className='flex justify-between  p-3 my-2'>
+          <div className='flex justify-between flex-wrap  p-3 my-2'>
 
             <div>
               <p className='text-gray-500'>Base Price</p>
