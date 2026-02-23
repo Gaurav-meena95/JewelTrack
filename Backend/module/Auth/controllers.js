@@ -45,10 +45,8 @@ const signup = async (req, res) => {
 
 
 const login = async (req, res) => {
-    console.log('object')
     try {
         const { identifier, password, role } = req.body
-        console.log('gaurrfsdfsd',req.body)
         
         const value = validationInput({ identifier, password, role })
         if (value) {

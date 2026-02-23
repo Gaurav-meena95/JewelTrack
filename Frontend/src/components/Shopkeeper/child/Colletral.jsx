@@ -1,44 +1,66 @@
-import { Calculator, Cross, Eye, Search } from 'lucide-react'
+import { Calculator, Cross, Edit, Eye, Search } from 'lucide-react'
 import React, { useState } from 'react'
+import axios from 'axios';
+import { useEffect } from 'react';
 
 
-const Colletral =  () => {
+const Colletral = () => {
 
   const VITE_API_BASE_KEY = import.meta.env.VITE_API_BASE_KEY
-  const token = localStorage.getItem('token')
-  const refreshToken = localStorage.getItem('refreshToken')
+  const token = localStorage.getItem('x-access-token')
+  const refreshToken = localStorage.getItem('x-refresh-token')
   const header = {
-        'Content-Type':'application/json',
-        'Authorization':`JWT ${token}`,
-        'x-refresh-token':refreshToken
-      }
+    'Content-Type': 'application/json',
+    'Authorization': `JWT ${token}`,
+    'x-refresh-token': refreshToken
+  }
 
   const [showAccount, setShowAccount] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [showCalculator, setCalculator] = useState(false)
+  const [showAllcolletral, setAllcolletral] = useState([])
+  const [error, setError] = useState('')
   const [intrestAmount, setIntrestAmount] = useState(0)
   const [formData, setormData] = useState([])
 
   const handelChange = (e) => {
     setormData({ ...formData, [e.target.name]: e.target.value })
   }
+  const calculateDayes = (endDate,startDate) =>{
+    const days = (new Date(endDate) - new Date(startDate)) / (60000 * 60 * 24)
+    return days
+  }
   const handelSubmit = (e) => {
     e.preventDefault()
-    const days = (new Date(formData.endDate ) - new Date(formData.startDate))/(60000*60*24)
+    const days = calculateDayes(formData.endDate,formData.startDate)
     const months = Math.floor(days / 30)
-    const intrestAmount =  (formData.basePrice * formData.intrest * days)/(365*100)
+    const intrestAmount = (formData.basePrice * formData.intrest * days) / (365 * 100)
     setIntrestAmount(intrestAmount)
   }
-  const fetchAllCollatrol = async () =>{
+  const fetchAllCollatrol = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.get(`${VITE_API_BASE_KEY}/customers/collatral/me`, {
+        headers: header
+      })
+      if (response.data) {
+        setAllcolletral(response.data.data)
+      }
 
-    const response = await fetch(`${VITE_API_BASE_KEY}/customers/collatral/me`,{
-      method:'GET',
-      headers: header
-    })
-    console.log(response)
-    const data = await response.json()
-    console.log(data)
+    } catch (error) {
+      setError(error)
+      console.log(error)
+    }
+    setLoading(false)
+
   }
-  fetchAllCollatrol()
+  useEffect(() => {
+    fetchAllCollatrol()
+  }, [])
+
+  console.log(showAllcolletral)
+
+
   return (
 
     // header
@@ -68,57 +90,62 @@ const Colletral =  () => {
         </div>
 
         {/* colletral card */}
-        <div className='bg-gray-500/10 my-10 p-5 rounded-2xl space-y-4'>
-          <div className='flex  justify-between'>
-            <div className=' flex gap-2'>
-              <h1 className='text-amber-400/80'>G001</h1>
-              <button className='bg-amber-400/30 px-3 text-sm rounded-2xl'> Active</button>
+        {
+          showAllcolletral.map((item, index) => (
+            <div key={index} className='bg-gray-500/10 my-10 p-5 rounded-2xl space-y-4'>
+              <div className='flex  justify-between'>
+                  <h1 className='text-amber-400/80 bg-accent/30 px-1 rounded-full'>{index+1}</h1>
+                <div className=' flex gap-10'>
+                  <button className={`${item.status === 'closed' ? "bg-green-700": 'bg-red-800'}  px-3 text-sm rounded-2xl`}> {item.status}</button>
+                </div>
+                <Edit onClick={() => setShowAccount((prev) => !prev)} />
+              </div>
+
+
+              <div>
+                <h1>{item.customerId.name}</h1>
+                <p className='text-gray-500'>+91 {item.customerId.phone}</p>
+              </div>
+
+              <div className='w-full border rounded-2xl bg-gray-400/10 p-2'>
+                <p className='text-gray-500'>Collateral Jewelry</p>
+                <h3 className='text-xl'>{item.jewellery}</h3>
+              </div>
+
+
+              <div className='flex justify-between flex-wrap  p-3 my-2'>
+
+                <div>
+                  <p className='text-gray-500'>Base Price</p>
+                  <h3>{item.price}</h3>
+                </div>
+                <div>
+                  <p className='text-gray-500'>Interest</p>
+                  <h4 className='text-amber-300/80'>{item.interestRate} {}</h4>
+                  <h3>₹100,000</h3>
+                </div>
+                <div>
+                  <p className='text-gray-500'>Total Payable</p>
+                  <h3>₹100,000</h3>
+                </div>
+                <div>
+                  <p className='text-gray-500'>paid</p>
+                  <h3 className='text-green-600'>₹100,000</h3>
+                </div>
+                <div>
+                  <p className='text-gray-500 '>Balance</p>
+                  <h3 className='text-red-700'>₹100,000</h3>
+                </div>
+
+              </div>
+              <div className='flex gap-10'>
+                <span className='text-gray-500 '>Created At: <p className='text-white'>{new Date (item.createdAt).toISOString().split('T')[0]} </p> </span>
+                <span className='text-gray-500 '>Update At: <p className='text-white'>{new Date(item.updatedAt).toISOString().split('T')[0]}</p> </span>
+              </div>
             </div>
-            <Eye onClick={() => setShowAccount((prev) => !prev)} />
-          </div>
+           ))
+        } 
 
-
-          <div>
-            <h1>Gaurav Meena</h1>
-            <p className='text-gray-500'>+91 7724024993</p>
-          </div>
-
-          <div className='w-full border rounded-2xl bg-gray-400/10 p-2'>
-            <p className='text-gray-500'>Collateral Jewelry</p>
-            <h3 className='text-xl'>22K Gold Bangles (Set of 4)</h3>
-          </div>
-
-
-          <div className='flex justify-between flex-wrap  p-3 my-2'>
-
-            <div>
-              <p className='text-gray-500'>Base Price</p>
-              <h3>₹100,000</h3>
-            </div>
-            <div>
-              <p className='text-gray-500'>Interest</p>
-              <h4 className='text-amber-300/80'>2% × 3m</h4>
-              <h3>₹100,000</h3>
-            </div>
-            <div>
-              <p className='text-gray-500'>Total Payable</p>
-              <h3>₹100,000</h3>
-            </div>
-            <div>
-              <p className='text-gray-500'>paid</p>
-              <h3 className='text-green-600'>₹100,000</h3>
-            </div>
-            <div>
-              <p className='text-gray-500 '>Balance</p>
-              <h3 className='text-red-700'>₹100,000</h3>
-            </div>
-
-          </div>
-          <div className='flex gap-10'>
-            <span className='text-gray-500 '>Created: <p className='text-white'>2024-10-01 </p> </span>
-            <span className='text-gray-500 '>Due: <p className='text-white'>2024-10-01</p> </span>
-          </div>
-        </div>
 
 
       </div>

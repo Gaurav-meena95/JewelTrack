@@ -73,26 +73,29 @@ const deleteCollatral = async (req, res) => {
 
 }
 const allCollatral = async (req, res) => {
-    console.log('dffdfdg')
-    try {
-        console.log('fkdj fkjfkjfkfd')
-        const {phone} = req.query
-        const allcollatrals = await Collateral.find()
-        const spacificCollatral = await Collateral.find({phone})
-        console.log('object' , allcollatrals)
-        if (!(spacificCollatral.length === 0)){
-            return res.status(200).json({ message: `spacificCollatral collatral for :${phone}`, spacificCollatral })
-        }else{
-            return res.status(200).json({ message: "All collatral are :", allcollatrals })
-        }
+  try {
+    const { phone } = req.query;
 
+    let data;
 
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({ message: 'Internal Server Error' })
+    if (phone) {
+      data = await Collateral.find({ phone })
+        .populate("customerId", "name phone");
+    } else {
+      data = await Collateral.find()
+        .populate("customerId", "name phone");
     }
 
-}
+    return res.status(200).json({
+      message: "Collaterals fetched",
+      data
+    });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 
 module.exports = { createCollatral, updateCollatral, deleteCollatral, allCollatral }
