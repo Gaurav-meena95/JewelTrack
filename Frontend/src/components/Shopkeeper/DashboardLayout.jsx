@@ -24,7 +24,12 @@ const DashboardLayout = () => {
     { id: 'settings', icon: Settings, label: 'Settings' },
   ];
   //get user details form loacalStorage 
-  const {name,shopName} = JSON.parse(localStorage.getItem('user'))
+  const userData = localStorage.getItem('user')
+  if (!userData) {
+    navigate('/login')
+    return null
+  }
+  const {name,shopName} = JSON.parse(userData)
 
 const handelLogout = ()=>{
     navigate('/login')
