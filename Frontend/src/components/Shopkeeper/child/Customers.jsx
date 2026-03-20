@@ -14,6 +14,7 @@ const Customers = () => {
   }
 
   const [customers, setCustomers] = useState([])
+  const [allCustomers, setAllCustomers] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -50,7 +51,9 @@ const Customers = () => {
       })
       if (response.data) {
         const data = response.data.customer
-        setCustomers(Array.isArray(data) ? data : [data])
+        const customersArray = Array.isArray(data) ? data : [data]
+        setCustomers(customersArray)
+        setAllCustomers(customersArray)
       }
     } catch (error) {
       console.log(error)
@@ -59,28 +62,15 @@ const Customers = () => {
     setLoading(false)
   }
 
-  // Search customer by phone
-  const handelSearch = async () => {
+  // Live search effect on frontend instead of hitting backend every keystroke
+  useEffect(() => {
     if (!searchPhone.trim()) {
-      fetchCustomers()
-      return
+      setCustomers(allCustomers)
+    } else {
+      const filtered = allCustomers.filter(c => String(c.phone).includes(searchPhone.trim()))
+      setCustomers(filtered)
     }
-    try {
-      setLoading(true)
-      const response = await axios.get(`${VITE_API_BASE_KEY}/customers/register/get?phone=${searchPhone}`, {
-        headers: header
-      })
-      if (response.data) {
-        const data = response.data.customer
-        setCustomers(Array.isArray(data) ? data : [data])
-      }
-    } catch (error) {
-      console.log(error)
-      setCustomers([])
-      setError(error.response?.data?.message || 'Customer not found')
-    }
-    setLoading(false)
-  }
+  }, [searchPhone, allCustomers])
 
   // Register new customer
   const handelRegister = async (e) => {
@@ -211,19 +201,12 @@ const Customers = () => {
           <div className='relative bg-secondary/50 p-5 rounded-2xl'>
             <Search className='absolute left-8 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5' />
             <input
-              className='w-full border border-border/50 pl-10 rounded-2xl bg-input/90 p-2 pr-24'
+              className='w-full border border-border/50 pl-10 rounded-2xl bg-input/90 p-2 pr-4'
               type='text'
               value={searchPhone}
               onChange={(e) => setSearchPhone(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handelSearch()}
-              placeholder='Search by phone number..'
+              placeholder='Live search by phone number...'
             />
-            <button
-              onClick={handelSearch}
-              className='absolute right-8 top-1/2 -translate-y-1/2 bg-amber-400/80 px-4 py-1 rounded-[8px] text-sm'
-            >
-              Search
-            </button>
           </div>
 
           {/* Stats */}
@@ -310,8 +293,25 @@ const Customers = () => {
         {!loading && customers.length === 0 && !error && (
           <div className='text-center py-20'>
             <Users className='h-16 w-16 text-muted-foreground mx-auto mb-4' />
-            <h2 className='text-muted-foreground'>No customers found</h2>
-            <p className='text-muted-foreground text-sm'>Register your first customer to get started</p>
+            <h2 className='text-muted-foreground'>
+              {searchPhone ? `No customer found with phone ${searchPhone}` : 'No customers found'}
+            </h2>
+            <p className='text-muted-foreground text-sm mb-4'>
+              {searchPhone ? 'Register them now to continue' : 'Register your first customer to get started'}
+            </p>
+            {searchPhone && (
+              <button
+                onClick={() => { 
+                  resetForm(); 
+                  setFormData(prev => ({ ...prev, phone: searchPhone }));
+                  setShowRegisterModal(true); 
+                }}
+                className='p-2 px-4 bg-amber-400/80 rounded-[8px] inline-flex items-center gap-2 text-black'
+              >
+                <Plus className='h-4 w-4' />
+                Register New Customer
+              </button>
+            )}
           </div>
         )}
 
