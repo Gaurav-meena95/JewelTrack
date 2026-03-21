@@ -13,10 +13,6 @@ const colletralSchema = new mongoose.Schema(
       ref: 'Customer',
       required: true
     },
-    description: {
-      type: String,
-      required: true
-    },
     jewellery: {
       type: String,
       required: true
@@ -41,8 +37,28 @@ const colletralSchema = new mongoose.Schema(
       enum: ['active', 'closed'],
       default: 'active'
     },
-    phone:{
-      type:Number
+    weight: {
+      type: Number,
+      required: true
+    },
+    phone: {
+      type: Number
+    },
+    paymentHistory: [
+      {
+        amount: { type: Number, required: true },
+        date: { type: Date, default: Date.now },
+        type: { type: String, enum: ['payment', 'adjustment'], default: 'payment' },
+        note: { type: String }
+      }
+    ],
+    totalPaid: {
+      type: Number,
+      default: 0
+    },
+    remainingAmount: {
+      type: Number,
+      default: 0
     }
   },
   { timestamps: true }

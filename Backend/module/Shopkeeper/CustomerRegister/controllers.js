@@ -4,7 +4,6 @@ const Customer = require('./db')
 const registerCustomer = async (req, res) => {
 
     try {
-        
          if (!req.user || !req.user.id) {
             return res.status(401).json({ message: 'Unauthorized' })
         }
@@ -36,13 +35,14 @@ const getCustomer = async (req, res) => {
         const { phone } = req.query
         const allCustomer = await Customer.find()
         const existing = await Customer.findOne({ phone })
-        if (existing ) {
+        if (existing) {
+            console.log(existing)
             return res.status(201).json({ message: 'Customer fetch  successfully', customer: existing })
-        }else if(allCustomer){
+        } else if (phone) {
+            return res.status(404).json({ message: "Customer not found register user" });
+        } else {
             return res.status(201).json({ message: 'All Customer fetch  successfully', customer: allCustomer })
         }
-        return res.status(404).json({ message: "Customer not found register user" });
-
     } catch (error) {
         console.log(error)
         return res.status(500).json({ message: 'Internal Server Error' })

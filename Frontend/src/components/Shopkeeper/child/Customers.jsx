@@ -1,17 +1,10 @@
 import { Plus, Search, Edit, Trash2, Users, Phone, Mail, MapPin, User, X } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-
+import { VITE_API_BASE_KEY, getAuthHeaders } from '../../../utils/apiConfig'
 const Customers = () => {
 
-  const VITE_API_BASE_KEY = import.meta.env.VITE_API_BASE_KEY
-  const token = localStorage.getItem('x-access-token')
-  const refreshToken = localStorage.getItem('x-refresh-token')
-  const header = {
-    'Content-Type': 'application/json',
-    'Authorization': `JWT ${token}`,
-    'x-refresh-token': refreshToken
-  }
+  const header = getAuthHeaders()
 
   const [customers, setCustomers] = useState([])
   const [allCustomers, setAllCustomers] = useState([])
@@ -253,13 +246,13 @@ const Customers = () => {
                   <div className='flex gap-2'>
                     <button
                       onClick={() => openEditModal(customer)}
-                      className='p-2 hover:bg-amber-400/20 rounded-xl transition-all'
+                      className='p-2 hover:bg-amber-400/20 rounded-[8px] transition-all'
                     >
                       <Edit className='h-4 w-4 text-amber-400' />
                     </button>
                     <button
                       onClick={() => openDeleteConfirm(customer)}
-                      className='p-2 hover:bg-red-400/20 rounded-xl transition-all'
+                      className='p-2 hover:bg-red-400/20 rounded-[8px] transition-all'
                     >
                       <Trash2 className='h-4 w-4 text-red-400' />
                     </button>

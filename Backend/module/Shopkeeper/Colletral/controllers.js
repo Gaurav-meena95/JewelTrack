@@ -9,8 +9,8 @@ const createCollatral = async (req, res) => {
         }
         const shopkeeper_id = req.user.id
         const { phone } = req.query
-        const { description, jewellery, image, price, interestRate, status } = req.body
-        const value = validationInput({ description, jewellery, image, price, interestRate, status })
+        const { weight, jewellery, image, price, interestRate, status } = req.body
+        const value = validationInput({ jewellery, image, price, interestRate, status,weight })
         if (value) {
             return res.status(403).json({ message: `Check missing value ${value}` })
         }
@@ -20,8 +20,7 @@ const createCollatral = async (req, res) => {
 
         }
 
-        const newCollatral = await Collateral.create({ phone,shopkeeperId :shopkeeper_id, customerId:existing._id ,description, jewellery, image, price, interestRate, status })
-        console.log('kjfndsf',newCollatral)
+        const newCollatral = await Collateral.create({ phone,shopkeeperId :shopkeeper_id, customerId:existing._id , jewellery, image, price, interestRate, status, remainingAmount: price,weight })
         return res.status(200).json({message:'collatral create successfully',newCollatral})
 
     } catch (error) {
@@ -35,7 +34,7 @@ const createCollatral = async (req, res) => {
 const updateCollatral = async (req, res) => {
     try {
         const { phone ,collatral_id} = req.query
-        const { description, jewellery, image, price, interestRate, status } = req.body
+        const { weight, jewellery, image, price, interestRate, status, paymentHistory, totalPaid, remainingAmount } = req.body
         const existing = await Customer.findOne({ phone })
         if (!existing) {
             return res.status(402).json({ message: 'customer collatral doest not exist' })
@@ -43,7 +42,7 @@ const updateCollatral = async (req, res) => {
         const exsitingCollateral = await Collateral.find({_id:collatral_id})
         const updated = await Collateral.updateOne(
             { _id: exsitingCollateral[0]._id },
-            { description, jewellery, image, price, interestRate, status }
+            { weight, jewellery, image, price, interestRate, status, paymentHistory, totalPaid, remainingAmount }
         )
         return res.status(200).json({ message: "Collateral upadate successfully", updated })
     } catch (error) {
