@@ -5,7 +5,7 @@ const Bill = require('./db')
 const createBilling = async (req, res) => {
     try {
         const { phone } = req.query
-        const { itemName, metal, purity, weight, ratePerGram, makingChargePercent, gstPercent, manualAdjustment, amountPaid, paymentMethod } = req.body
+        const { itemName, metal, purity, weight, ratePerGram, makingChargePercent, gstPercent, manualAdjustment, amountPaid, paymentMethod, image } = req.body
         const existingUser = await Customer.findOne({ phone })
         if (!existingUser) {
             return res.status(404).json({ message: "Customer not found register user" });
@@ -33,6 +33,7 @@ const createBilling = async (req, res) => {
         }
         const createBill = await Bill.create({
             customerId: existingUser._id,
+            image: image || [],
             invoice: {
                 itemName,
                 metal,
@@ -68,7 +69,7 @@ const createBilling = async (req, res) => {
 const updateBilling = async (req, res) => {
     try {
         const { phone, bill_id } = req.query
-        const { itemName, metal, purity, weight, ratePerGram, makingChargePercent, gstPercent, manualAdjustment, amountPaid, paymentMethod } = req.body
+        const { itemName, metal, purity, weight, ratePerGram, makingChargePercent, gstPercent, manualAdjustment, amountPaid, paymentMethod, image } = req.body
         const value = validationInput({ phone,bill_id,paymentMethod, amountPaid, itemName, metal, purity, weight, ratePerGram, makingChargePercent, gstPercent, manualAdjustment })
 
         if (value) {
@@ -102,7 +103,7 @@ const updateBilling = async (req, res) => {
         const updateBill = await Bill.updateOne(
             { _id: existingBills._id },
             {
-
+                image: image || [],
                 invoice: {
                     itemName,
                     metal,
@@ -135,18 +136,36 @@ const updateBilling = async (req, res) => {
 }
 const getBillingProfile = async (req, res) => {
     try {
-        const { phone } = req.query
-        const existingUser = await Customer.findOne({ phone })
-        if (!existingUser) {
-            return res.status(404).json({ message: "Customer not found register user" });
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({ message: 'Unauthorized' })
         }
-        const bills = await Bill.find({ customerId: existingUser._id })
+        const { phone } = req.query
+        
+        if (phone) {
+            const existingUser = await Customer.findOne({ phone })
+            if (!existingUser) {
+                return res.status(404).json({ message: "Customer not found register user" });
+            }
+            const bills = await Bill.find({ customerId: existingUser._id }).populate("customerId", "name phone").sort({ createdAt: -1 })
 
-        return res.status(200).json({
-            message: 'Customer profile fetched successfully',
-            customer: existingUser,
-            bills
-        })
+            return res.status(200).json({
+                message: 'Customer profile fetched successfully',
+                customer: existingUser,
+                data: bills
+            })
+        } else {
+            // Find all customers belonging to this shopkeeper
+            const shopkeeperCustomers = await Customer.find({ shopkeeperId: req.user.id }).select("_id")
+            const customerIds = shopkeeperCustomers.map(c => c._id)
+            
+            // Find all bills for these customers
+            const allBills = await Bill.find({ customerId: { $in: customerIds } }).populate("customerId", "name phone").sort({ createdAt: -1 })
+            
+            return res.status(200).json({
+                message: 'All bills fetched successfully',
+                data: allBills
+            })
+        }
     } catch (error) {
         console.log(error)
         res.status(500).json({ message: "Internal Server Error" })

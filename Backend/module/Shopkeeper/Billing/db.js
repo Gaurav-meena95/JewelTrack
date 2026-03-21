@@ -7,6 +7,10 @@ const billingSchema = new mongoose.Schema(
             ref: 'Customer',
             required: true
         },
+        image: {
+            type: [String],
+            default: []
+        },
         invoice: {
             itemName: {
                 type: String,
