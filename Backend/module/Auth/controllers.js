@@ -98,36 +98,49 @@ const login = async (req, res) => {
 }
 const setting =  async(req,res)=>{
      try {
-        const { shopName, name, email, phone, password, role } = req.body
-        const value = validationInput({ shopName, name, email, phone, password, role })
-        if (value) {
-            return res.status(403).json({ message: `Check missing value ${value}` })
-        }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            return res.status(401).json({ message: "Invalid Email Address" })
+        const { shopName, name, email, phone, password } = req.body
+        const userId = req.user.id
 
+        const user = await User.findById(userId)
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' })
         }
-        if (!/^\d{10}$/.test(phone)) {
+
+        if (email && email !== user.email) {
+            const existingEmail = await User.findOne({ email });
+            if (existingEmail) return res.status(400).json({ message: 'Email already in use' })
+        }
+        if (phone && phone !== user.phone) {
+            const existingPhone = await User.findOne({ phone });
+            if (existingPhone) return res.status(400).json({ message: 'Phone number already in use' })
+        }
+
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.status(400).json({ message: "Invalid Email Address" })
+        }
+        if (phone && !/^\d{10}$/.test(phone)) {
             return res.status(400).json({ message: "Phone number must be exactly 10 digits" });
         }
-        if (!/(?=.*[!@#$%^&*])(?=.{8,})/.test(password)) {
-            return res.status(400).json({ message: "Password must be at least 8 characters long and contain one special character" });
+
+        let updatedData = {
+           shopName: shopName || user.shopName,
+           name: name || user.name,
+           email: email || user.email,
+           phone: phone || user.phone
         }
 
-        const exsiting = await User.findOne({
-            $or: [{ email }, { phone }]
-        });
-        if (exsiting) {
-            return res.status(400).json({ message: 'User is already exists' })
+        if (password && password.trim() !== '') {
+            if (!/(?=.*[!@#$%^&*])(?=.{8,})/.test(password)) {
+                return res.status(400).json({ message: "Password must be at least 8 characters long and contain one special character" });
+            }
+            updatedData.password = await bcrypt.hash(password, 10)
         }
-        const hashedPassword = await bcrypt.hash(password, 10)
-        const newUser = await User.create({
-            shopName, name, email, phone,
-            password: hashedPassword, role,
-        });
-        return res.status(201).json({
-            message: 'Signup successful',
-            user: newUser
+
+        const updatedUser = await User.findByIdAndUpdate(userId, updatedData, { new: true })
+
+        return res.status(200).json({
+            message: 'Profile updated successfully',
+            user: updatedUser
         })
     } catch (error) {
         console.log(error)
