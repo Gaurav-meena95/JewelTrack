@@ -19,11 +19,16 @@ const Bills = () => {
    // Dashboard Search
    const [searchQuery, setSearchQuery] = useState('')
 
+   // Profile Payment Filter
+   const [paymentFilter, setPaymentFilter] = useState('all') // 'all' | 'paid' | 'partially_paid' | 'unpaid'
+
    // Modals
    const [showLookupModal, setShowLookupModal] = useState(false)
    const [showNewBill, setShowNewBill] = useState(false)
    const [showViewBill, setShowViewBill] = useState(false)
+   const [showEditPayment, setShowEditPayment] = useState(false)
    const [activeBillDetails, setActiveBillDetails] = useState(null)
+   const [editPaymentData, setEditPaymentData] = useState({ additionalPayment: '', paymentMethod: 'cash' })
 
 
    // Lookup / Create Customer Form
@@ -100,15 +105,18 @@ const Bills = () => {
       return list.sort((a, b) => new Date(b.lastPurchase) - new Date(a.lastPurchase))
    }, [bills, searchQuery])
 
-   // Customer Profile Bills 
+   // Customer Profile Bills (with filter)
    const currentCustomerBills = useMemo(() => {
       if (!selectedCustomer) return []
-      return bills.filter(b => b.customerId?.phone === selectedCustomer.phone).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-   }, [bills, selectedCustomer])
+      let list = bills.filter(b => b.customerId?.phone === selectedCustomer.phone).sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
+      if (paymentFilter !== 'all') list = list.filter(b => b.payment?.paymentStatus === paymentFilter)
+      return list
+   }, [bills, selectedCustomer, paymentFilter])
 
    // --- Dashboard Actions ---
    const openCustomerProfile = (customer) => {
       setSelectedCustomer(customer)
+      setPaymentFilter('all')
       setViewMode('profile')
    }
 
@@ -220,6 +228,8 @@ const Bills = () => {
       reader.readAsDataURL(file)
    }
 
+   const removeImage = (idx) => setImages(images.filter((_, i) => i !== idx))
+
    // --- Submit Final Bill ---
    const handleGenerateBill = async () => {
       if (cartItems.length === 0) return setError("Cart is empty! Add at least one item.")
@@ -247,9 +257,44 @@ const Bills = () => {
       'unpaid': 'bg-red-500/10 text-red-500 border-red-500/30'
    }
 
+   const canEditBill = (bill) => bill.payment?.paymentStatus !== 'paid'
+
+   const openEditBillPayment = (bill) => {
+      setActiveBillDetails(bill)
+      setEditPaymentData({ additionalPayment: '', paymentMethod: bill.payment?.paymentMethod || 'cash' })
+      setShowEditPayment(true)
+   }
+
+   const handleRecordBillPayment = async () => {
+      if (!activeBillDetails) return
+      setLoading(true)
+      try {
+         await axios.patch(
+            `${VITE_API_BASE_KEY}/customers/bills/pay?bill_id=${activeBillDetails._id}`,
+            editPaymentData,
+            { headers: header }
+         )
+         setSuccess('Payment recorded successfully!')
+         setShowEditPayment(false)
+         fetchBills()
+      } catch (err) {
+         setError(err.response?.data?.message || 'Failed to record payment')
+      }
+      setLoading(false)
+   }
+
+   const remainingAfterBillEdit = activeBillDetails
+      ? Math.max(0, (activeBillDetails.payment?.remainingAmount || 0) - (Number(editPaymentData.additionalPayment) || 0))
+      : 0
+
+   const formatDateTime = (d) => {
+      if (!d) return ''
+      return new Date(d).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+   }
+
    return (
       <>
-         <div className={`min-h-screen ${showLookupModal || showNewBill || showViewBill ? 'blur-[2px] pointer-events-none' : ''}`}>
+         <div className={`min-h-screen ${showLookupModal || showNewBill || showViewBill || showEditPayment ? 'blur-[2px] pointer-events-none' : ''}`}>
 
             {/* --- VIEW 1: DASHBOARD --- */}
             {viewMode === 'dashboard' && (
@@ -320,6 +365,19 @@ const Bills = () => {
                      </button>
                   </div>
 
+                  {/* Filter Tabs */}
+                  <div className='flex flex-wrap gap-2'>
+                     {['all', 'paid', 'partially_paid', 'unpaid'].map(f => (
+                        <button
+                           key={f}
+                           onClick={() => setPaymentFilter(f)}
+                           className={`px-4 py-2 rounded-[8px] text-sm font-medium border transition-all ${paymentFilter === f ? 'bg-amber-400 text-black border-amber-400' : 'bg-secondary/30 border-border/50 text-muted-foreground hover:text-foreground'}`}
+                        >
+                           {f === 'all' ? 'All Bills' : f === 'paid' ? 'Paid' : f === 'partially_paid' ? 'Partially Paid' : 'Unpaid'}
+                        </button>
+                     ))}
+                  </div>
+
                   <div className='space-y-4'>
                      <h3 className='text-lg font-bold flex items-center gap-2'><History className='w-5 h-5 text-amber-500' /> Purchase History</h3>
 
@@ -334,6 +392,9 @@ const Bills = () => {
                               <div className='flex flex-wrap justify-between items-start mb-4 gap-4'>
                                  <div className='space-y-1'>
                                     <p className='text-sm text-muted-foreground flex items-center gap-2'><Calendar className='w-4 h-4' /> {new Date(bill.createdAt).toLocaleDateString()}</p>
+                                    {bill.updatedAt && bill.updatedAt !== bill.createdAt && (
+                                       <p className='text-xs text-muted-foreground/60'>Updated: {formatDateTime(bill.updatedAt)}</p>
+                                    )}
                                     <p className='font-bold flex items-center gap-1 text-lg'>Invoice Total: <IndianRupee className='w-4 h-4' />{bill.invoice?.grandTotal || bill.invoice?.finalPrice}</p>
                                     <p className='text-sm text-muted-foreground'>Items: {bill.invoice?.items ? bill.invoice.items.map(i => i.itemName).join(', ') : bill.invoice?.itemName}</p>
                                  </div>
@@ -345,7 +406,14 @@ const Bills = () => {
                                        <p>Paid: <span className='text-green-500 font-medium'>₹{bill.payment?.amountPaid}</span></p>
                                        {bill.payment?.remainingAmount > 0 && <p>Due: <span className='text-red-500 font-medium'>₹{bill.payment?.remainingAmount}</span></p>}
                                     </div>
-                                    <button onClick={() => { setActiveBillDetails(bill); setShowViewBill(true); }} className='text-amber-500 text-sm hover:underline mt-2 inline-block'>View Invoice</button>
+                                    <div className='flex gap-3 justify-end flex-wrap mt-2'>
+                                       <button onClick={() => { setActiveBillDetails(bill); setShowViewBill(true); }} className='text-amber-500 text-sm hover:underline'>View Invoice</button>
+                                       {canEditBill(bill) && (
+                                          <button onClick={() => openEditBillPayment(bill)} className='text-blue-400 text-sm hover:underline flex items-center gap-1'>
+                                             <Edit className='w-3 h-3' /> Record Payment
+                                          </button>
+                                       )}
+                                    </div>
                                  </div>
                               </div>
                            </div>
@@ -588,6 +656,83 @@ const Bills = () => {
                         </div>
                      </div>
                   )}
+               </div>
+            </div>
+         )}
+
+         {/* --- EDIT PAYMENT MODAL --- */}
+         {showEditPayment && activeBillDetails && (
+            <div className='fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4'>
+               <div className='bg-card w-full max-w-md p-6 rounded-2xl border border-border/50 shadow-2xl'>
+                  <div className='flex justify-between items-center mb-5'>
+                     <h2 className='text-xl font-bold'>Record Payment</h2>
+                     <button onClick={() => setShowEditPayment(false)} className='hover:bg-secondary p-1 rounded-full'><X /></button>
+                  </div>
+
+                  {error && <div className='bg-red-500/20 border border-red-500/50 text-red-500 text-sm p-2 rounded-[8px] mb-4 text-center'>{error}</div>}
+
+                  {/* Current State */}
+                  <div className='bg-secondary/30 rounded-[8px] p-4 mb-5 space-y-1'>
+                     <p className='text-sm font-bold'>{activeBillDetails.customerId?.name}</p>
+                     <p className='text-xs text-muted-foreground'>Items: {activeBillDetails.invoice?.items?.map(i => i.itemName).join(', ') || activeBillDetails.invoice?.itemName}</p>
+                     <div className='flex justify-between text-sm mt-2'>
+                        <span className='text-muted-foreground'>Invoice Total:</span>
+                        <span className='font-bold'>₹{(activeBillDetails.invoice?.grandTotal || activeBillDetails.invoice?.finalPrice)?.toFixed(0)}</span>
+                     </div>
+                     <div className='flex justify-between text-sm'>
+                        <span className='text-muted-foreground'>Already Paid:</span>
+                        <span className='text-green-500 font-bold'>₹{activeBillDetails.payment?.amountPaid?.toFixed(0)}</span>
+                     </div>
+                     <div className='flex justify-between text-sm'>
+                        <span className='text-muted-foreground'>Currently Due:</span>
+                        <span className='text-red-500 font-bold'>₹{activeBillDetails.payment?.remainingAmount?.toFixed(0)}</span>
+                     </div>
+                  </div>
+
+                  <div className='space-y-4'>
+                     {/* Additional Payment */}
+                     <div>
+                        <label className='text-sm font-medium text-muted-foreground mb-1 block'>Additional Payment Now (₹)</label>
+                        <input
+                           type='number'
+                           placeholder='Enter amount customer is paying now...'
+                           value={editPaymentData.additionalPayment}
+                           onChange={e => setEditPaymentData({ ...editPaymentData, additionalPayment: e.target.value })}
+                           className='w-full p-3 rounded-[8px] bg-green-500/10 border border-green-500/30 text-green-400 font-bold outline-none focus:border-green-500'
+                        />
+                     </div>
+
+                     {/* New Remaining Preview */}
+                     {editPaymentData.additionalPayment && (
+                        <div className={`p-3 rounded-[8px] border text-sm font-bold flex justify-between ${remainingAfterBillEdit === 0 ? 'bg-green-500/10 border-green-500/30 text-green-500' : 'bg-amber-500/10 border-amber-500/30 text-amber-500'}`}>
+                           <span>Remaining After Payment:</span>
+                           <span>₹{remainingAfterBillEdit.toFixed(0)}</span>
+                        </div>
+                     )}
+
+                     {/* Payment Method */}
+                     <div>
+                        <label className='text-sm font-medium text-muted-foreground mb-1 block'>Payment Method</label>
+                        <select
+                           value={editPaymentData.paymentMethod}
+                           onChange={e => setEditPaymentData({ ...editPaymentData, paymentMethod: e.target.value })}
+                           className='w-full p-3 rounded-[8px] bg-input border border-border/50 outline-none'
+                        >
+                           <option value='cash'>Cash</option>
+                           <option value='upi'>UPI / Wallet</option>
+                           <option value='card'>Card</option>
+                           <option value='bank_transfer'>Bank Transfer</option>
+                        </select>
+                     </div>
+
+                     <button
+                        onClick={handleRecordBillPayment}
+                        disabled={loading || !editPaymentData.additionalPayment}
+                        className='w-full p-3 bg-amber-400 text-black font-bold rounded-[8px] hover:bg-amber-500 disabled:opacity-50'
+                     >
+                        {loading ? 'Saving...' : 'Save Payment'}
+                     </button>
+                  </div>
                </div>
             </div>
          )}
