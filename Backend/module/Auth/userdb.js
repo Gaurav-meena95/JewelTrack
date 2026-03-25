@@ -27,6 +27,14 @@ const user = new mongoose.Schema(
         role: {
             type: String,
             enum: ["admin", "shopkeeper"]
+        },
+        itemNames: {
+            type: [String],
+            default: []
+        },
+        purities: {
+            type: [String],
+            default: []
         }
         
     },

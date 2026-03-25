@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { User, Store, Phone, Mail, Lock, Save, Shield, CheckCircle, AlertCircle } from 'lucide-react'
+import { User, Store, Phone, Mail, Lock, Save, Shield, CheckCircle, AlertCircle, X, Tag } from 'lucide-react'
 import axios from 'axios'
 import { VITE_API_BASE_KEY, getAuthHeaders } from '../../../utils/apiConfig'
 
@@ -16,8 +16,37 @@ const Settings = () => {
         email: '',
         phone: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        itemNames: [],
+        purities: []
     })
+
+    const [newItemName, setNewItemName] = useState('')
+    const [newPurity, setNewPurity] = useState('')
+
+    const handleAddItemName = (e) => {
+        e.preventDefault()
+        if (newItemName.trim() && !profile.itemNames.includes(newItemName.trim())) {
+            setProfile(prev => ({ ...prev, itemNames: [...prev.itemNames, newItemName.trim()] }))
+            setNewItemName('')
+        }
+    }
+
+    const handleRemoveItemName = (item) => {
+        setProfile(prev => ({ ...prev, itemNames: prev.itemNames.filter(i => i !== item) }))
+    }
+
+    const handleAddPurity = (e) => {
+        e.preventDefault()
+        if (newPurity.trim() && !profile.purities.includes(newPurity.trim())) {
+            setProfile(prev => ({ ...prev, purities: [...prev.purities, newPurity.trim()] }))
+            setNewPurity('')
+        }
+    }
+
+    const handleRemovePurity = (purity) => {
+        setProfile(prev => ({ ...prev, purities: prev.purities.filter(p => p !== purity) }))
+    }
 
     useEffect(() => {
         fetchProfile()
@@ -32,7 +61,9 @@ const Settings = () => {
                     shopName: res.data.user.shopName || '',
                     name: res.data.user.name || '',
                     email: res.data.user.email || '',
-                    phone: res.data.user.phone || ''
+                    phone: res.data.user.phone || '',
+                    itemNames: res.data.user.itemNames || [],
+                    purities: res.data.user.purities || []
                 }))
             }
         } catch (err) {
@@ -64,6 +95,8 @@ const Settings = () => {
                 name: profile.name,
                 email: profile.email,
                 phone: profile.phone,
+                itemNames: profile.itemNames,
+                purities: profile.purities,
             }
             if (profile.password) {
                 payload.password = profile.password
@@ -169,6 +202,63 @@ const Settings = () => {
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </section>
+
+                {/* Custom Options Section */}
+                <section className='bg-card/40 border border-border/50 rounded-2xl overflow-hidden'>
+                    <div className='bg-secondary/30 px-6 py-4 border-b border-border/50 flex items-center gap-3'>
+                        <div className='p-2 bg-indigo-400/20 text-indigo-500 rounded'><Tag className='w-5 h-5' /></div>
+                        <h2 className='text-xl font-bold'>Predefined Dropdown Options</h2>
+                    </div>
+                    <div className='p-6 grid grid-cols-1 md:grid-cols-2 gap-8'>
+                        
+                        {/* Item Names */}
+                        <div className='space-y-4'>
+                            <div>
+                                <label className='text-sm font-medium text-muted-foreground'>Predefined Item Names</label>
+                                <p className='text-xs text-muted-foreground/70 mb-2'>Add common item names (e.g., Ring, Chain) for quick selection in forms.</p>
+                                <div className='flex gap-2'>
+                                    <input type="text" value={newItemName} onChange={e => setNewItemName(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddItemName(e))} className='flex-1 p-3 bg-input border border-border/50 rounded-[8px] outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/50 transition-all' placeholder="e.g., Gold Bangle" />
+                                    <button type="button" onClick={handleAddItemName} className='px-4 py-2 bg-indigo-500 text-white rounded-[8px] hover:bg-indigo-600 transition-all font-medium'>Add</button>
+                                </div>
+                            </div>
+                            <div className='flex flex-wrap gap-2'>
+                                {profile.itemNames.map((item, idx) => (
+                                    <div key={idx} className='flex items-center gap-2 bg-indigo-500/10 text-indigo-500 px-3 py-1 rounded-[8px] border border-indigo-500/20'>
+                                        <span className='text-sm font-medium'>{item}</span>
+                                        <button type="button" onClick={() => handleRemoveItemName(item)} className='hover:bg-indigo-500/20 p-0.5 rounded transition-colors'>
+                                            <X className='w-3 h-3' />
+                                        </button>
+                                    </div>
+                                ))}
+                                {profile.itemNames.length === 0 && <span className='text-sm text-muted-foreground italic'>No item names added yet</span>}
+                            </div>
+                        </div>
+
+                        {/* Purities */}
+                        <div className='space-y-4'>
+                            <div>
+                                <label className='text-sm font-medium text-muted-foreground'>Predefined Purities</label>
+                                <p className='text-xs text-muted-foreground/70 mb-2'>Add common purities (e.g., 22K, 18K) for quick selection.</p>
+                                <div className='flex gap-2'>
+                                    <input type="text" value={newPurity} onChange={e => setNewPurity(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddPurity(e))} className='flex-1 p-3 bg-input border border-border/50 rounded-[8px] outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/50 transition-all' placeholder="e.g., 22K" />
+                                    <button type="button" onClick={handleAddPurity} className='px-4 py-2 bg-indigo-500 text-white rounded-[8px] hover:bg-indigo-600 transition-all font-medium'>Add</button>
+                                </div>
+                            </div>
+                            <div className='flex flex-wrap gap-2'>
+                                {profile.purities.map((purity, idx) => (
+                                    <div key={idx} className='flex items-center gap-2 bg-indigo-500/10 text-indigo-500 px-3 py-1 rounded-[8px] border border-indigo-500/20'>
+                                        <span className='text-sm font-medium'>{purity}</span>
+                                        <button type="button" onClick={() => handleRemovePurity(purity)} className='hover:bg-indigo-500/20 p-0.5 rounded transition-colors'>
+                                            <X className='w-3 h-3' />
+                                        </button>
+                                    </div>
+                                ))}
+                                {profile.purities.length === 0 && <span className='text-sm text-muted-foreground italic'>No purities added yet</span>}
+                            </div>
+                        </div>
+
                     </div>
                 </section>
 

@@ -12,6 +12,9 @@ const Colletral = () => {
   const [searchPhone, setSearchPhone] = useState('')
   const [filter, setFilter] = useState('all') // all, active, closed
 
+  // Predefined Settings
+  const [predefinedItemNames, setPredefinedItemNames] = useState([])
+
   // Modals
   const [showCalculator, setShowCalculator] = useState(false)
   const [showNewGirvi, setShowNewGirvi] = useState(false)
@@ -50,8 +53,20 @@ const Colletral = () => {
     setLoading(false)
   }
 
+  const fetchProfileSettings = async () => {
+    try {
+      const res = await axios.get(`${VITE_API_BASE_KEY}/auth/me`, { headers: header })
+      if (res.data && res.data.user) {
+         setPredefinedItemNames(res.data.user.itemNames || [])
+      }
+    } catch (err) {
+      console.error('Failed to load settings', err)
+    }
+  }
+
   useEffect(() => {
     fetchCollaterals()
+    fetchProfileSettings()
   }, [])
 
   // Auto-clear messages
@@ -420,7 +435,7 @@ const Colletral = () => {
                 <div className='bg-secondary/40 p-4 rounded-[8px] border border-border/50 space-y-4'>
                   <h3 className='text-sm font-semibold'>Jewelry & Loan Details</h3>
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    <input type='text' placeholder='Jewelry Name (e.g. 24K Gold Ring)' required value={girviData.jewellery} onChange={(e) => setGirviData({ ...girviData, jewellery: e.target.value })} className='w-full p-2 rounded-[8px] bg-input border border-border/50' />
+                    <input type='text' list='predefined-items' placeholder='Jewelry Name (e.g. 24K Gold Ring)' required value={girviData.jewellery} onChange={(e) => setGirviData({ ...girviData, jewellery: e.target.value })} className='w-full p-2 rounded-[8px] bg-input border border-border/50 outline-none focus:border-amber-400/50' />
                     <input type='number' placeholder='weight (e.g. 12g)' value={girviData.weight} onChange={(e) => setGirviData({ ...girviData, weight: e.target.value })} className='w-full p-2 rounded-[8px] bg-input border border-border/50' />
                     <div className='relative'>
                       <IndianRupee className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
@@ -619,6 +634,11 @@ const Colletral = () => {
           <img src={enlargedImage} alt="Enlarged" className='max-w-full max-h-[90vh] object-contain rounded-[8px] shadow-2xl' onClick={(e) => e.stopPropagation()} />
         </div>
       )}
+
+      {/* Datalist for custom settings */}
+      <datalist id="predefined-items">
+         {predefinedItemNames.map((name, idx) => <option key={idx} value={name} />)}
+      </datalist>
 
     </>
   )

@@ -12,6 +12,10 @@ const Bills = () => {
    const [error, setError] = useState('')
    const [success, setSuccess] = useState('')
 
+   // Predefined Settings
+   const [predefinedItemNames, setPredefinedItemNames] = useState([])
+   const [predefinedPurities, setPredefinedPurities] = useState([])
+
    // Navigation State
    const [viewMode, setViewMode] = useState('dashboard') // 'dashboard' or 'profile'
    const [selectedCustomer, setSelectedCustomer] = useState(null) // Active customer object
@@ -58,8 +62,21 @@ const Bills = () => {
       setLoading(false)
    }
 
+   const fetchProfileSettings = async () => {
+      try {
+         const res = await axios.get(`${VITE_API_BASE_KEY}/auth/me`, { headers: header })
+         if (res.data && res.data.user) {
+             setPredefinedItemNames(res.data.user.itemNames || [])
+             setPredefinedPurities(res.data.user.purities || [])
+         }
+      } catch (err) {
+         console.error('Failed to load settings', err)
+      }
+   }
+
    useEffect(() => {
       fetchBills()
+      fetchProfileSettings()
    }, [])
 
    useEffect(() => {
@@ -476,11 +493,11 @@ const Bills = () => {
                         <div className='bg-secondary/20 p-5 rounded-2xl border border-border/50'>
                            <h3 className='font-bold mb-4 flex items-center gap-2'>1. Add Jewelry to Cart</h3>
                            <div className='grid grid-cols-2 gap-3'>
-                              <input type='text' placeholder='Item Name (e.g. Chain)' value={currentItem.itemName} onChange={e => setCurrentItem({ ...currentItem, itemName: e.target.value })} className='col-span-2 p-3 rounded-[8px] bg-input border border-border/50' />
+                              <input type='text' list='predefined-items' placeholder='Item Name (e.g. Chain)' value={currentItem.itemName} onChange={e => setCurrentItem({ ...currentItem, itemName: e.target.value })} className='col-span-2 p-3 rounded-[8px] bg-input border border-border/50 focus:border-amber-400 outline-none transition-all' />
                               <select value={currentItem.metal} onChange={e => setCurrentItem({ ...currentItem, metal: e.target.value })} className='p-3 rounded-[8px] bg-input border border-border/50 outline-none'>
                                  <option value="gold">Gold</option><option value="silver">Silver</option><option value="diamond">Diamond</option>
                               </select>
-                              <input type='text' placeholder='Purity (22K)' value={currentItem.purity} onChange={e => setCurrentItem({ ...currentItem, purity: e.target.value })} className='p-3 rounded-[8px] bg-input border border-border/50' />
+                              <input type='text' list='predefined-purities' placeholder='Purity (22K)' value={currentItem.purity} onChange={e => setCurrentItem({ ...currentItem, purity: e.target.value })} className='p-3 rounded-[8px] bg-input border border-border/50 focus:border-amber-400 outline-none transition-all' />
 
                               <div className='relative'>
                                  <span className='absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-xs'>grams</span>
@@ -744,6 +761,13 @@ const Bills = () => {
                <img src={enlargedImage} alt="Enlarged" className='max-w-full max-h-[90vh] object-contain rounded-[8px] shadow-2xl' onClick={(e) => e.stopPropagation()} />
             </div>
          )}
+         {/* Datalists for custom settings */}
+         <datalist id="predefined-items">
+            {predefinedItemNames.map((name, idx) => <option key={idx} value={name} />)}
+         </datalist>
+         <datalist id="predefined-purities">
+            {predefinedPurities.map((purity, idx) => <option key={idx} value={purity} />)}
+         </datalist>
       </>
    )
 }

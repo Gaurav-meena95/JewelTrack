@@ -98,7 +98,7 @@ const login = async (req, res) => {
 }
 const setting =  async(req,res)=>{
      try {
-        const { shopName, name, email, phone, password } = req.body
+        const { shopName, name, email, phone, password, itemNames, purities } = req.body
         const userId = req.user.id
 
         const user = await User.findById(userId)
@@ -128,6 +128,9 @@ const setting =  async(req,res)=>{
            email: email || user.email,
            phone: phone || user.phone
         }
+
+        if (itemNames !== undefined) updatedData.itemNames = itemNames;
+        if (purities !== undefined) updatedData.purities = purities;
 
         if (password && password.trim() !== '') {
             if (!/(?=.*[!@#$%^&*])(?=.{8,})/.test(password)) {

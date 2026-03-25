@@ -16,6 +16,9 @@ const Inventory = () => {
    const [error, setError] = useState('')
    const [success, setSuccess] = useState('')
 
+   // ─── Predefined Settings ──────────────────────────────────────────────────
+   const [predefinedItemNames, setPredefinedItemNames] = useState([])
+
    // ─── Dashboard & Filters ──────────────────────────────────────────────────
    const [searchQuery, setSearchQuery] = useState('')
    const [metalFilter, setMetalFilter] = useState('all')
@@ -49,7 +52,21 @@ const Inventory = () => {
       setLoading(false)
    }
 
-   useEffect(() => { fetchInventory() }, [])
+   const fetchProfileSettings = async () => {
+      try {
+         const res = await axios.get(`${VITE_API_BASE_KEY}/auth/me`, { headers: header })
+         if (res.data && res.data.user) {
+             setPredefinedItemNames(res.data.user.itemNames || [])
+         }
+      } catch (err) {
+         console.error('Failed to load settings', err)
+      }
+   }
+
+   useEffect(() => { 
+      fetchInventory() 
+      fetchProfileSettings()
+   }, [])
 
    useEffect(() => {
       if (success || error) {
@@ -336,6 +353,7 @@ const Inventory = () => {
                      <label className='block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1'>Item Name <span className='text-red-500'>*</span></label>
                      <input 
                         type='text' 
+                        list='predefined-items'
                         required
                         placeholder='e.g. Gold Necklace, Silver Ring' 
                         value={formData.jewelleryType} 
@@ -405,6 +423,10 @@ const Inventory = () => {
             </div>
          </div>
       )}
+      {/* Datalist for custom settings */}
+      <datalist id="predefined-items">
+         {predefinedItemNames.map((name, idx) => <option key={idx} value={name} />)}
+      </datalist>
       </>
    )
 }

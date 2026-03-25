@@ -33,6 +33,10 @@ const Orders = () => {
    const [error, setError] = useState('')
    const [success, setSuccess] = useState('')
 
+   // ─── Predefined Settings ──────────────────────────────────────────────────
+   const [predefinedItemNames, setPredefinedItemNames] = useState([])
+   const [predefinedPurities, setPredefinedPurities] = useState([])
+
    // ─── Navigation ───────────────────────────────────────────────────────────
    const [viewMode, setViewMode] = useState('dashboard') // 'dashboard' | 'profile'
    const [selectedCustomer, setSelectedCustomer] = useState(null)
@@ -78,7 +82,22 @@ const Orders = () => {
       setLoading(false)
    }
 
-   useEffect(() => { fetchOrders() }, [])
+   const fetchProfileSettings = async () => {
+      try {
+         const res = await axios.get(`${VITE_API_BASE_KEY}/auth/me`, { headers: header })
+         if (res.data && res.data.user) {
+             setPredefinedItemNames(res.data.user.itemNames || [])
+             setPredefinedPurities(res.data.user.purities || [])
+         }
+      } catch (err) {
+         console.error('Failed to load settings', err)
+      }
+   }
+
+   useEffect(() => { 
+      fetchOrders(); 
+      fetchProfileSettings();
+   }, [])
 
    useEffect(() => {
       if (success || error) {
@@ -547,11 +566,11 @@ const Orders = () => {
                         <div className='bg-secondary/20 p-5 rounded-2xl border border-border/50'>
                            <h3 className='font-bold mb-4'>1. Add Jewelry Items</h3>
                            <div className='grid grid-cols-2 gap-3'>
-                              <input type='text' placeholder='Item Name (e.g. Ring, Necklace)' value={currentItem.itemName} onChange={e => setCurrentItem({ ...currentItem, itemName: e.target.value })} className='col-span-2 p-3 rounded-[8px] bg-input border border-border/50 outline-none focus:border-amber-400/50' />
+                              <input type='text' list='predefined-items' placeholder='Item Name (e.g. Ring, Necklace)' value={currentItem.itemName} onChange={e => setCurrentItem({ ...currentItem, itemName: e.target.value })} className='col-span-2 p-3 rounded-[8px] bg-input border border-border/50 outline-none focus:border-amber-400/50' />
                               <select value={currentItem.metal} onChange={e => setCurrentItem({ ...currentItem, metal: e.target.value })} className='p-3 rounded-[8px] bg-input border border-border/50 outline-none'>
                                  {METAL_OPTIONS.map(m => <option key={m} value={m}>{m.charAt(0).toUpperCase() + m.slice(1)}</option>)}
                               </select>
-                              <input type='text' placeholder='Purity (e.g. 22K, 92.5)' value={currentItem.purity} onChange={e => setCurrentItem({ ...currentItem, purity: e.target.value })} className='p-3 rounded-[8px] bg-input border border-border/50 outline-none focus:border-amber-400/50' />
+                              <input type='text' list='predefined-purities' placeholder='Purity (e.g. 22K, 92.5)' value={currentItem.purity} onChange={e => setCurrentItem({ ...currentItem, purity: e.target.value })} className='p-3 rounded-[8px] bg-input border border-border/50 outline-none focus:border-amber-400/50' />
                               <input type='text' placeholder='Weight (grams)' value={currentItem.weight} onChange={e => setCurrentItem({ ...currentItem, weight: e.target.value })} className='p-3 rounded-[8px] bg-input border border-border/50 outline-none focus:border-amber-400/50' />
                               <input type='text' placeholder='Size (e.g. 7, M, 52mm)' value={currentItem.size} onChange={e => setCurrentItem({ ...currentItem, size: e.target.value })} className='p-3 rounded-[8px] bg-input border border-border/50 outline-none focus:border-amber-400/50' />
                               <input type='text' placeholder='Description / Special instructions' value={currentItem.description} onChange={e => setCurrentItem({ ...currentItem, description: e.target.value })} className='col-span-2 p-3 rounded-[8px] bg-input border border-border/50 outline-none focus:border-amber-400/50' />
@@ -872,6 +891,13 @@ const Orders = () => {
                <img src={enlargedImage} alt='Enlarged' className='max-w-full max-h-[90vh] object-contain rounded-[8px] shadow-2xl' onClick={e => e.stopPropagation()} />
             </div>
          )}
+         {/* Datalists for custom settings */}
+         <datalist id="predefined-items">
+            {predefinedItemNames.map((name, idx) => <option key={idx} value={name} />)}
+         </datalist>
+         <datalist id="predefined-purities">
+            {predefinedPurities.map((purity, idx) => <option key={idx} value={purity} />)}
+         </datalist>
       </>
    )
 }
