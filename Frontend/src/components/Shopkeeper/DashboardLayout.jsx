@@ -1,18 +1,20 @@
 import { BarChart3, FileText, Gem, LayoutDashboard, LogOut, Menu, Package, Settings, ShoppingCart, Users, Wallet, X } from 'lucide-react';
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
-import ThemeToggle from '../ThemeToggle';
-import { useNavigate, Outlet } from 'react-router-dom';
+import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
+import ThemeToggle  from '../ThemeToggle';
 
 const DashboardLayout = () => {
 
 
   const navigate = useNavigate()
+  const location = useLocation()
   const [loading, setLoading] = useState(false)
   // const {user,logout} = useAuth
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [currentPage, setCurrntpage] = useState('dashboard')
+  
+  const pathSegment = location.pathname.split('/').filter(Boolean).pop();
+  const currentPage = pathSegment || 'dashboard';
   const menuItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { id: 'inventory', icon: Package, label: 'Inventory' },
@@ -68,44 +70,46 @@ const handelLogout = ()=>{
       </header>
 
       <aside className={`
-      fixed top-16 left-0 bottom-0 z-30
-          bg-card/40 backdrop-blur-md border-r border-border/50
-          transition-all duration-300
-          ${sidebarCollapsed ? 'w-20' : 'w-64'}
-          ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-          lg:translate-x-0
-        `}>
-        <nav className='p-4 space-y-2'>
-          {
-            menuItems.map((ele, ind) => {
-              const Icon = ele.icon
-              const isActive = ele.id === currentPage;
-              return (
-                <button
-
-                  key={ele.id}
-                  onClick={() => {
-                    navigate(`/dashboard/${ele.id}`)
-                    setMobileSidebarOpen(false)
-                    setCurrntpage(ele.id);
-                  }}
-                  className={`
-                  w-full flex items-center gap-3 px-4 py-3 
-                  transition-all duration-200 rounded-2xl
-                  ${isActive
-                      ? 'bg-[#c7a003a2] text-[#f8cf71] shadow-2xl'
-                      : 'hover:bg-accent/30 text-foreground'
-                    }
-                `}
-                >
-                  <Icon className="h-5 w-5 shrink-0" />
+        fixed top-16 left-0 bottom-0 z-30 flex flex-col
+        bg-card/60 backdrop-blur-xl border-r border-border/50
+        transition-all duration-300 shadow-2xl lg:shadow-none
+        ${sidebarCollapsed ? 'w-20' : 'w-64'}
+        ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        lg:translate-x-0
+      `}>
+        <div className='flex-1 overflow-y-auto py-6 px-4 custom-scrollbar'>
+          <nav className='space-y-1.5'>
+            {
+              menuItems.map((ele, ind) => {
+                const Icon = ele.icon
+                const isActive = ele.id === currentPage;
+                return (
+                  <button
+                    key={ele.id}
+                    onClick={() => {
+                      navigate(`/dashboard/${ele.id}`)
+                      setMobileSidebarOpen(false)
+                    }}
+                    className={`
+                      relative w-full flex items-center gap-3 px-4 py-3 
+                      transition-all duration-300 rounded group overflow-hidden tracking-wide
+                      ${isActive
+                          ? 'bg-gradient-to-r from-amber-400/10 to-transparent text-amber-500 font-semibold border border-amber-400/20 shadow-sm'
+                          : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground hover:translate-x-1'
+                        }
+                    `}
+                  >
+                    {isActive && (
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 h-3/4 w-1 bg-gradient-to-b from-amber-400 to-amber-600 rounded-r-md"></div>
+                    )}
+                    <Icon className={`h-5 w-5 shrink-0 transition-transform duration-300 ${isActive ? 'scale-110 drop-shadow-md' : 'group-hover:scale-110 group-hover:text-amber-400'}`} />
                     <span className="truncate">{ele.label}</span>
-                </button>
-              )
-            })
-          }
-        </nav>
-
+                  </button>
+                )
+              })
+            }
+          </nav>
+        </div>
       </aside>
 
       {mobileSidebarOpen && (
