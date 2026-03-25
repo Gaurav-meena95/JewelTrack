@@ -1,5 +1,8 @@
 const { validationInput } = require('../../../utils/utils')
 const Customer = require('./db')
+const Bill = require('../Billing/db')
+const Order = require('../Orders/db')
+const Collateral = require('../Colletral/db')
 
 const registerCustomer = async (req, res) => {
 
@@ -96,5 +99,38 @@ const deleteCustomer = async (req, res) => {
     }
 }
 
+const getCustomerDetails = async (req, res) => {
+    try {
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({ message: 'Unauthorized' })
+        }
+        const { id } = req.query
+        
+        if (!id) {
+             return res.status(400).json({ message: 'Customer ID is required' })
+        }
 
-module.exports = { registerCustomer,updateCustomer ,getCustomer,deleteCustomer}
+        const customer = await Customer.findById(id)
+        if (!customer) {
+            return res.status(404).json({ message: 'Customer not found' })
+        }
+
+        // Fetch associated data
+        const bills = await Bill.find({ customerId: id }).sort({ createdAt: -1 })
+        const orders = await Order.find({ customerId: id }).sort({ createdAt: -1 })
+        const collaterals = await Collateral.find({ customerId: id }).sort({ createdAt: -1 })
+
+        return res.status(200).json({ 
+            message: 'Customer details fetched successfully', 
+            customer,
+            bills,
+            orders,
+            collaterals
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ message: 'Internal Server Error' })
+    }
+}
+
+module.exports = { registerCustomer, updateCustomer, getCustomer, deleteCustomer, getCustomerDetails }
