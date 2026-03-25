@@ -20,8 +20,7 @@ const customerSchema = new mongoose.Schema({
         maxLength: 10
     },
     email: {
-        type: String,
-        required: true
+        type: String
     },
     address: {
         type: String,

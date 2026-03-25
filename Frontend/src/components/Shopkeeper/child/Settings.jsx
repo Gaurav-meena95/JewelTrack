@@ -132,14 +132,14 @@ const Settings = () => {
                             <label className='text-sm font-medium text-muted-foreground'>Phone Number</label>
                             <div className='relative'>
                                 <Phone className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50' />
-                                <input type="text" name="phone" value={profile.phone} onChange={handleChange} required pattern="\d{10}" title="Must be exactly 10 digits" className='w-full pl-12 p-3 bg-input border border-border/50 rounded-[8px] outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 transition-all' placeholder="10-digit mobile number" />
+                                <input type="text" name="phone" value={profile.phone} onChange={handleChange} required pattern="\d{10}" title="Must be exactly 10 digits" className='w-full pl-12 p-3 bg-input border border-border/50 rounded-[8px] outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 transition-all pointer-events-none' placeholder="10-digit mobile number" />
                             </div>
                         </div>
                         <div className='space-y-2 col-span-1 md:col-span-2'>
                             <label className='text-sm font-medium text-muted-foreground'>Email Address <span className='text-xs text-amber-500/70 ml-2'>(Used for Login)</span></label>
                             <div className='relative'>
                                 <Mail className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50' />
-                                <input type="email" name="email" value={profile.email} onChange={handleChange} required className='w-full pl-12 p-3 bg-input border border-border/50 rounded-[8px] outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 transition-all' placeholder="shop@example.com" />
+                                <input  type="email" name="email" value={profile.email} onChange={handleChange} required className='w-full pl-12 p-3 bg-input border border-border/50 rounded-[8px] outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 transition-all pointer-events-none' placeholder="shop@example.com" />
                             </div>
                         </div>
                     </div>

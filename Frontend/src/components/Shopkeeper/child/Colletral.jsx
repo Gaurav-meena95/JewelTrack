@@ -91,7 +91,7 @@ const Colletral = () => {
       const res = await axios.get(`${VITE_API_BASE_KEY}/customers/register/get?phone=${customerPhone}`, { headers: header })
       if (res.data) {
         setCustomerFound(true)
-        const c = res.data.customer        
+        const c = res.data.customer
         setCustomerData({ name: c.name, father_name: c.father_name, address: c.address, email: c.email })
       } else {
         setCustomerFound(false)
@@ -129,7 +129,7 @@ const Colletral = () => {
         canvas.height = height
         const ctx = canvas.getContext('2d')
         ctx.drawImage(img, 0, 0, width, height)
-        
+
         const base64String = canvas.toDataURL('image/jpeg', 0.6)
         setImages(prev => [...prev, base64String])
       }
@@ -303,7 +303,7 @@ const Colletral = () => {
             {displayedCollaterals.map((item, index) => {
               const liveInterest = calculateLiveInterest(item)
 
-              const remain = item.remainingAmount 
+              const remain = item.remainingAmount
               const totalPayable = (Number(remain) + Number(liveInterest)).toFixed(2)
 
               return (
@@ -333,7 +333,7 @@ const Colletral = () => {
                     </div>
                   </div>
 
-                  <div className='grid grid-cols-3 md:grid-cols-6 gap-4 bg-secondary/30 p-4 rounded-xl mb-4'>
+                  <div className='grid grid-cols-3 md:grid-cols-6 gap-4 bg-secondary/30 p-4 rounded-[8px] mb-4'>
                     <div>
                       <p className='text-xs text-muted-foreground'>Jewelry Item</p>
                       <h4 className='font-medium'>{item.jewellery}</h4>
@@ -417,7 +417,7 @@ const Colletral = () => {
 
               {/* Step 2: Collateral Details (Only shown if customer step is active) */}
               {(customerFound !== null) && (
-                <div className='bg-secondary/40 p-4 rounded-xl border border-border/50 space-y-4'>
+                <div className='bg-secondary/40 p-4 rounded-[8px] border border-border/50 space-y-4'>
                   <h3 className='text-sm font-semibold'>Jewelry & Loan Details</h3>
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <input type='text' placeholder='Jewelry Name (e.g. 24K Gold Ring)' required value={girviData.jewellery} onChange={(e) => setGirviData({ ...girviData, jewellery: e.target.value })} className='w-full p-2 rounded-[8px] bg-input border border-border/50' />
@@ -434,15 +434,15 @@ const Colletral = () => {
 
                   {/* Image Upload Area */}
                   <div className='mt-4 pt-4 border-t border-border/50'>
-                    <label className='text-xs font-semibold text-muted-foreground mb-3 flex items-center gap-2'><ImageIcon className='w-4 h-4 text-amber-500'/> Upload Jewelry Photos</label>
+                    <label className='text-xs font-semibold text-muted-foreground mb-3 flex items-center gap-2'><ImageIcon className='w-4 h-4 text-amber-500' /> Upload Jewelry Photos</label>
                     <div className='flex gap-4 overflow-x-auto pb-2'>
                       {images.map((img, idx) => (
-                        <div key={idx} className='relative flex-shrink-0 w-24 h-24 rounded-xl border border-border/50 overflow-hidden group'>
+                        <div key={idx} className='relative flex-shrink-0 w-24 h-24 rounded-[8px] border border-border/50 overflow-hidden group'>
                           <img src={img} alt='uploaded' className='w-full h-full object-cover' />
-                          <button type='button' onClick={() => removeImage(idx)} className='absolute top-1 right-1 bg-red-500/90 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity'><X className='w-3 h-3'/></button>
+                          <button type='button' onClick={() => removeImage(idx)} className='absolute top-1 right-1 bg-red-500/90 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity'><X className='w-3 h-3' /></button>
                         </div>
                       ))}
-                      <div className='flex-shrink-0 w-24 h-24 rounded-xl border-2 border-dashed border-border/50 relative hover:border-amber-400 hover:bg-amber-400/5 transition-colors group cursor-pointer'>
+                      <div className='flex-shrink-0 w-24 h-24 rounded-[8px] border-2 border-dashed border-border/50 relative hover:border-amber-400 hover:bg-amber-400/5 transition-colors group cursor-pointer'>
                         <label className='w-full h-full flex flex-col items-center justify-center text-muted-foreground group-hover:text-amber-500 cursor-pointer'>
                           <Camera className='w-6 h-6 mb-1' />
                           <span className='text-[10px] font-medium'>Add Photo</span>
@@ -493,10 +493,10 @@ const Colletral = () => {
             {/* Jewelry Images */}
             {selectedAccount.image && selectedAccount.image.length > 0 && (
               <div className='mb-6 bg-secondary/10 p-4 rounded border border-border/50'>
-                <p className='text-xs text-muted-foreground mb-3 flex items-center gap-2'><ImageIcon className='w-4 h-4'/> Product Images</p>
+                <p className='text-xs text-muted-foreground mb-3 flex items-center gap-2'><ImageIcon className='w-4 h-4' /> Product Images</p>
                 <div className='flex gap-3 overflow-x-auto pb-2'>
                   {selectedAccount.image.map((img, idx) => (
-                    <div key={idx} onClick={() => setEnlargedImage(img)} className='flex-shrink-0 w-20 h-20 rounded-xl border border-border/50 overflow-hidden cursor-pointer hover:opacity-80 transition-opacity'>
+                    <div key={idx} onClick={() => setEnlargedImage(img)} className='flex-shrink-0 w-20 h-20 rounded-[8px] border border-border/50 overflow-hidden cursor-pointer hover:opacity-80 transition-opacity'>
                       <img src={img} alt='jewelry' className='w-full h-full object-cover' />
                     </div>
                   ))}
@@ -602,7 +602,7 @@ const Colletral = () => {
             </form>
 
             {calcResult !== 0 && (
-              <div className='mt-6 p-4 bg-amber-400/10 border border-amber-400/30 rounded-xl text-center'>
+              <div className='mt-6 p-4 bg-amber-400/10 border border-amber-400/30 rounded-[8px] text-center'>
                 <p className='text-sm text-amber-500/80 mb-1'>Calculated Interest</p>
                 <h3 className='text-3xl font-bold text-amber-400'>
                   {calcResult === "Invalid Dates" ? "Error" : `₹${calcResult}`}
@@ -615,8 +615,8 @@ const Colletral = () => {
       {/* --- ENLARGED IMAGE VIEWER MODAL --- */}
       {enlargedImage && (
         <div className='fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-4' onClick={() => setEnlargedImage(null)}>
-          <button className='absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 hover:text-red-500 rounded-full text-white transition-colors'><X className='w-6 h-6'/></button>
-          <img src={enlargedImage} alt="Enlarged" className='max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl' onClick={(e) => e.stopPropagation()} />
+          <button className='absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 hover:text-red-500 rounded-full text-white transition-colors'><X className='w-6 h-6' /></button>
+          <img src={enlargedImage} alt="Enlarged" className='max-w-full max-h-[90vh] object-contain rounded-[8px] shadow-2xl' onClick={(e) => e.stopPropagation()} />
         </div>
       )}
 

@@ -12,40 +12,49 @@ const billingSchema = new mongoose.Schema(
             default: []
         },
         invoice: {
-            itemName: {
-                type: String,
-                required: true
-            },
-            metal: {
-                type: String,
-                enum: ['gold', 'silver', 'diamond'],
-                required: true
-            },
-            purity: {
-                type: String,
-            },
-            weight: {
-                type: Number,
-                min: 0
-            },
-            ratePerGram: {
-                type: Number,
-                min: 0
-            },
-            makingChargePercent: {
-                type: Number,
-                min: 0
-            },
-            gstPercent: {
-                type: Number,
-                default: 3,
-                min: 0
-            },
-            manualAdjustment: {
-                type: Number,
-                default: 0
-            },
-            finalPrice: {
+            items: [
+                {
+                    itemName: {
+                        type: String,
+                        required: true
+                    },
+                    metal: {
+                        type: String,
+                        enum: ['gold', 'silver', 'diamond'],
+                        required: true
+                    },
+                    purity: {
+                        type: String,
+                    },
+                    weight: {
+                        type: Number,
+                        min: 0
+                    },
+                    ratePerGram: {
+                        type: Number,
+                        min: 0
+                    },
+                    makingChargePercent: {
+                        type: Number,
+                        min: 0
+                    },
+                    gstPercent: {
+                        type: Number,
+                        default: 3,
+                        min: 0
+                    },
+                    manualAdjustment: {
+                        type: Number,
+                        default: 0
+                    },
+                    finalPrice: {
+                        type: Number,
+                        required: true,
+                        min: 0
+                    }
+                }
+            ],
+            grandTotal: {
                 type: Number,
                 required: true,
                 min: 0

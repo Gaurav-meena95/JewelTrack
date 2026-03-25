@@ -9,7 +9,7 @@ const registerCustomer = async (req, res) => {
         }
         const {id} = req.user
         const { name, email, phone, father_name, address } = req.body
-        const value = validationInput({ name, email, phone, father_name, address })
+        const value = validationInput({ name, phone, father_name, address })
         if (value) {
             return res.status(403).json({ message: `Check missing value ${value}` })
         }
@@ -57,7 +57,7 @@ const updateCustomer = async (req, res) => {
         }
         const {id} = req.user
         const { name, email, phone, father_name, address } = req.body
-        const value = validationInput({ name, email, phone, father_name, address })
+        const value = validationInput({ name, phone, father_name, address })
         if (value) {
             return res.status(403).json({ message: `Check missing value ${value}` })
         }

@@ -5,45 +5,51 @@ const Bill = require('./db')
 const createBilling = async (req, res) => {
     try {
         const { phone } = req.query
-        const { itemName, metal, purity, weight, ratePerGram, makingChargePercent, gstPercent, manualAdjustment, amountPaid, paymentMethod, image } = req.body
+        const { amountPaid, paymentMethod, image, items } = req.body
+        
+        if (!items || items.length === 0) {
+            return res.status(400).json({ message: "Cart cannot be empty" })
+        }
+
         const existingUser = await Customer.findOne({ phone })
         if (!existingUser) {
             return res.status(404).json({ message: "Customer not found register user" });
         }
 
-        const value = validationInput({ amountPaid, itemName, metal, purity, weight, ratePerGram, makingChargePercent, gstPercent, manualAdjustment })
-        if (value) {
-            return res.status(401).json({ message: `Check missing value ${value}` })
-        }
+        let grandTotal = 0;
+        const processedItems = items.map(item => {
+            const basePrice = (Number(item.weight) * Number(item.ratePerGram))
+            const finalPrice = basePrice + (basePrice * (Number(item.makingChargePercent) || 0) / 100) + (basePrice * (Number(item.gstPercent) || 0) / 100) - (Number(item.manualAdjustment) || 0)
+            grandTotal += finalPrice;
+            return {
+                ...item,
+                finalPrice
+            }
+        });
 
-        const basePrice = (weight * ratePerGram)
-        const finalPrice = basePrice + (basePrice * (makingChargePercent) / 100) + (basePrice * (gstPercent) / 100) - manualAdjustment
-        if (amountPaid > finalPrice) {
-            return res.status(401).json({ message: 'Amount paid cannot exceed final price' })
+        if (amountPaid > grandTotal) {
+            return res.status(401).json({ message: 'Amount paid cannot exceed grand total' })
         }
+        
+        let paymentStatus = 'unpaid'
+        let remainingAmount = grandTotal
         if (amountPaid === 0) {
             paymentStatus = 'unpaid'
-            remainingAmount = finalPrice
-        } else if (amountPaid < finalPrice) {
+            remainingAmount = grandTotal
+        } else if (amountPaid < grandTotal) {
             paymentStatus = 'partially_paid'
-            remainingAmount = finalPrice - amountPaid
+            remainingAmount = grandTotal - amountPaid
         } else {
             paymentStatus = 'paid'
             remainingAmount = 0
         }
+        
         const createBill = await Bill.create({
             customerId: existingUser._id,
             image: image || [],
             invoice: {
-                itemName,
-                metal,
-                purity,
-                weight,
-                ratePerGram,
-                makingChargePercent,
-                gstPercent,
-                manualAdjustment,
-                finalPrice
+                items: processedItems,
+                grandTotal
             },
             payment: {
                 amountPaid,
@@ -69,32 +75,45 @@ const createBilling = async (req, res) => {
 const updateBilling = async (req, res) => {
     try {
         const { phone, bill_id } = req.query
-        const { itemName, metal, purity, weight, ratePerGram, makingChargePercent, gstPercent, manualAdjustment, amountPaid, paymentMethod, image } = req.body
-        const value = validationInput({ phone,bill_id,paymentMethod, amountPaid, itemName, metal, purity, weight, ratePerGram, makingChargePercent, gstPercent, manualAdjustment })
-
-        if (value) {
-            return res.status(401).json({ message: `Check missing value ${value}` })
+        const { amountPaid, paymentMethod, image, items } = req.body
+        
+        if (!items || items.length === 0) {
+            return res.status(400).json({ message: "Cart cannot be empty" })
         }
+
         const existingUser = await Customer.findOne({ phone })
         if (!existingUser) {
             return res.status(404).json({ message: "Customer not found register user" });
         }
+        
         const existingBills = await Bill.findById({_id:bill_id })
-
-        if (existingBills.length === 0) {
+        if (!existingBills) {
             return res.status(400).json({ message: "Bill not exist" })
         }
-        const basePrice = (weight * ratePerGram)
-        const finalPrice = basePrice + (basePrice * (makingChargePercent) / 100) + (basePrice * (gstPercent) / 100) - manualAdjustment
-        if (amountPaid > finalPrice) {
-            return res.status(401).json({ message: 'Amount paid cannot exceed final price' })
+
+        let grandTotal = 0;
+        const processedItems = items.map(item => {
+            const basePrice = (Number(item.weight) * Number(item.ratePerGram))
+            const finalPrice = basePrice + (basePrice * (Number(item.makingChargePercent) || 0) / 100) + (basePrice * (Number(item.gstPercent) || 0) / 100) - (Number(item.manualAdjustment) || 0)
+            grandTotal += finalPrice;
+            return {
+                ...item,
+                finalPrice
+            }
+        });
+
+        if (amountPaid > grandTotal) {
+            return res.status(401).json({ message: 'Amount paid cannot exceed grand total' })
         }
+        
+        let paymentStatus = 'unpaid'
+        let remainingAmount = grandTotal
         if (amountPaid === 0) {
             paymentStatus = 'unpaid'
-            remainingAmount = finalPrice
-        } else if (amountPaid < finalPrice) {
+            remainingAmount = grandTotal
+        } else if (amountPaid < grandTotal) {
             paymentStatus = 'partially_paid'
-            remainingAmount = finalPrice - amountPaid
+            remainingAmount = grandTotal - amountPaid
         } else {
             paymentStatus = 'paid'
             remainingAmount = 0
@@ -105,15 +124,8 @@ const updateBilling = async (req, res) => {
             {
                 image: image || [],
                 invoice: {
-                    itemName,
-                    metal,
-                    purity,
-                    weight,
-                    ratePerGram,
-                    makingChargePercent,
-                    gstPercent,
-                    manualAdjustment,
-                    finalPrice
+                    items: processedItems,
+                    grandTotal
                 },
                 payment: {
                     amountPaid,

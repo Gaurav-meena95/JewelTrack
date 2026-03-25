@@ -294,10 +294,10 @@ const Customers = () => {
             </p>
             {searchPhone && (
               <button
-                onClick={() => { 
-                  resetForm(); 
+                onClick={() => {
+                  resetForm();
                   setFormData(prev => ({ ...prev, phone: searchPhone }));
-                  setShowRegisterModal(true); 
+                  setShowRegisterModal(true);
                 }}
                 className='p-2 px-4 bg-amber-400/80 rounded-[8px] inline-flex items-center gap-2 text-black'
               >
@@ -521,7 +521,7 @@ const Customers = () => {
                 <X className='h-5 w-5' />
               </button>
             </div>
-            <div className='bg-red-500/10 border border-red-500/30 p-4 rounded-xl'>
+            <div className='bg-red-500/10 border border-red-500/30 p-4 rounded-[8px]'>
               <p className='text-sm'>Are you sure you want to delete <strong>{selectedCustomer.name}</strong> (+91 {selectedCustomer.phone})?</p>
               <p className='text-xs text-muted-foreground mt-2'>This action cannot be undone.</p>
             </div>
