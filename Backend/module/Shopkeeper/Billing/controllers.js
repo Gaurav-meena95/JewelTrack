@@ -212,7 +212,7 @@ const getBillingProfile = async (req, res) => {
             const shopkeeperCustomers = await Customer.find({ shopkeeperId: req.user.id }).select("_id")
             const customerIds = shopkeeperCustomers.map(c => c._id)
 
-            // Find all bills for these customers
+
             const allBills = await Bill.find({ customerId: { $in: customerIds } }).populate("customerId", "name phone").sort({ createdAt: -1 })
 
             return res.status(200).json({

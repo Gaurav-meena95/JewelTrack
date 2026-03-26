@@ -86,7 +86,8 @@ const billingSchema = new mongoose.Schema(
         }
 
 
-    }
+    },
+    { timestamps: true }
 )
 
 

@@ -21,7 +21,6 @@ const orderSchema = new mongoose.Schema(
             ref: 'Customer',
             required: true
         },
-        // Array of jewelry items ordered
         items: {
             type: [orderItemSchema],
             required: true,
@@ -30,7 +29,7 @@ const orderSchema = new mongoose.Schema(
                 message: 'Order must have at least one item'
             }
         },
-        // Reference images of jewelry customer wants made
+
         image: {
             type: [String],
             required: true,
@@ -39,43 +38,43 @@ const orderSchema = new mongoose.Schema(
                 message: 'At least one image is required for an order'
             }
         },
-        // Estimated total price for the entire order
+
         Total: {
             type: Number,
             required: true,
             min: 0
         },
-        // Advance payment received upfront
+
         AdvancePayment: {
             type: Number,
             required: true,
             min: 0,
             default: 0
         },
-        // Calculated: Total - AdvancePayment
+
         RemainingAmount: {
             type: Number,
             required: true,
             default: 0
         },
-        // Payment status based on amounts
+
         paymentStatus: {
             type: String,
             enum: ['unpaid', 'partially_paid', 'paid'],
             default: 'unpaid'
         },
-        // Order progress/production status
+
         orderStatus: {
             type: String,
             enum: ['request', 'accept', 'progress', 'complete'],
             default: 'request'
         },
-        // Notes / remarks from shopkeeper
+
         notes: {
             type: String,
             default: ''
         },
-        // Expected delivery date
+
         deliveryDate: {
             type: Date,
             default: null

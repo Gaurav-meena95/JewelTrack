@@ -10,24 +10,24 @@ const METAL_OPTIONS = ['gold', 'silver', 'diamond', 'platinum', 'other']
 const Inventory = () => {
    const header = getAuthHeaders()
 
-   // ─── App State ────────────────────────────────────────────────────────────
+   //  App State 
    const [inventory, setInventory] = useState([])
    const [loading, setLoading] = useState(false)
    const [error, setError] = useState('')
    const [success, setSuccess] = useState('')
 
-   // ─── Predefined Settings ──────────────────────────────────────────────────
+   //  Predefined Settings 
    const [predefinedItemNames, setPredefinedItemNames] = useState([])
 
-   // ─── Dashboard & Filters ──────────────────────────────────────────────────
+   //  Dashboard & Filters 
    const [searchQuery, setSearchQuery] = useState('')
    const [metalFilter, setMetalFilter] = useState('all')
 
-   // ─── Modals ───────────────────────────────────────────────────────────────
+   //  Modals 
    const [showModal, setShowModal] = useState(false)
    const [isEditing, setIsEditing] = useState(false)
 
-   // ─── Form Data ────────────────────────────────────────────────────────────
+   //  Form Data 
    const initialFormState = {
       _id: '',
       jewelleryType: '',
@@ -37,7 +37,7 @@ const Inventory = () => {
    }
    const [formData, setFormData] = useState(initialFormState)
 
-   // ─── API: Fetch Inventory ─────────────────────────────────────────────────
+   //  API: Fetch Inventory ─
    const fetchInventory = async () => {
       try {
          setLoading(true)
@@ -75,7 +75,7 @@ const Inventory = () => {
       }
    }, [success, error])
 
-   // ─── Derived Data ─────────────────────────────────────────────────────────
+   //  Derived Data 
    const filteredInventory = useMemo(() => {
       let list = inventory
       if (searchQuery.trim()) {
@@ -97,7 +97,7 @@ const Inventory = () => {
    const uniqueCategories = new Set(inventory.map(item => item.metalType)).size
    const lowStockItems = inventory.filter(item => (Number(item.quantity) || 0) < 5)
 
-   // ─── Handlers ─────────────────────────────────────────────────────────────
+   //  Handlers ─
    const handleOpenAddModal = () => {
       setFormData(initialFormState)
       setIsEditing(false)
@@ -170,7 +170,7 @@ const Inventory = () => {
       setLoading(false)
    }
 
-   // ─── Helpers ──────────────────────────────────────────────────────────────
+   //  Helpers 
    const formatDate = (dateStr) => {
       if (!dateStr) return '—'
       return new Date(dateStr).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -179,7 +179,7 @@ const Inventory = () => {
    return (
       <>
          <div className={`space-y-6 min-h-screen ${showModal ? 'blur-[2px] pointer-events-none' : ''}`}>
-            {/* ─── Header ────────────────────────────────────────────────────────── */}
+            {/*  Header ─ */}
             <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
                <div>
                   <h1>Inventory Management</h1>
@@ -196,7 +196,7 @@ const Inventory = () => {
             {success && <div className='bg-green-500/20 border border-green-500/50 text-green-600 dark:text-green-400 p-3 rounded-[8px] text-center'>{success}</div>}
             {error && <div className='bg-red-500/20 border border-red-500/50 text-red-600 dark:text-red-400 p-3 rounded-[8px] text-center'>{error}</div>}
 
-            {/* ─── Dashboard Metrics ─────────────────────────────────────────────── */}
+            {/*  Dashboard Metrics  */}
             <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
                <div className='bg-card/40 border border-border/50 p-5 rounded-[8px] flex items-center gap-4'>
                   <div className='h-12 w-12 bg-amber-400/10 rounded-full flex items-center justify-center text-amber-500 shrink-0'>
@@ -235,7 +235,7 @@ const Inventory = () => {
                </div>
             </div>
 
-            {/* ─── Search & Filters ──────────────────────────────────────────────── */}
+            {/*  Search & Filters  */}
             <div className='flex flex-col md:flex-row justify-between gap-4 bg-secondary/30 p-4 rounded border border-border/50'>
                <div className='relative w-full md:max-w-md flex items-center bg-card rounded-[8px] border border-border/50'>
                   <Search className='absolute left-3 text-muted-foreground w-4 h-4' />
@@ -260,7 +260,7 @@ const Inventory = () => {
                </div>
             </div>
 
-            {/* ─── Inventory Table ───────────────────────────────────────────────── */}
+            {/*  Inventory Table ─ */}
             <div className='bg-card/40 rounded border border-border/50 overflow-hidden overflow-x-auto'>
                <table className='w-full text-left text-sm'>
                   <thead className='bg-secondary/50 text-muted-foreground uppercase text-xs'>
@@ -336,7 +336,7 @@ const Inventory = () => {
             </div>
          </div>
 
-         {/* ─── Add/Edit Modal ────────────────────────────────────────────────── */}
+         {/*  Add/Edit Modal  */}
          {showModal && (
             <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200'>
                <div className='bg-card w-full max-w-lg p-6 rounded-2xl border border-border/50 shadow-2xl'>
@@ -351,15 +351,17 @@ const Inventory = () => {
                   <form onSubmit={handleSave} className='space-y-4'>
                      <div>
                         <label className='block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1'>Item Name <span className='text-red-500'>*</span></label>
-                        <input
-                           type='text'
-                           list='predefined-items'
-                           required
-                           placeholder='e.g. Gold Necklace, Silver Ring'
+                        <select
                            value={formData.jewelleryType}
                            onChange={e => setFormData({ ...formData, jewelleryType: e.target.value })}
                            className='w-full p-3 rounded-[8px] bg-input border border-border outline-none focus:border-amber-400/50'
-                        />
+                           required
+                        >
+                           {predefinedItemNames.map(j => (
+                              <option key={j} value={j} >{j}</option>
+                           ))}
+
+                        </select>
                      </div>
 
                      <div>
@@ -368,8 +370,10 @@ const Inventory = () => {
                            value={formData.metalType}
                            onChange={e => setFormData({ ...formData, metalType: e.target.value })}
                            className='w-full p-3 rounded-[8px] bg-input border border-border outline-none focus:border-amber-400/50 capitalize'
+                           required
                         >
                            {METAL_OPTIONS.map(m => (
+                              
                               <option key={m} value={m}>{m}</option>
                            ))}
                         </select>
@@ -424,9 +428,9 @@ const Inventory = () => {
             </div>
          )}
          {/* Datalist for custom settings */}
-         <datalist id="predefined-items">
-            {predefinedItemNames.map((name, idx) => <option key={idx} value={name} />)}
-         </datalist>
+         {/* <select id="predefined-items">
+               {predefinedItemNames.map((name, idx) => <option key={idx} value={name} />)}
+         </select> */}
       </>
    )
 }

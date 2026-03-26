@@ -8,7 +8,7 @@ import {
 import axios from 'axios'
 import { VITE_API_BASE_KEY, getAuthHeaders } from '../../../utils/apiConfig'
 
-// ─── Status Config ──────────────────────────────────────────────────────────
+//  Status Config 
 const paymentStatusColors = {
    paid: 'bg-green-500/10 text-green-500 border-green-500/30',
    partially_paid: 'bg-amber-500/10 text-amber-500 border-amber-500/30',
@@ -27,49 +27,49 @@ const METAL_OPTIONS = ['gold', 'silver', 'diamond', 'platinum', 'other']
 const Orders = () => {
    const header = getAuthHeaders()
 
-   // ─── App State ────────────────────────────────────────────────────────────
+   //  App State 
    const [orders, setOrders] = useState([])
    const [loading, setLoading] = useState(false)
    const [error, setError] = useState('')
    const [success, setSuccess] = useState('')
 
-   // ─── Predefined Settings ──────────────────────────────────────────────────
+   //  Predefined Settings 
    const [predefinedItemNames, setPredefinedItemNames] = useState([])
    const [predefinedPurities, setPredefinedPurities] = useState([])
 
-   // ─── Navigation ───────────────────────────────────────────────────────────
+   //  Navigation 
    const [viewMode, setViewMode] = useState('dashboard') // 'dashboard' | 'profile'
    const [selectedCustomer, setSelectedCustomer] = useState(null)
 
-   // ─── Dashboard ────────────────────────────────────────────────────────────
+   //  Dashboard 
    const [searchQuery, setSearchQuery] = useState('')
 
-   // ─── Profile Filter ───────────────────────────────────────────────────────
+   //  Profile Filter 
    const [paymentFilter, setPaymentFilter] = useState('all') // 'all' | 'paid' | 'partially_paid' | 'unpaid'
 
-   // ─── Modals ───────────────────────────────────────────────────────────────
+   //  Modals 
    const [showLookupModal, setShowLookupModal] = useState(false)
    const [showNewOrder, setShowNewOrder] = useState(false)
    const [showViewOrder, setShowViewOrder] = useState(false)
    const [showEditPayment, setShowEditPayment] = useState(false)
    const [activeOrderDetails, setActiveOrderDetails] = useState(null)
 
-   // ─── Customer Lookup ──────────────────────────────────────────────────────
+   //  Customer Lookup 
    const [customerPhone, setCustomerPhone] = useState('')
    const [customerFound, setCustomerFound] = useState(null)
    const [customerData, setCustomerData] = useState({ name: '', phone: '' })
 
-   // ─── Cart System ──────────────────────────────────────────────────────────
+   //  Cart System 
    const [cartItems, setCartItems] = useState([])
    const [currentItem, setCurrentItem] = useState({ itemName: '', metal: 'gold', purity: '', weight: '', size: '', description: '' })
    const [orderDetails, setOrderDetails] = useState({ Total: '', AdvancePayment: '', notes: '', deliveryDate: '', orderStatus: 'request' })
    const [images, setImages] = useState([])
    const [enlargedImage, setEnlargedImage] = useState(null)
 
-   // ─── Edit Payment ─────────────────────────────────────────────────────────
+   //  Edit Payment 
    const [editPaymentData, setEditPaymentData] = useState({ additionalPayment: '', orderStatus: '', notes: '' })
 
-   // ─── API ──────────────────────────────────────────────────────────────────
+   //  API 
    const fetchOrders = async () => {
       try {
          setLoading(true)
@@ -106,7 +106,7 @@ const Orders = () => {
       }
    }, [success, error])
 
-   // ─── Derived: Unique Customers (Dashboard) ────────────────────────────────
+   //  Derived: Unique Customers (Dashboard) 
    const uniqueCustomers = useMemo(() => {
       const map = {}
       orders.forEach(order => {
@@ -139,7 +139,7 @@ const Orders = () => {
       return list.sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated))
    }, [orders, searchQuery])
 
-   // ─── Derived: Customer Profile Orders ─────────────────────────────────────
+   //  Derived: Customer Profile Orders 
    const currentCustomerOrders = useMemo(() => {
       if (!selectedCustomer) return []
       let list = orders
@@ -149,14 +149,14 @@ const Orders = () => {
       return list
    }, [orders, selectedCustomer, paymentFilter])
 
-   // ─── Dashboard Actions ────────────────────────────────────────────────────
+   //  Dashboard Actions 
    const openCustomerProfile = (customer) => {
       setSelectedCustomer(customer)
       setPaymentFilter('all')
       setViewMode('profile')
    }
 
-   // ─── Lookup Logic (Orders require existing customer only) ─────────────────
+   //  Lookup Logic (Orders require existing customer only) 
    const checkCustomer = async () => {
       if (customerPhone.length < 10) return setError('Please enter a valid 10-digit phone number')
       try {
@@ -182,7 +182,7 @@ const Orders = () => {
       openNewOrderModal()
    }
 
-   // ─── Cart Logic ───────────────────────────────────────────────────────────
+   //  Cart Logic 
    const openNewOrderModal = () => {
       setCartItems([])
       setCurrentItem({ itemName: '', metal: 'gold', purity: '', weight: '', size: '', description: '' })
@@ -199,7 +199,7 @@ const Orders = () => {
 
    const removeCartItem = (idx) => setCartItems(cartItems.filter((_, i) => i !== idx))
 
-   // ─── Image Upload ─────────────────────────────────────────────────────────
+   //  Image Upload 
    const handleImageUpload = (e) => {
       const file = e.target.files[0]
       if (!file) return
@@ -222,7 +222,7 @@ const Orders = () => {
 
    const removeImage = (idx) => setImages(images.filter((_, i) => i !== idx))
 
-   // ─── Submit Order ─────────────────────────────────────────────────────────
+   //  Submit Order 
    const handleCreateOrder = async () => {
       if (cartItems.length === 0) return setError('Cart is empty! Add at least one jewelry item.')
       if (images.length === 0) return setError('Please upload at least one reference image of the jewelry.')
@@ -257,7 +257,7 @@ const Orders = () => {
       setLoading(false)
    }
 
-   // ─── Record Payment ───────────────────────────────────────────────────────
+   //  Record Payment 
    const openEditPayment = (order) => {
       setActiveOrderDetails(order)
       setEditPaymentData({
@@ -290,7 +290,7 @@ const Orders = () => {
       ? Math.max(0, activeOrderDetails.RemainingAmount - (Number(editPaymentData.additionalPayment) || 0))
       : 0
 
-   // ─── Helpers ──────────────────────────────────────────────────────────────
+   //  Helpers 
    const formatDate = (dateStr) => {
       if (!dateStr) return '—'
       return new Date(dateStr).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -365,7 +365,7 @@ const Orders = () => {
                </div>
             )}
 
-            {/* ── PROFILE VIEW ───────────────────────────────────────────── */}
+            {/*  PROFILE VIEW  */}
             {viewMode === 'profile' && selectedCustomer && (
                <div className='space-y-6'>
                   <button onClick={() => setViewMode('dashboard')} className='flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors'>
@@ -497,7 +497,7 @@ const Orders = () => {
             )}
          </div>
 
-         {/* ─── LOOKUP MODAL ─────────────────────────────────────────────── */}
+         {/*  LOOKUP MODAL  */}
          {showLookupModal && (
             <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4'>
                <div className='bg-card w-full max-w-md p-6 rounded-2xl border border-border/50 shadow-2xl'>
@@ -543,7 +543,7 @@ const Orders = () => {
             </div>
          )}
 
-         {/* ─── NEW ORDER MODAL (CART) ────────────────────────────────────── */}
+         {/*  NEW ORDER MODAL (CART)  */}
          {showNewOrder && selectedCustomer && (
             <div className='fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4'>
                <div className='bg-card w-full max-w-5xl max-h-[95vh] flex flex-col rounded-2xl border border-border/50 shadow-2xl overflow-hidden'>
@@ -559,7 +559,7 @@ const Orders = () => {
 
                   <div className='flex-1 overflow-y-auto p-4 md:p-6 flex flex-col lg:flex-row gap-6'>
 
-                     {/* ── LEFT: Add Items + Images + Order Info ─────────── */}
+                     {/*  LEFT: Add Items + Images + Order Info  */}
                      <div className='lg:flex-1 space-y-5'>
 
                         {/* 1. Add Items */}
@@ -625,7 +625,7 @@ const Orders = () => {
                         </div>
                      </div>
 
-                     {/* ── RIGHT: Cart Summary ───────────────────────────── */}
+                     {/*  RIGHT: Cart Summary  */}
                      <div className='lg:flex-1 flex flex-col bg-card border border-border/50 rounded-2xl shadow-inner lg:overflow-hidden'>
                         <div className='bg-secondary/50 p-4 font-bold border-b border-border/50 flex items-center gap-2'>
                            <ShoppingCart className='w-4 h-4' /> Order Cart
@@ -685,7 +685,7 @@ const Orders = () => {
             </div>
          )}
 
-         {/* ─── VIEW ORDER DETAILS MODAL ──────────────────────────────────── */}
+         {/*  VIEW ORDER DETAILS MODAL  */}
          {showViewOrder && activeOrderDetails && (
             <div className='fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4'>
                <div className='bg-card w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8 rounded-3xl border border-border/50 shadow-2xl relative'>
@@ -795,7 +795,7 @@ const Orders = () => {
             </div>
          )}
 
-         {/* ─── EDIT PAYMENT MODAL ────────────────────────────────────────── */}
+         {/*  EDIT PAYMENT MODAL  */}
          {showEditPayment && activeOrderDetails && (
             <div className='fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4'>
                <div className='bg-card w-full max-w-md p-6 rounded-2xl border border-border/50 shadow-2xl'>
@@ -884,7 +884,7 @@ const Orders = () => {
             </div>
          )}
 
-         {/* ─── ENLARGED IMAGE ────────────────────────────────────────────── */}
+         {/*  ENLARGED IMAGE  */}
          {enlargedImage && (
             <div className='fixed inset-0 z-[80] flex items-center justify-center bg-black/95 backdrop-blur-md p-4' onClick={() => setEnlargedImage(null)}>
                <button className='absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 hover:text-red-500 rounded-full text-white transition-colors'><X className='w-6 h-6' /></button>
@@ -892,12 +892,12 @@ const Orders = () => {
             </div>
          )}
          {/* Datalists for custom settings */}
-         <datalist id="predefined-items">
+         <select id="predefined-items">
             {predefinedItemNames.map((name, idx) => <option key={idx} value={name} />)}
-         </datalist>
-         <datalist id="predefined-purities">
+         </select>
+         <select id="predefined-purities">
             {predefinedPurities.map((purity, idx) => <option key={idx} value={purity} />)}
-         </datalist>
+         </select>
       </>
    )
 }

@@ -47,6 +47,8 @@ const Bills = () => {
    const [images, setImages] = useState([])
    const [enlargedImage, setEnlargedImage] = useState(null)
 
+
+
    // --- API Calls ---
    const fetchBills = async () => {
       try {
@@ -66,8 +68,8 @@ const Bills = () => {
       try {
          const res = await axios.get(`${VITE_API_BASE_KEY}/auth/me`, { headers: header })
          if (res.data && res.data.user) {
-             setPredefinedItemNames(res.data.user.itemNames || [])
-             setPredefinedPurities(res.data.user.purities || [])
+            setPredefinedItemNames(res.data.user.itemNames || [])
+            setPredefinedPurities(res.data.user.purities || [])
          }
       } catch (err) {
          console.error('Failed to load settings', err)
@@ -261,8 +263,9 @@ const Bills = () => {
          await axios.post(`${VITE_API_BASE_KEY}/customers/bills/create?phone=${selectedCustomer.phone}`, billPayload, { headers: header })
          setSuccess("Bill successfully generated!")
          setShowNewBill(false)
-         fetchBills() // Refresh history
+         fetchBills()
       } catch (err) {
+         console.log('skjfnkjdsn', err.response.data.message)
          setError(err.response?.data?.message || 'Failed to generate Bill')
       }
       setLoading(false)
@@ -493,11 +496,32 @@ const Bills = () => {
                         <div className='bg-secondary/20 p-5 rounded-2xl border border-border/50'>
                            <h3 className='font-bold mb-4 flex items-center gap-2'>1. Add Jewelry to Cart</h3>
                            <div className='grid grid-cols-2 gap-3'>
-                              <input type='text' list='predefined-items' placeholder='Item Name (e.g. Chain)' value={currentItem.itemName} onChange={e => setCurrentItem({ ...currentItem, itemName: e.target.value })} className='col-span-2 p-3 rounded-[8px] bg-input border border-border/50 focus:border-amber-400 outline-none transition-all' />
+                              <select
+                                 value={currentItem.itemName}
+                                 onChange={e => setCurrentItem({ ...currentItem, itemName: e.target.value })}
+                                 className='col-span-2 p-3 rounded-[8px] bg-input border border-border/50 focus:border-amber-400 outline-none transition-all'
+                              >
+                                 <option>Item Name</option>
+                                 {predefinedItemNames.map((e) => (
+                                    <option value={e} key={e} >{e}</option>
+                                 ))}
+                              </select>
+
                               <select value={currentItem.metal} onChange={e => setCurrentItem({ ...currentItem, metal: e.target.value })} className='p-3 rounded-[8px] bg-input border border-border/50 outline-none'>
                                  <option value="gold">Gold</option><option value="silver">Silver</option><option value="diamond">Diamond</option>
                               </select>
-                              <input type='text' list='predefined-purities' placeholder='Purity (22K)' value={currentItem.purity} onChange={e => setCurrentItem({ ...currentItem, purity: e.target.value })} className='p-3 rounded-[8px] bg-input border border-border/50 focus:border-amber-400 outline-none transition-all' />
+
+                              <select
+                                 value={currentItem.purity}
+                                 onChange={e => setCurrentItem({ ...currentItem, purity: e.target.value })}
+                                 className='p-3 rounded-[8px] bg-input border border-border/50 focus:border-amber-400 outline-none transition-all'
+                              >
+                                 <option>Carat</option>
+                                 {predefinedPurities.map((e) => (
+                                    <option value={e} key={e} >{e}</option>
+                                 ))}
+                              </select>
+
 
                               <div className='relative'>
                                  <span className='absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-xs'>grams</span>
@@ -577,7 +601,9 @@ const Bills = () => {
                            )}
                         </div>
 
+
                         <div className='border-t border-border/50 bg-secondary/10 p-5 space-y-4'>
+                           {error && <div className='bg-red-500/20 border border-red-500/50 text-red-500 text-sm p-2 rounded-[8px] mb-4 text-center'>{error}</div>}
                            <div className='flex justify-between items-center font-bold text-xl'>
                               <span>Grand Total:</span>
                               <span className='text-foreground'>₹{cartGrandTotal.toFixed(2)}</span>
@@ -762,12 +788,12 @@ const Bills = () => {
             </div>
          )}
          {/* Datalists for custom settings */}
-         <datalist id="predefined-items">
+         <select id="predefined-items">
             {predefinedItemNames.map((name, idx) => <option key={idx} value={name} />)}
-         </datalist>
-         <datalist id="predefined-purities">
+         </select>
+         <select id="predefined-purities">
             {predefinedPurities.map((purity, idx) => <option key={idx} value={purity} />)}
-         </datalist>
+         </select>
       </>
    )
 }
