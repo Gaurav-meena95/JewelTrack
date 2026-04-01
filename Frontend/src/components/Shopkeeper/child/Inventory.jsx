@@ -4,6 +4,7 @@ import {
 } from 'lucide-react'
 import axios from 'axios'
 import { VITE_API_BASE_KEY, getAuthHeaders } from '../../../utils/apiConfig'
+import Loading from '../../../utils/loading'
 
 const METAL_OPTIONS = ['gold', 'silver', 'diamond', 'platinum', 'other']
 
@@ -180,9 +181,9 @@ const Inventory = () => {
       <>
          <div className={`space-y-6 min-h-screen ${showModal ? 'blur-[2px] pointer-events-none' : ''}`}>
             {/*  Header ─ */}
-            <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
-               <div>
-                  <h1>Inventory Management</h1>
+            <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-linear-to-r from-secondary/50 to-transparent p-6 rounded-2xl border border-border/50'>
+               <div className='space-y-1'>
+                  <h1 className='text-3xl font-bold bg-linear-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent'>Inventory Management</h1>
                   <p className='text-muted-foreground'>Track live stock, metals, and quantities</p>
                </div>
                <button
@@ -212,7 +213,7 @@ const Inventory = () => {
                </div>
 
                <div className='bg-card/40 border border-border/50 p-5 rounded-[8px] flex items-center gap-4'>
-                  <div className='h-12 w-12 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-500 shrink-0'>
+                  <div className='h-12 w-12 bg-amber-400/10 rounded-full flex items-center justify-center text-amber-500 shrink-0'>
                      <Layers className='w-6 h-6' />
                   </div>
                   <div>
@@ -275,7 +276,8 @@ const Inventory = () => {
                   </thead>
                   <tbody className='divide-y divide-border/50'>
                      {loading ? (
-                        <tr><td colSpan='6' className='p-8 text-center text-muted-foreground'>Loading inventory...</td></tr>
+                         <tr><td colSpan='6' className='p-8 text-center text-muted-foreground'> <Loading/></td></tr>
+                       
                      ) : filteredInventory.length === 0 ? (
                         <tr>
                            <td colSpan='6' className='p-12 text-center text-muted-foreground'>
@@ -294,7 +296,7 @@ const Inventory = () => {
                                     </div>
                                  </td>
                                  <td className='p-4'>
-                                    <span className='capitalize inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary/50 text-xs border border-border/50'>
+                                    <span className='capitalize inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-secondary/50 text-xs border border-border/50'>
                                        <Tag className='w-3 h-3 text-amber-500' />
                                        {item.metalType}
                                     </span>
@@ -313,7 +315,7 @@ const Inventory = () => {
                                     <div className='flex items-center justify-end gap-3'>
                                        <button
                                           onClick={() => handleOpenEditModal(item)}
-                                          className='text-blue-400 hover:text-blue-300 p-1 hover:bg-blue-400/10 rounded transition-colors'
+                                          className='text-amber-500  p-1 hover:bg-amber-400/10 rounded transition-colors'
                                           title="Edit Item"
                                        >
                                           <Edit className='w-4 h-4' />
@@ -373,7 +375,7 @@ const Inventory = () => {
                            required
                         >
                            {METAL_OPTIONS.map(m => (
-                              
+
                               <option key={m} value={m}>{m}</option>
                            ))}
                         </select>

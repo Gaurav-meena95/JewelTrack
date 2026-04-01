@@ -39,7 +39,7 @@ const updateCollatral = async (req, res) => {
         if (!existing) {
             return res.status(402).json({ message: 'customer collatral doest not exist' })
         }
-        const exsitingCollateral = await Collateral.find({_id:collatral_id})
+        const exsitingCollateral = await Collateral.findById(collatral_id)
         const updated = await Collateral.updateOne(
             { _id: exsitingCollateral[0]._id },
             { weight, jewellery, image, price, interestRate, status, paymentHistory, totalPaid, remainingAmount }

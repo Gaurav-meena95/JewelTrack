@@ -82,12 +82,12 @@ const allOrders = async (req, res) => {
     }
 }
 
-// PATCH /orders/update?order_id=XXX  — Full order update (items, images, total, etc.)
+
 const updateOrders = async (req, res) => {
     try {
         const { order_id } = req.query
-        const { items, image, AdvancePayment, Total, orderStatus, notes, deliveryDate } = req.body
-
+        const { items, image, AdvancePayment, Total, orderStatus, paymentHistory, notes, deliveryDate } = req.body
+        console.log(req.body)
         if (!order_id) return res.status(400).json({ message: 'order_id is required' })
 
         const existingOrder = await Order.findById(order_id)
@@ -104,17 +104,7 @@ const updateOrders = async (req, res) => {
 
         const updated = await Order.findByIdAndUpdate(
             order_id,
-            {
-                ...(items && items.length > 0 ? { items } : {}),
-                ...(image && image.length > 0 ? { image } : {}),
-                AdvancePayment: advance,
-                Total: total,
-                RemainingAmount,
-                paymentStatus,
-                ...(orderStatus ? { orderStatus } : {}),
-                ...(notes !== undefined ? { notes } : {}),
-                ...(deliveryDate !== undefined ? { deliveryDate } : {})
-            },
+            {items, image, AdvancePayment, Total, orderStatus, paymentHistory, notes, deliveryDate,RemainingAmount,paymentStatus},
             { new: true }
         ).populate('customerId', 'name phone address')
 
@@ -125,43 +115,43 @@ const updateOrders = async (req, res) => {
     }
 }
 
-// PATCH /orders/pay?order_id=XXX  — Optimized: record a payment / update order status only
-const recordOrderPayment = async (req, res) => {
-    try {
-        const { order_id } = req.query
-        const { additionalPayment, orderStatus, notes } = req.body
 
-        if (!order_id) return res.status(400).json({ message: 'order_id is required' })
+// const recordOrderPayment = async (req, res) => {
+//     try {
+//         const { order_id } = req.query
+//         const { additionalPayment, orderStatus, notes } = req.body
 
-        const existingOrder = await Order.findById(order_id)
-        if (!existingOrder) return res.status(404).json({ message: 'Order not found' })
+//         if (!order_id) return res.status(400).json({ message: 'order_id is required' })
 
-        const newTotalPaid = existingOrder.AdvancePayment + (Number(additionalPayment) || 0)
-        if (newTotalPaid > existingOrder.Total) {
-            return res.status(400).json({ message: 'Payment exceeds total order amount' })
-        }
+//         const existingOrder = await Order.findById(order_id)
+//         if (!existingOrder) return res.status(404).json({ message: 'Order not found' })
 
-        const RemainingAmount = existingOrder.Total - newTotalPaid
-        const paymentStatus = computePaymentStatus(existingOrder.Total, newTotalPaid)
+//         const newTotalPaid = existingOrder.AdvancePayment + (Number(additionalPayment) || 0)
+//         if (newTotalPaid > existingOrder.Total) {
+//             return res.status(400).json({ message: 'Payment exceeds total order amount' })
+//         }
 
-        const updated = await Order.findByIdAndUpdate(
-            order_id,
-            {
-                AdvancePayment: newTotalPaid,
-                RemainingAmount,
-                paymentStatus,
-                ...(orderStatus ? { orderStatus } : {}),
-                ...(notes !== undefined ? { notes } : {})
-            },
-            { new: true }
-        ).populate('customerId', 'name phone address')
+//         const RemainingAmount = existingOrder.Total - newTotalPaid
+//         const paymentStatus = computePaymentStatus(existingOrder.Total, newTotalPaid)
 
-        return res.status(200).json({ message: 'Payment recorded successfully', order: updated })
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({ message: 'Internal Server Error' })
-    }
-}
+//         const updated = await Order.findByIdAndUpdate(
+//             order_id,
+//             {
+//                 AdvancePayment: newTotalPaid,
+//                 RemainingAmount,
+//                 paymentStatus,
+//                 ...(orderStatus ? { orderStatus } : {}),
+//                 ...(notes !== undefined ? { notes } : {})
+//             },
+//             { new: true }
+//         ).populate('customerId', 'name phone address')
+
+//         return res.status(200).json({ message: 'Payment recorded successfully', order: updated })
+//     } catch (error) {
+//         console.log(error)
+//         return res.status(500).json({ message: 'Internal Server Error' })
+//     }
+// }
 
 // DELETE /orders/delete?order_id=XXX
 const deleteOrders = async (req, res) => {
@@ -180,4 +170,4 @@ const deleteOrders = async (req, res) => {
     }
 }
 
-module.exports = { createOrders, updateOrders, deleteOrders, allOrders, recordOrderPayment }
+module.exports = { createOrders, updateOrders, deleteOrders, allOrders }

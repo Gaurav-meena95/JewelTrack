@@ -3,6 +3,7 @@ import { IndianRupee, Package, ShoppingCart, Wallet, Users, Activity, Clock, Arr
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { VITE_API_BASE_KEY, getAuthHeaders } from '../../../utils/apiConfig';
+import Loading from '../../../utils/loading';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -65,7 +66,6 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
 
-  // --- Calculations ---
 
   // 1. Total Revenue (from bills - Grand Total sum)
   const totalRevenue = data.bills.reduce((sum, bill) => sum + (bill.invoice?.grandTotal || 0), 0);
@@ -88,7 +88,6 @@ const Dashboard = () => {
     let activities = [];
 
     data.bills.forEach(b => {
-      console.log('fkjv nfdk',b);
       
       activities.push({
         id: `bill_${b.customerId._id}`,
@@ -122,10 +121,10 @@ const Dashboard = () => {
       });
     });
 
-    return activities.sort((a, b) => b.date - a.date).slice(0, 8);
+    return activities.sort((a, b) => b.date - a.date).slice(0, 6);
   };
   const recentActivities = extractRecentActivity();
-  console.log('receet',recentActivities);
+
   
 
   // Stats Array for Top Cards
@@ -138,12 +137,7 @@ const Dashboard = () => {
   ];
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <div className="w-12 h-12 border-4 border-amber-400/30 border-t-amber-400 rounded-full animate-spin"></div>
-        <p className="text-muted-foreground animate-pulse">Loading dashboard insights...</p>
-      </div>
-    );
+    <Loading/>
   }
 
   return (
@@ -157,13 +151,13 @@ const Dashboard = () => {
         </div>
 
         <div className='flex flex-wrap items-center gap-3'>
-          <button onClick={() => navigate('/dashboard/bills')} className='px-4 py-2 bg-linear-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black font-medium rounded flex items-center gap-2  shadow-lg shadow-amber-400/20'>
+          <button onClick={() => navigate('/dashboard/bills')} className='px-4 py-2 bg-linear-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black font-medium rounded flex items-center gap-2  shadow-lg shadow-amber-400/30'>
             <Plus className='w-4 h-4' /> Create Bill
           </button>
-          <button onClick={() => navigate('/dashboard/orders')} className='px-4 py-2 bg-secondary hover:bg-secondary/80 border border-border/50 rounded flex items-center gap-2 transition-all'>
+          <button onClick={() => navigate('/dashboard/orders')} className='px-4 py-2 bg-secondary/50 hover:bg-secondary/80 rder border-border/50 rounded flex items-center gap-2 transition-all'>
             <Plus className='w-4 h-4 text-amber-500' /> New Order
           </button>
-          <button onClick={() => navigate('/dashboard/colletral')} className='px-4 py-2 bg-secondary hover:bg-secondary/80 border border-border/50 rounded flex items-center gap-2 transition-all'>
+          <button onClick={() => navigate('/dashboard/colletral')} className='px-4 py-2 bg-secondary/50 hover:bg-secondary/80 rder border-border/50 rounded flex items-center gap-2 transition-all'>
             <Plus className='w-4 h-4 text-amber-500' /> Add Girvi
           </button>
         </div>
@@ -180,7 +174,7 @@ const Dashboard = () => {
         {topStats.map((stat, indx) => {
           const Icon = stat.icon;
           return (
-            <div key={indx} className='relative overflow-hidden backdrop-blur-md bg-card/40 border border-border/50 rounded-2xl p-5 shadow-sm '>
+            <div key={indx} className='relative overflow-hidden backdrop-blur-md bg-card/40 border border-border/50 rounded-2xl p-5 shadow-sm hover:bg-secondary/50  '>
               <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full ${stat.bg} opacity-20 group-hover:scale-150 transition-transform duration-500 blur-2xl`}></div>
               <div className='flex items-center justify-between mb-4 relative z-10'>
                 <div className={`p-2.5 rounded ${stat.bg} ${stat.color}`}>
@@ -219,7 +213,7 @@ const Dashboard = () => {
                 </div>
                 <div className='flex justify-between items-center p-3.5 bg-secondary/30 rounded'>
                   <span className='text-muted-foreground'>Completed</span>
-                  <span className='font-bold text-green-500 text-lg'>{data.orders.filter(o => o.orderStatus === 'Delivered' || o.orderStatus === 'completed').length}</span>
+                  <span className='font-bold text-lg'>{data.orders.filter(o => o.orderStatus === 'Delivered' || o.orderStatus === 'completed').length}</span>
                 </div>
               </div>
             </div>
@@ -296,7 +290,7 @@ const Dashboard = () => {
                       act.type === 'order' ? 'bg-amber-400' : 'bg-green-400'}`}
                   ></div>
 
-                  <div className='bg-secondary/40 p-3.5 rounded border border-border/50 ml-2 hover:border-amber-400/30 transition-all hover:-translate-y-0.5 shadow-sm'>
+                  <div className='bg-secondary/40 p-3.5 rounded border border-border/50 ml-2 hover:bg-secondary/70 adow-sm'>
                     <div className='flex justify-between items-start mb-1.5'>
                       <h4 className='text-sm font-medium leading-tight'>{act.title}</h4>
                       <span className='text-[10px] text-muted-foreground whitespace-nowrap ml-2 uppercase tracking-wide font-medium'>

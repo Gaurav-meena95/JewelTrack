@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import {
-   Search, Plus, X, Phone, IndianRupee, UserCheck, UserX,
-   ShoppingCart, User, Calendar, ArrowLeft, Trash2, Camera,
-   Image as ImageIcon, History, Package, CheckCircle2, Clock,
-   Wrench, AlertCircle, Edit, Filter, ChevronDown
+   Search, Plus, X, Phone, IndianRupee, UserCheck, UserX, ShoppingCart, User, Calendar, ArrowLeft, Trash2, Camera, Image as ImageIcon, History, Package, CheckCircle2, Clock,
+   Wrench, AlertCircle, Edit, Filter, ChevronDown,
+   IndianRupeeIcon,
+   BadgeIndianRupeeIcon
 } from 'lucide-react'
 import axios from 'axios'
 import { VITE_API_BASE_KEY, getAuthHeaders } from '../../../utils/apiConfig'
+import Loading from '../../../utils/loading'
 
 //  Status Config 
 const paymentStatusColors = {
@@ -16,8 +17,7 @@ const paymentStatusColors = {
 }
 
 const orderStatusConfig = {
-   request: { label: 'Requested', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30', Icon: Clock },
-   accept: { label: 'Accepted', color: 'bg-purple-500/10 text-purple-400 border-purple-500/30', Icon: CheckCircle2 },
+   accept: { label: 'Accepted', color: 'bg-amber-500/10 text-green-400 border-green-500/30', Icon: CheckCircle2 },
    progress: { label: 'In Progress', color: 'bg-amber-500/10 text-amber-400 border-amber-500/30', Icon: Wrench },
    complete: { label: 'Complete', color: 'bg-green-500/10 text-green-400 border-green-500/30', Icon: CheckCircle2 },
 }
@@ -32,6 +32,7 @@ const Orders = () => {
    const [loading, setLoading] = useState(false)
    const [error, setError] = useState('')
    const [success, setSuccess] = useState('')
+
 
    //  Predefined Settings 
    const [predefinedItemNames, setPredefinedItemNames] = useState([])
@@ -54,6 +55,9 @@ const Orders = () => {
    const [showEditPayment, setShowEditPayment] = useState(false)
    const [activeOrderDetails, setActiveOrderDetails] = useState(null)
 
+   console.log('vfkjerfkj23',activeOrderDetails)
+
+
    //  Customer Lookup 
    const [customerPhone, setCustomerPhone] = useState('')
    const [customerFound, setCustomerFound] = useState(null)
@@ -62,12 +66,13 @@ const Orders = () => {
    //  Cart System 
    const [cartItems, setCartItems] = useState([])
    const [currentItem, setCurrentItem] = useState({ itemName: '', metal: 'gold', purity: '', weight: '', size: '', description: '' })
-   const [orderDetails, setOrderDetails] = useState({ Total: '', AdvancePayment: '', notes: '', deliveryDate: '', orderStatus: 'request' })
+   const [orderDetails, setOrderDetails] = useState({ Total: '', AdvancePayment: '', notes: '', deliveryDate: '', orderStatus: 'accept' })
    const [images, setImages] = useState([])
    const [enlargedImage, setEnlargedImage] = useState(null)
 
    //  Edit Payment 
    const [editPaymentData, setEditPaymentData] = useState({ additionalPayment: '', orderStatus: '', notes: '' })
+   const [showHistory, setShowHistory] = useState(false)
 
    //  API 
    const fetchOrders = async () => {
@@ -86,16 +91,16 @@ const Orders = () => {
       try {
          const res = await axios.get(`${VITE_API_BASE_KEY}/auth/me`, { headers: header })
          if (res.data && res.data.user) {
-             setPredefinedItemNames(res.data.user.itemNames || [])
-             setPredefinedPurities(res.data.user.purities || [])
+            setPredefinedItemNames(res.data.user.itemNames || [])
+            setPredefinedPurities(res.data.user.purities || [])
          }
       } catch (err) {
          console.error('Failed to load settings', err)
       }
    }
 
-   useEffect(() => { 
-      fetchOrders(); 
+   useEffect(() => {
+      fetchOrders();
       fetchProfileSettings();
    }, [])
 
@@ -270,11 +275,30 @@ const Orders = () => {
 
    const handleRecordPayment = async () => {
       if (!activeOrderDetails) return
+       if (!editPaymentData.additionalPayment || isNaN(editPaymentData.additionalPayment)) return setError("Invalid payment amount")
       setLoading(true)
       try {
+         const amount = Number(editPaymentData.additionalPayment)
+         const currentHistory = activeOrderDetails.paymentHistory || []
+         const currentPaid =  activeOrderDetails.AdvancePayment || 0
+         const remain = activeOrderDetails.RemainingAmount  
+
+         const newPayment = {
+            amount,
+            orderStatus: editPaymentData.orderStatus,
+            data: new Date(),
+            notes:editPaymentData.notes
+
+         }
+
+         const updatedPayload = {
+            ...activeOrderDetails,
+            paymentHistory:[...currentHistory,newPayment],
+            RemainingAmount: Total - amount
+         }
          await axios.patch(
-            `${VITE_API_BASE_KEY}/customers/orders/pay?order_id=${activeOrderDetails._id}`,
-            editPaymentData,
+            `${VITE_API_BASE_KEY}/customers/orders/update/?order_id=${activeOrderDetails._id}`,
+            updatedPayload,
             { headers: header }
          )
          setSuccess('Payment recorded successfully!')
@@ -313,11 +337,12 @@ const Orders = () => {
 
             {viewMode === 'dashboard' && (
                <div className='space-y-6'>
-                  <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
-                     <div>
-                        <h1>Custom Orders</h1>
-                        <p className='text-muted-foreground'>Manage customer jewelry orders & track progress</p>
+                  <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-linear-to-r from-secondary/50 to-transparent p-6 rounded-2xl border border-border/50'>
+                     <div className='space-y-1'>
+                        <h1 className='text-3xl font-bold bg-linear-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent'>Manage customer jewelry orders & track progress</h1>
+                        <p className='text-muted-foreground'>Track live stock, metals, and quantities</p>
                      </div>
+
                      <button
                         onClick={() => { setCustomerPhone(''); setCustomerFound(null); setShowLookupModal(true) }}
                         className='p-2 px-4 bg-amber-400/80 text-black rounded-[8px] flex items-center gap-2 hover:bg-amber-400 font-medium'
@@ -335,11 +360,11 @@ const Orders = () => {
                   </div>
 
                   {loading ? (
-                     <div className='text-center py-10 text-muted-foreground'>Loading Orders...</div>
+                     <div className='text-center py-10 text-muted-foreground'><Loading /></div>
                   ) : (
                      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
                         {uniqueCustomers.map(customer => (
-                           <div key={customer._id} onClick={() => openCustomerProfile(customer)} className='bg-card/40 border border-border/50 p-5 rounded-[8px] hover:border-amber-400/50 transition-colors cursor-pointer group flex items-start gap-4'>
+                           <div key={customer._id} onClick={() => openCustomerProfile(customer)} className='bg-card/40   border border-border/50 p-5 rounded-[8px] hover:border-amber-400/50 transition-colors cursor-pointer group flex items-start gap-4'>
                               <div className='h-12 w-12 bg-amber-400/10 rounded-full flex items-center justify-center text-amber-500 shrink-0 group-hover:scale-110 transition-transform'>
                                  <User className='w-6 h-6' />
                               </div>
@@ -388,7 +413,7 @@ const Orders = () => {
                      </div>
                      <button
                         onClick={() => { setSelectedCustomer(selectedCustomer); openNewOrderModal() }}
-                        className='p-3 px-6 bg-amber-400 text-black rounded-[8px] flex items-center gap-2 hover:bg-amber-500 font-bold shadow-lg shadow-amber-400/20'
+                        className='p-3 px-6 bg-amber-400/80 text-black rounded-[8px] flex items-center gap-2 hover:bg-amber-400 font-bold shadow-lg shadow-amber-400/20'
                      >
                         <Plus className='h-5 w-5' /> New Order
                      </button>
@@ -411,15 +436,16 @@ const Orders = () => {
                   <div className='space-y-4'>
                      <h3 className='text-lg font-bold flex items-center gap-2'><History className='w-5 h-5 text-amber-500' /> Order History</h3>
 
-                     {loading ? <div className='py-10 text-center'>Loading...</div> : currentCustomerOrders.length === 0 ? (
+                     {loading ? <div className='py-10 text-center'><Loading /></div> : currentCustomerOrders.length === 0 ? (
                         <div className='text-center py-10 bg-secondary/20 rounded-[8px] border border-border/30'>
                            <Package className='w-10 h-10 mx-auto text-muted-foreground mb-3 opacity-50' />
                            <p className='text-muted-foreground'>No orders found for this filter.</p>
                         </div>
                      ) : (
                         currentCustomerOrders.map(order => {
-                           const osCfg = orderStatusConfig[order.orderStatus] || orderStatusConfig.request
+                           const osCfg = orderStatusConfig[order.orderStatus] || orderStatusConfig.accept
                            const OsIcon = osCfg.Icon
+
                            return (
                               <div key={order._id} className='bg-card/60 border border-border/50 p-5 rounded-[8px] hover:border-amber-400/30 transition-colors'>
                                  <div className='flex flex-wrap justify-between items-start gap-4 mb-4'>
@@ -453,9 +479,9 @@ const Orders = () => {
 
                                     {/* Right: payment */}
                                     <div className='text-right space-y-1 shrink-0'>
-                                       <p className='font-bold text-lg flex items-center justify-end gap-1'>
+                                       <p className='font-bold text-lg flex items-center justify-end gap'>
+                                          <span className='text-xs text-muted-foreground font-normal'>Total:</span>
                                           <IndianRupee className='w-4 h-4' />{order.Total?.toFixed(0)}
-                                          <span className='text-xs text-muted-foreground font-normal'>total</span>
                                        </p>
                                        <p className='text-sm text-green-500'>Advance: ₹{order.AdvancePayment?.toFixed(0)}</p>
                                        {order.RemainingAmount > 0 && <p className='text-sm text-red-500'>Due: ₹{order.RemainingAmount?.toFixed(0)}</p>}
@@ -475,14 +501,14 @@ const Orders = () => {
                                  <div className='flex items-center gap-3 pt-3 border-t border-border/30'>
                                     <button
                                        onClick={() => { setActiveOrderDetails(order); setShowViewOrder(true) }}
-                                       className='text-amber-500 text-sm hover:underline'
+                                       className='text-amber-500/80 text-sm hover:underline'
                                     >
                                        View Details
                                     </button>
                                     {canEdit(order) && (
                                        <button
                                           onClick={() => openEditPayment(order)}
-                                          className='flex items-center gap-1 text-sm text-blue-400 hover:text-blue-300 hover:underline'
+                                          className='flex items-center gap-1 text-sm text-amber-400/90 hover:text-amber-300 hover:bg-amber-500/20 p-1 rounded'
                                        >
                                           <Edit className='w-3 h-3' /> Record Payment / Update
                                        </button>
@@ -614,7 +640,6 @@ const Orders = () => {
                                  <input type='number' placeholder='0' value={orderDetails.AdvancePayment} onChange={e => setOrderDetails({ ...orderDetails, AdvancePayment: e.target.value })} className='w-full pl-20 p-3 rounded-[8px] bg-green-500/10 border border-green-500/30 outline-none' />
                               </div>
                               <select value={orderDetails.orderStatus} onChange={e => setOrderDetails({ ...orderDetails, orderStatus: e.target.value })} className='p-3 rounded-[8px] bg-input border border-border/50 outline-none'>
-                                 <option value='request'>Status: Requested</option>
                                  <option value='accept'>Status: Accepted</option>
                                  <option value='progress'>Status: In Progress</option>
                                  <option value='complete'>Status: Complete</option>
@@ -741,25 +766,52 @@ const Orders = () => {
                   </div>
 
                   {/* Payment Summary */}
-                  <div className='flex flex-col items-end space-y-2 mb-6'>
-                     <div className='flex justify-between w-64 text-sm'>
-                        <span className='text-muted-foreground'>Estimated Total:</span>
-                        <span className='font-bold text-lg'>₹{activeOrderDetails.Total?.toFixed(0)}</span>
-                     </div>
-                     <div className='flex justify-between w-64 text-sm pb-2 border-b border-border/30'>
-                        <span className='text-muted-foreground'>Advance Paid:</span>
-                        <span className='font-bold text-green-500'>₹{activeOrderDetails.AdvancePayment?.toFixed(0)}</span>
-                     </div>
-                     <div className='flex justify-between w-64 text-sm font-bold'>
-                        <span className='text-muted-foreground'>Balance Due:</span>
-                        <span className='text-red-500'>₹{activeOrderDetails.RemainingAmount?.toFixed(0)}</span>
-                     </div>
-                     {activeOrderDetails.deliveryDate && (
-                        <div className='flex justify-between w-64 text-sm'>
-                           <span className='text-muted-foreground'>Delivery Date:</span>
-                           <span className='text-amber-500'>{formatDate(activeOrderDetails.deliveryDate)}</span>
+                  <div className='flex justify-between items-end space-y-2 mb-6 bg-secondary/20 rounded-[8px] border border-border/50 overflow-hidden mb-6 p-2'>
+                     <div>
+
+                        <div className='bg-secondary/20 border border-border/40 p-4 rounded mb-6 space-y-2 max-h-40 overflow-y-auto'>
+                           <div className='flex gap-1 bg-secondary/40 p-3 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b'> <History className='w-4 h-4' />  Payment History</div>
+                           {/* {(!activeOrderDetails.paymentHistory || activeOrderDetails.paymentHistory.length === 0) ? (
+                                          <p className='text-sm text-muted-foreground text-center py-2'>No payments recorded yet.</p>
+                                        ) : (
+                                          activeOrderDetails.paymentHistory.map((pay, i) => (
+                                            <div key={i} className='flex justify-between items-center text-sm border-b border-border/30 pb-2 last:border-0 last:pb-0'>
+                                              <div>
+                                                <span className='text-muted-foreground'>{new Date(pay.date).toLocaleDateString()}</span>
+                                                {pay.type === 'adjustment' && <span className='ml-2 text-xs bg-amber-500/20 text-amber-500 px-1.5 py-0.5 rounded'>Adjustment/Discount</span>}
+                                              </div>
+                                              <span className='font-medium text-green-500'>+ ₹{pay.amount}</span>
+                                            </div>
+                                          ))
+                                        )} */}
                         </div>
-                     )}
+
+                     </div>
+                     <div className=''>
+                        <div className='bg-secondary/20 border border-border/40 p-4 rounded mb-6 space-y-2 p-2'>
+                           <div className='flex gap-1 bg-secondary/40 p-3 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b'> < BadgeIndianRupeeIcon className='w-4 h-4' />Payment deatils</div>
+                           <div className='flex justify-between w-64 text-sm'>
+                              <span className='text-muted-foreground'>Estimated Total:</span>
+                              <span className='font-bold text-lg'>₹{activeOrderDetails.Total?.toFixed(0)}</span>
+                           </div>
+                           <div className='flex justify-between w-64 text-sm pb-2 border-b border-border/30'>
+                              <span className='text-muted-foreground'>Advance Paid:</span>
+                              <span className='font-bold text-green-500'>₹{activeOrderDetails.AdvancePayment?.toFixed(0)}</span>
+                           </div>
+                           <div className='flex justify-between w-64 text-sm font-bold'>
+                              <span className='text-muted-foreground'>Balance Due:</span>
+                              <span className='text-red-500'>₹{activeOrderDetails.RemainingAmount?.toFixed(0)}</span>
+                           </div>
+                           {activeOrderDetails.deliveryDate && (
+                              <div className='flex justify-between w-64 text-sm'>
+                                 <span className='text-muted-foreground'>Delivery Date:</span>
+                                 <span className='text-amber-500'>{formatDate(activeOrderDetails.deliveryDate)}</span>
+                              </div>
+                           )}
+                        </div>
+                     </div>
+
+
                   </div>
 
                   {/* Notes */}
@@ -892,12 +944,12 @@ const Orders = () => {
             </div>
          )}
          {/* Datalists for custom settings */}
-         <select id="predefined-items">
+         {/* <select id="predefined-items">
             {predefinedItemNames.map((name, idx) => <option key={idx} value={name} />)}
          </select>
          <select id="predefined-purities">
             {predefinedPurities.map((purity, idx) => <option key={idx} value={purity} />)}
-         </select>
+         </select> */}
       </>
    )
 }

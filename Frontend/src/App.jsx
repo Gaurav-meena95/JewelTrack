@@ -13,6 +13,7 @@ import { Customers } from './components/Shopkeeper/child/Customers'
 import { Report } from './components/Shopkeeper/child/Report'
 import { Settings } from './components/Shopkeeper/child/Settings'
 import { Dashboard } from './components/Shopkeeper/child/Dashboard'
+import Loading from './utils/loading'
 
 
 
@@ -21,6 +22,7 @@ function App() {
   return (
     <>
       <Routes>
+        {/* <Route path='/loading' element={<Loading/>}/> */}
         <Route path='/' element={<Landing />} />
         <Route path='/signup' element={<Signup />} />
         <Route path='/login' element={<Login />} />
