@@ -55,7 +55,7 @@ const Orders = () => {
    const [showEditPayment, setShowEditPayment] = useState(false)
    const [activeOrderDetails, setActiveOrderDetails] = useState(null)
 
-   console.log('vfkjerfkj23',activeOrderDetails)
+
 
 
    //  Customer Lookup 
@@ -275,26 +275,27 @@ const Orders = () => {
 
    const handleRecordPayment = async () => {
       if (!activeOrderDetails) return
-       if (!editPaymentData.additionalPayment || isNaN(editPaymentData.additionalPayment)) return setError("Invalid payment amount")
+      if (!editPaymentData.additionalPayment || isNaN(editPaymentData.additionalPayment)) return setError("Invalid payment amount")
       setLoading(true)
       try {
          const amount = Number(editPaymentData.additionalPayment)
          const currentHistory = activeOrderDetails.paymentHistory || []
-         const currentPaid =  activeOrderDetails.AdvancePayment || 0
-         const remain = activeOrderDetails.RemainingAmount  
+         const currentPaid = activeOrderDetails.AdvancePayment || 0
+         const remain = activeOrderDetails.RemainingAmount
 
          const newPayment = {
             amount,
             orderStatus: editPaymentData.orderStatus,
             data: new Date(),
-            notes:editPaymentData.notes
+            notes: editPaymentData.notes
 
          }
 
          const updatedPayload = {
             ...activeOrderDetails,
-            paymentHistory:[...currentHistory,newPayment],
-            RemainingAmount: Total - amount
+            amount,
+            paymentHistory: [...currentHistory, newPayment],
+            RemainingAmount: activeOrderDetails.Total - amount
          }
          await axios.patch(
             `${VITE_API_BASE_KEY}/customers/orders/update/?order_id=${activeOrderDetails._id}`,
@@ -305,6 +306,7 @@ const Orders = () => {
          setShowEditPayment(false)
          fetchOrders()
       } catch (err) {
+         console.log(err)
          setError(err.response?.data?.message || 'Failed to record payment')
       }
       setLoading(false)
@@ -766,30 +768,29 @@ const Orders = () => {
                   </div>
 
                   {/* Payment Summary */}
-                  <div className='flex justify-between items-end space-y-2 mb-6 bg-secondary/20 rounded-[8px] border border-border/50 overflow-hidden mb-6 p-2'>
-                     <div>
-
-                        <div className='bg-secondary/20 border border-border/40 p-4 rounded mb-6 space-y-2 max-h-40 overflow-y-auto'>
-                           <div className='flex gap-1 bg-secondary/40 p-3 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b'> <History className='w-4 h-4' />  Payment History</div>
-                           {/* {(!activeOrderDetails.paymentHistory || activeOrderDetails.paymentHistory.length === 0) ? (
-                                          <p className='text-sm text-muted-foreground text-center py-2'>No payments recorded yet.</p>
-                                        ) : (
-                                          activeOrderDetails.paymentHistory.map((pay, i) => (
-                                            <div key={i} className='flex justify-between items-center text-sm border-b border-border/30 pb-2 last:border-0 last:pb-0'>
-                                              <div>
-                                                <span className='text-muted-foreground'>{new Date(pay.date).toLocaleDateString()}</span>
-                                                {pay.type === 'adjustment' && <span className='ml-2 text-xs bg-amber-500/20 text-amber-500 px-1.5 py-0.5 rounded'>Adjustment/Discount</span>}
-                                              </div>
-                                              <span className='font-medium text-green-500'>+ ₹{pay.amount}</span>
-                                            </div>
-                                          ))
-                                        )} */}
+                  <div className='flex justify-between items-top space-y-2 gap-2 bg-secondary/20 rounded-[8px] border border-border/50 overflow-hidden mb-6 p-2'>
+                     <div className='w-full h-max'>
+                           <div className='flex gap-1 bg-secondary/50 p-3 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b rounded-t'> <History className='w-4 h-4' />  Payment History</div>
+                        <div className='bg-secondary/20 border border-border/40 p-4 rounded-b mb-6 space-y-2 max-h-40 overflow-y-auto'>
+                           {(!activeOrderDetails.paymentHistory || activeOrderDetails.paymentHistory.length === 0) ? (
+                              <p className='text-sm text-muted-foreground text-center py-2'>No payments recorded yet.</p>
+                           ) : (
+                              activeOrderDetails.paymentHistory.map((pay, i) => (
+                                 <div key={i} className='flex justify-between items-center text-sm border-b border-border/30 pb-2 last:border-0 last:pb-0'>
+                                    <div>
+                                       <span className='text-muted-foreground'>{new Date(pay.date).toLocaleDateString()}</span>
+                                       {pay.type === 'adjustment' && <span className='ml-2 text-xs bg-amber-500/20 text-amber-500 px-1.5 py-0.5 rounded'>Adjustment/Discount</span>}
+                                    </div>
+                                    <span className='font-medium text-green-500'>+ ₹{pay.amount}</span>
+                                 </div>
+                              ))
+                           )}
                         </div>
 
                      </div>
-                     <div className=''>
-                        <div className='bg-secondary/20 border border-border/40 p-4 rounded mb-6 space-y-2 p-2'>
-                           <div className='flex gap-1 bg-secondary/40 p-3 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b'> < BadgeIndianRupeeIcon className='w-4 h-4' />Payment deatils</div>
+                     <div className='w-full h-max'>
+                           <div className='flex gap-1 bg-secondary/50 p-3 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b rounded-t'> < BadgeIndianRupeeIcon className='w-4 h-4' />Payment deatils</div>
+                        <div className='bg-secondary/20 border border-border/40 p-4 rounded-b mb-6 space-y-2 p-2'>
                            <div className='flex justify-between w-64 text-sm'>
                               <span className='text-muted-foreground'>Estimated Total:</span>
                               <span className='font-bold text-lg'>₹{activeOrderDetails.Total?.toFixed(0)}</span>
@@ -943,13 +944,7 @@ const Orders = () => {
                <img src={enlargedImage} alt='Enlarged' className='max-w-full max-h-[90vh] object-contain rounded-[8px] shadow-2xl' onClick={e => e.stopPropagation()} />
             </div>
          )}
-         {/* Datalists for custom settings */}
-         {/* <select id="predefined-items">
-            {predefinedItemNames.map((name, idx) => <option key={idx} value={name} />)}
-         </select>
-         <select id="predefined-purities">
-            {predefinedPurities.map((purity, idx) => <option key={idx} value={purity} />)}
-         </select> */}
+
       </>
    )
 }

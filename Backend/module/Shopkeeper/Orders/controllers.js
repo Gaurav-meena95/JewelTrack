@@ -86,7 +86,7 @@ const allOrders = async (req, res) => {
 const updateOrders = async (req, res) => {
     try {
         const { order_id } = req.query
-        const { items, image, AdvancePayment, Total, orderStatus, paymentHistory, notes, deliveryDate } = req.body
+        const { items, image, AdvancePayment, Total, orderStatus, paymentHistory, notes, deliveryDate ,amount} = req.body
         console.log(req.body)
         if (!order_id) return res.status(400).json({ message: 'order_id is required' })
 
@@ -98,9 +98,10 @@ const updateOrders = async (req, res) => {
         if (advance > total) {
             return res.status(400).json({ message: 'Advance payment cannot exceed total amount' })
         }
-
-        const RemainingAmount = total - advance
+    
+        const RemainingAmount = total - advance - amount
         const paymentStatus = computePaymentStatus(total, advance)
+        console.log('fgerf',RemainingAmount)
 
         const updated = await Order.findByIdAndUpdate(
             order_id,
@@ -116,44 +117,6 @@ const updateOrders = async (req, res) => {
 }
 
 
-// const recordOrderPayment = async (req, res) => {
-//     try {
-//         const { order_id } = req.query
-//         const { additionalPayment, orderStatus, notes } = req.body
-
-//         if (!order_id) return res.status(400).json({ message: 'order_id is required' })
-
-//         const existingOrder = await Order.findById(order_id)
-//         if (!existingOrder) return res.status(404).json({ message: 'Order not found' })
-
-//         const newTotalPaid = existingOrder.AdvancePayment + (Number(additionalPayment) || 0)
-//         if (newTotalPaid > existingOrder.Total) {
-//             return res.status(400).json({ message: 'Payment exceeds total order amount' })
-//         }
-
-//         const RemainingAmount = existingOrder.Total - newTotalPaid
-//         const paymentStatus = computePaymentStatus(existingOrder.Total, newTotalPaid)
-
-//         const updated = await Order.findByIdAndUpdate(
-//             order_id,
-//             {
-//                 AdvancePayment: newTotalPaid,
-//                 RemainingAmount,
-//                 paymentStatus,
-//                 ...(orderStatus ? { orderStatus } : {}),
-//                 ...(notes !== undefined ? { notes } : {})
-//             },
-//             { new: true }
-//         ).populate('customerId', 'name phone address')
-
-//         return res.status(200).json({ message: 'Payment recorded successfully', order: updated })
-//     } catch (error) {
-//         console.log(error)
-//         return res.status(500).json({ message: 'Internal Server Error' })
-//     }
-// }
-
-// DELETE /orders/delete?order_id=XXX
 const deleteOrders = async (req, res) => {
     try {
         const { order_id } = req.query

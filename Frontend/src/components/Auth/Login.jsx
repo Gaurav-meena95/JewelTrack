@@ -28,7 +28,6 @@ const Login = () => {
         setError('')
         setLoading(true)
         try {
-            console.log('object')
             const res = await fetch(`${apiUrl}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
