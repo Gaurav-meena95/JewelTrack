@@ -1,7 +1,7 @@
 import { BarChart3, FileText, Gem, LayoutDashboard, LogOut, Menu, Package, Settings, ShoppingCart, Users, Wallet, X } from 'lucide-react';
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
-import ThemeToggle  from '../ThemeToggle';
+import ThemeToggle  from '../../ThemeToggle';
 
 const DashboardLayout = () => {
 
