@@ -1,7 +1,19 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { Calculator, Edit, Search, Plus, X, Phone, IndianRupee, UserCheck, UserX, ShoppingCart, User, Calendar, FileText, ArrowLeft, Trash2, Camera, Image as ImageIcon, History } from 'lucide-react'
+import { Edit, User, Calendar, ArrowLeft, History, IndianRupee } from 'lucide-react'
 import axios from 'axios'
 import { VITE_API_BASE_KEY, getAuthHeaders } from '../../../utils/apiConfig'
+
+// Shared Utils
+import SearchBar from '../../../utils/SearchBar'
+import SectionHeader from '../../../utils/SectionHeader'
+import StatusBadge from '../../../utils/StatusBadge'
+import ImageViewer from '../../../utils/ImageViewer'
+
+// Sub-components
+import CustomerLookupModal from './components/CustomerLookupModal'
+import NewBillModal from './components/NewBillModal'
+import BillDetailsModal from './components/BillDetailsModal'
+import RecordPaymentModal from './components/RecordPaymentModal'
 
 const Bills = () => {
    const header = getAuthHeaders()
@@ -18,13 +30,13 @@ const Bills = () => {
 
    // Navigation State
    const [viewMode, setViewMode] = useState('dashboard') // 'dashboard' or 'profile'
-   const [selectedCustomer, setSelectedCustomer] = useState(null) // Active customer object
+   const [selectedCustomer, setSelectedCustomer] = useState(null)
 
    // Dashboard Search
    const [searchQuery, setSearchQuery] = useState('')
 
    // Profile Payment Filter
-   const [paymentFilter, setPaymentFilter] = useState('all') // 'all' | 'paid' | 'partially_paid' | 'unpaid'
+   const [paymentFilter, setPaymentFilter] = useState('all')
 
    // Modals
    const [showLookupModal, setShowLookupModal] = useState(false)
@@ -33,7 +45,6 @@ const Bills = () => {
    const [showEditPayment, setShowEditPayment] = useState(false)
    const [activeBillDetails, setActiveBillDetails] = useState(null)
    const [editPaymentData, setEditPaymentData] = useState({ additionalPayment: '', paymentMethod: 'cash' })
-
 
    // Lookup / Create Customer Form
    const [customerPhone, setCustomerPhone] = useState('')
@@ -46,8 +57,6 @@ const Bills = () => {
    const [paymentDetails, setPaymentDetails] = useState({ amountPaid: '', paymentMethod: 'cash' })
    const [images, setImages] = useState([])
    const [enlargedImage, setEnlargedImage] = useState(null)
-
-
 
    // --- API Calls ---
    const fetchBills = async () => {
@@ -88,7 +97,7 @@ const Bills = () => {
       }
    }, [success, error])
 
-   // --- Grouping Bills by Customer (Dashboard Data) ---
+   // --- Derived Data ---
    const uniqueCustomers = useMemo(() => {
       const customerMap = {}
       bills.forEach(bill => {
@@ -124,7 +133,6 @@ const Bills = () => {
       return list.sort((a, b) => new Date(b.lastPurchase) - new Date(a.lastPurchase))
    }, [bills, searchQuery])
 
-   // Customer Profile Bills (with filter)
    const currentCustomerBills = useMemo(() => {
       if (!selectedCustomer) return []
       let list = bills.filter(b => b.customerId?.phone === selectedCustomer.phone).sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
@@ -132,14 +140,13 @@ const Bills = () => {
       return list
    }, [bills, selectedCustomer, paymentFilter])
 
-   // --- Dashboard Actions ---
+   // --- Actions ---
    const openCustomerProfile = (customer) => {
       setSelectedCustomer(customer)
       setPaymentFilter('all')
       setViewMode('profile')
    }
 
-   // --- Lookup/Create Customer Logic ---
    const checkCustomer = async () => {
       if (customerPhone.length < 10) return
       try {
@@ -168,7 +175,6 @@ const Bills = () => {
          } else {
             await axios.post(`${VITE_API_BASE_KEY}/customers/register`, custPayload, { headers: header })
          }
-         // Shift to Profile View and Open Cart
          setSelectedCustomer(custPayload)
          setShowLookupModal(false)
          setViewMode('profile')
@@ -178,7 +184,6 @@ const Bills = () => {
       }
    }
 
-   // --- Cart System Logic ---
    const openCartModal = () => {
       setCartItems([])
       setCurrentItem({ itemName: '', metal: 'gold', purity: '', weight: '', ratePerGram: '', makingChargePercent: '', gstPercent: '3', manualAdjustment: '0' })
@@ -207,25 +212,17 @@ const Bills = () => {
          makingChargePercent: Number(currentItem.makingChargePercent || 0),
          gstPercent: Number(currentItem.gstPercent || 0),
          manualAdjustment: Number(currentItem.manualAdjustment || 0),
+         finalPrice: calcCurrentItemPrice()
       }
       setCartItems([...cartItems, itemToSave])
       setCurrentItem({ itemName: '', metal: 'gold', purity: '', weight: '', ratePerGram: '', makingChargePercent: '', gstPercent: '3', manualAdjustment: '0' })
    }
 
-   const removeCartItem = (idx) => {
-      setCartItems(cartItems.filter((_, i) => i !== idx))
-   }
+   const removeCartItem = (idx) => setCartItems(cartItems.filter((_, i) => i !== idx))
 
-   const cartGrandTotal = cartItems.reduce((acc, item) => {
-      const base = item.weight * item.ratePerGram
-      const mc = base * (item.makingChargePercent / 100)
-      const gst = base * (item.gstPercent / 100)
-      return acc + (base + mc + gst - item.manualAdjustment)
-   }, 0)
-
+   const cartGrandTotal = cartItems.reduce((acc, item) => acc + item.finalPrice, 0)
    const cartBalanceDue = Math.max(0, cartGrandTotal - Number(paymentDetails.amountPaid || 0))
 
-   // --- Image Handling ---
    const handleImageUpload = (e) => {
       const file = e.target.files[0]
       if (!file) return
@@ -249,7 +246,6 @@ const Bills = () => {
 
    const removeImage = (idx) => setImages(images.filter((_, i) => i !== idx))
 
-   // --- Submit Final Bill ---
    const handleGenerateBill = async () => {
       if (cartItems.length === 0) return setError("Cart is empty! Add at least one item.")
       setLoading(true)
@@ -265,19 +261,10 @@ const Bills = () => {
          setShowNewBill(false)
          fetchBills()
       } catch (err) {
-         console.log('skjfnkjdsn', err.response.data.message)
          setError(err.response?.data?.message || 'Failed to generate Bill')
       }
       setLoading(false)
    }
-
-   const statusColors = {
-      'paid': 'bg-green-500/10 text-green-500 border-green-500/30',
-      'partially_paid': 'bg-amber-500/10 text-amber-500 border-amber-500/30',
-      'unpaid': 'bg-red-500/10 text-red-500 border-red-500/30'
-   }
-
-   const canEditBill = (bill) => bill.payment?.paymentStatus !== 'paid'
 
    const openEditBillPayment = (bill) => {
       setActiveBillDetails(bill)
@@ -312,30 +299,36 @@ const Bills = () => {
       return new Date(d).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
    }
 
+   const hasBlur = showLookupModal || showNewBill || showViewBill || showEditPayment
+
    return (
       <>
-         <div className={`min-h-screen ${showLookupModal || showNewBill || showViewBill || showEditPayment ? 'blur-[2px] pointer-events-none' : ''}`}>
+         <div className={`min-h-screen ${hasBlur ? 'blur-[2px] pointer-events-none' : ''}`}>
 
-            {/* --- VIEW 1: DASHBOARD --- */}
+            {/* --- DASHBOARD VIEW --- */}
             {viewMode === 'dashboard' && (
                <div className='space-y-6'>
-                  <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
-                     <div>
-                        <h1>Customers & Billing</h1>
-                        <p className='text-muted-foreground'>Manage your customers and their complete billing history</p>
-                     </div>
-                     <button onClick={() => { setCustomerPhone(''); setCustomerFound(null); setCustomerData({ name: '', father_name: '', address: '', email: '' }); setShowLookupModal(true); }} className='p-2 px-4 bg-amber-400/80 text-black rounded-[8px] flex items-center gap-2 hover:bg-amber-400 font-medium'>
-                        <Plus className='h-4 w-4' /> New Customer & Bill
-                     </button>
-                  </div>
+                  <SectionHeader 
+                     title="Customers & Billing" 
+                     subtitle="Manage your customers and their complete billing history"
+                     buttonText="New Customer & Bill"
+                     onButtonClick={() => { 
+                        setCustomerPhone(''); 
+                        setCustomerFound(null); 
+                        setCustomerData({ name: '', father_name: '', address: '', email: '' }); 
+                        setShowLookupModal(true); 
+                     }}
+                     titleClassName="text-3xl font-bold"
+                  />
 
                   {success && <div className='bg-green-500/20 border border-green-500/50 text-green-600 dark:text-green-400 p-3 rounded-[8px] text-center'>{success}</div>}
                   {error && <div className='bg-red-500/20 border border-red-500/50 text-red-600 dark:text-red-400 p-3 rounded-[8px] text-center'>{error}</div>}
 
-                  <div className='relative w-full max-w-md bg-secondary/50 p-2 rounded-[8px] border border-border/50 flex items-center'>
-                     <Search className='absolute left-5 text-muted-foreground w-5 h-5' />
-                     <input className="w-full bg-transparent border-none pl-10 pr-4 outline-none" type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder='Search customers by name or phone...' />
-                  </div>
+                  <SearchBar 
+                     value={searchQuery} 
+                     onChange={(e) => setSearchQuery(e.target.value)} 
+                     placeholder="Search customers by name or phone..." 
+                  />
 
                   {loading ? <div className='text-center py-10 text-muted-foreground'>Loading Customers...</div> : (
                      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
@@ -360,7 +353,7 @@ const Bills = () => {
                </div>
             )}
 
-            {/* --- VIEW 2: CUSTOMER PROFILE --- */}
+            {/* --- CUSTOMER PROFILE VIEW --- */}
             {viewMode === 'profile' && selectedCustomer && (
                <div className='space-y-6'>
                   <button onClick={() => setViewMode('dashboard')} className='flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-2'>
@@ -385,7 +378,6 @@ const Bills = () => {
                      </button>
                   </div>
 
-                  {/* Filter Tabs */}
                   <div className='flex flex-wrap gap-2'>
                      {['all', 'paid', 'partially_paid', 'unpaid'].map(f => (
                         <button
@@ -403,7 +395,7 @@ const Bills = () => {
 
                      {loading ? <div className='py-10 text-center'>Loading History...</div> : currentCustomerBills.length === 0 ? (
                         <div className='text-center py-10 bg-secondary/20 rounded-[8px] border border-border/30'>
-                           <ShoppingCart className='w-10 h-10 mx-auto text-muted-foreground mb-3 opacity-50' />
+                           <History className='w-10 h-10 mx-auto text-muted-foreground mb-3 opacity-50' />
                            <p className='text-muted-foreground'>No bills found for {selectedCustomer.name} yet.</p>
                         </div>
                      ) : (
@@ -419,16 +411,14 @@ const Bills = () => {
                                     <p className='text-sm text-muted-foreground'>Items: {bill.invoice?.items ? bill.invoice.items.map(i => i.itemName).join(', ') : bill.invoice?.itemName}</p>
                                  </div>
                                  <div className='text-right space-y-2'>
-                                    <span className={`px-3 py-1 text-xs rounded-full border uppercase inline-block ${statusColors[bill.payment?.paymentStatus || 'unpaid']}`}>
-                                       {(bill.payment?.paymentStatus || 'unpaid').replace('_', ' ')}
-                                    </span>
+                                    <StatusBadge status={bill.payment?.paymentStatus} />
                                     <div className='text-xs text-muted-foreground'>
                                        <p>Paid: <span className='text-green-500 font-medium'>₹{bill.payment?.amountPaid}</span></p>
                                        {bill.payment?.remainingAmount > 0 && <p>Due: <span className='text-red-500 font-medium'>₹{bill.payment?.remainingAmount}</span></p>}
                                     </div>
                                     <div className='flex gap-3 justify-end flex-wrap mt-2'>
                                        <button onClick={() => { setActiveBillDetails(bill); setShowViewBill(true); }} className='text-amber-500 text-sm hover:underline'>View Invoice</button>
-                                       {canEditBill(bill) && (
+                                       {bill.payment?.paymentStatus !== 'paid' && (
                                           <button onClick={() => openEditBillPayment(bill)} className='text-blue-400 text-sm hover:underline flex items-center gap-1'>
                                              <Edit className='w-3 h-3' /> Record Payment
                                           </button>
@@ -444,356 +434,68 @@ const Bills = () => {
             )}
          </div>
 
-         {/* --- DASHBOARD LOOKUP MODAL --- */}
-         {showLookupModal && (
-            <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4'>
-               <div className='bg-card w-full max-w-md p-6 rounded-2xl border border-border/50 shadow-2xl'>
-                  <div className='flex justify-between items-center mb-6'>
-                     <h2 className='text-xl font-bold'>Customer Lookup</h2>
-                     <button onClick={() => setShowLookupModal(false)} className='hover:bg-secondary p-1 rounded-full'><X /></button>
-                  </div>
-                  <form onSubmit={handleStartBillWithCustomer} className='space-y-4'>
-                     <div className='flex gap-2'>
-                        <input type='text' placeholder='10-digit Phone' maxLength={10} required value={customerPhone} onChange={(e) => { setCustomerPhone(e.target.value); setCustomerFound(null) }} className='flex-1 p-3 rounded-[8px] bg-input border border-border outline-none focus:border-amber-400' />
-                        <button type='button' onClick={checkCustomer} className='bg-secondary px-5 rounded-[8px] hover:bg-secondary/80 font-medium'>Check</button>
-                     </div>
+         {/* --- MODALS --- */}
+         <CustomerLookupModal 
+            show={showLookupModal} 
+            onClose={() => setShowLookupModal(false)}
+            customerPhone={customerPhone}
+            setCustomerPhone={setCustomerPhone}
+            customerFound={customerFound}
+            setCustomerFound={setCustomerFound}
+            checkCustomer={checkCustomer}
+            customerData={customerData}
+            setCustomerData={setCustomerData}
+            onSubmit={handleStartBillWithCustomer}
+         />
 
-                     {customerFound === true && <div className='text-green-500 text-sm flex items-center gap-1'><UserCheck className='w-4 h-4' /> Found! Starting new bill...</div>}
-                     {customerFound === false && <div className='text-amber-500 text-sm flex items-center gap-1'><UserX className='w-4 h-4' /> New Customer. Please fill details.</div>}
+         <NewBillModal 
+            show={showNewBill} 
+            onClose={() => setShowNewBill(false)}
+            customer={selectedCustomer}
+            predefinedItemNames={predefinedItemNames}
+            predefinedPurities={predefinedPurities}
+            cartItems={cartItems}
+            currentItem={currentItem}
+            setCurrentItem={setCurrentItem}
+            addItemToCart={addItemToCart}
+            removeCartItem={removeCartItem}
+            calcCurrentItemPrice={calcCurrentItemPrice}
+            paymentDetails={paymentDetails}
+            setPaymentDetails={setPaymentDetails}
+            images={images}
+            handleImageUpload={handleImageUpload}
+            removeImage={removeImage}
+            cartGrandTotal={cartGrandTotal}
+            cartBalanceDue={cartBalanceDue}
+            handleGenerateBill={handleGenerateBill}
+            loading={loading}
+            error={error}
+         />
 
-                     {(customerFound !== null) && (
-                        <div className='space-y-3 pt-2'>
-                           <input type='text' placeholder='Full Name' required value={customerData.name} onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })} className='w-full p-3 rounded-[8px] bg-input border border-border/50' />
-                           <input type='text' placeholder="Father's Name" value={customerData.father_name} onChange={(e) => setCustomerData({ ...customerData, father_name: e.target.value })} className='w-full p-3 rounded-[8px] bg-input border border-border/50' />
-                           <input type='text' placeholder='Address' required value={customerData.address} onChange={(e) => setCustomerData({ ...customerData, address: e.target.value })} className='w-full p-3 rounded-[8px] bg-input border border-border/50' />
-                        </div>
-                     )}
+         <BillDetailsModal 
+            show={showViewBill} 
+            onClose={() => setShowViewBill(false)}
+            bill={activeBillDetails}
+            onEnlargeImage={(img) => setEnlargedImage(img)}
+         />
 
-                     <button type='submit' disabled={customerFound === null} className='w-full p-3 bg-amber-400 text-black font-bold rounded-[8px] mt-4 disabled:opacity-50 hover:bg-amber-500'>
-                        Continue to Billing
-                     </button>
-                  </form>
-               </div>
-            </div>
-         )}
+         <RecordPaymentModal 
+            show={showEditPayment} 
+            onClose={() => setShowEditPayment(false)}
+            bill={activeBillDetails}
+            editPaymentData={editPaymentData}
+            setEditPaymentData={setEditPaymentData}
+            remainingAfterBillEdit={remainingAfterBillEdit}
+            handleRecordBillPayment={handleRecordBillPayment}
+            loading={loading}
+            error={error}
+         />
 
-         {/* --- CART SYSTEM MODAL (NEW BILL) --- */}
-         {showNewBill && selectedCustomer && (
-            <div className='fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4'>
-               <div className='bg-card w-full max-w-5xl max-h-[95vh] flex flex-col rounded-2xl border border-border/50 shadow-2xl overflow-hidden'>
+         <ImageViewer 
+            image={enlargedImage} 
+            onClose={() => setEnlargedImage(null)} 
+         />
 
-                  <div className='flex justify-between items-center p-4 md:p-6 border-b border-border/50 shrink-0 bg-secondary/30'>
-                     <div>
-                        <h2 className='text-xl font-bold flex items-center gap-2'><ShoppingCart className='w-5 h-5 text-amber-500' /> New Bill for {selectedCustomer.name}</h2>
-                        <p className='text-sm text-muted-foreground'>{selectedCustomer.phone}</p>
-                     </div>
-                     <button onClick={() => setShowNewBill(false)} className='bg-red-500/20 hover:bg-red-500/30 text-red-500 p-2 rounded-full'><X className='w-5 h-5' /></button>
-                  </div>
-
-                  <div className='flex-1 overflow-y-auto p-4 md:p-6 flex flex-col lg:flex-row gap-6'>
-                     {/* Left Side: Add Item Form */}
-                     <div className='lg:flex-1 space-y-6 '>
-                        <div className='bg-secondary/20 p-5 rounded-2xl border border-border/50'>
-                           <h3 className='font-bold mb-4 flex items-center gap-2'>1. Add Jewelry to Cart</h3>
-                           <div className='grid grid-cols-2 gap-3'>
-                              <select
-                                 value={currentItem.itemName}
-                                 onChange={e => setCurrentItem({ ...currentItem, itemName: e.target.value })}
-                                 className='col-span-2 p-3 rounded-[8px] bg-input border border-border/50 focus:border-amber-400 outline-none transition-all'
-                              >
-                                 <option>Item Name</option>
-                                 {predefinedItemNames.map((e) => (
-                                    <option value={e} key={e} >{e}</option>
-                                 ))}
-                              </select>
-
-                              <select value={currentItem.metal} onChange={e => setCurrentItem({ ...currentItem, metal: e.target.value })} className='p-3 rounded-[8px] bg-input border border-border/50 outline-none'>
-                                 <option value="gold">Gold</option><option value="silver">Silver</option><option value="diamond">Diamond</option>
-                              </select>
-
-                              <select
-                                 value={currentItem.purity}
-                                 onChange={e => setCurrentItem({ ...currentItem, purity: e.target.value })}
-                                 className='p-3 rounded-[8px] bg-input border border-border/50 focus:border-amber-400 outline-none transition-all'
-                              >
-                                 <option>Carat</option>
-                                 {predefinedPurities.map((e) => (
-                                    <option value={e} key={e} >{e}</option>
-                                 ))}
-                              </select>
-
-
-                              <div className='relative'>
-                                 <span className='absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-xs'>grams</span>
-                                 <input type='number' placeholder='Weight' value={currentItem.weight} onChange={e => setCurrentItem({ ...currentItem, weight: e.target.value })} className='w-full p-3 rounded-[8px] bg-input border border-border/50' />
-                              </div>
-                              <div className='relative'>
-                                 <span className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs'>₹</span>
-                                 <input type='number' placeholder='Rate / g' value={currentItem.ratePerGram} onChange={e => setCurrentItem({ ...currentItem, ratePerGram: e.target.value })} className='w-full pl-8 p-3 rounded-[8px] bg-input border border-border/50' />
-                              </div>
-
-                              <div className='relative'>
-                                 <span className='absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-xs'>% Making</span>
-                                 <input type='number' placeholder='Making' value={currentItem.makingChargePercent} onChange={e => setCurrentItem({ ...currentItem, makingChargePercent: e.target.value })} className='w-full p-3 rounded-[8px] bg-input border border-border/50' />
-                              </div>
-                              <div className='relative'>
-                                 <span className='absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-xs'>% GST</span>
-                                 <input type='number' placeholder='GST' value={currentItem.gstPercent} onChange={e => setCurrentItem({ ...currentItem, gstPercent: e.target.value })} className='w-full p-3 rounded-[8px] bg-input border border-border/50' />
-                              </div>
-                              <div className='col-span-2 relative'>
-                                 <span className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs'>₹ Discount</span>
-                                 <input type='number' placeholder='Discount / Adjust' value={currentItem.manualAdjustment} onChange={e => setCurrentItem({ ...currentItem, manualAdjustment: e.target.value })} className='w-full pl-20 p-3 rounded-[8px] bg-input border border-border/50' />
-                              </div>
-                           </div>
-
-                           <div className='mt-4 flex items-center justify-between p-3 bg-card border border-border/50 rounded-[8px]'>
-                              <span className='text-sm text-muted-foreground'>Item Final Price:</span>
-                              <span className='font-bold text-lg text-amber-500'>₹{calcCurrentItemPrice().toFixed(2)}</span>
-                           </div>
-
-                           <button onClick={addItemToCart} className='w-full mt-4 p-3 bg-secondary hover:bg-secondary/80 text-foreground font-bold rounded-[8px] border border-border flex items-center justify-center gap-2'>
-                              <Plus className='w-4 h-4' /> Add to Cart
-                           </button>
-                        </div>
-
-                        {/* Image Upload Area */}
-                        <div className='bg-secondary/20 p-4 rounded-2xl border border-border/50'>
-                           <label className='text-sm font-bold flex items-center gap-2 mb-3'><ImageIcon className='w-4 h-4 text-amber-500' /> 2. Add Photos (Optional)</label>
-                           <div className='flex gap-4 overflow-x-auto pb-2'>
-                              {images.map((img, idx) => (
-                                 <div key={idx} className='relative flex-shrink-0 w-20 h-20 rounded-[8px] border border-border/50 overflow-hidden group'>
-                                    <img src={img} alt='uploaded' className='w-full h-full object-cover' />
-                                    <button onClick={() => removeImage(idx)} className='absolute top-1 right-1 bg-red-500/90 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity'><X className='w-3 h-3' /></button>
-                                 </div>
-                              ))}
-                              <label className='flex-shrink-0 w-20 h-20 rounded-[8px] border-2 border-dashed border-border/50 flex flex-col items-center justify-center text-muted-foreground hover:text-amber-500 hover:border-amber-400 cursor-pointer transition-colors'>
-                                 <Camera className='w-6 h-6 mb-1' />
-                                 <span className='text-[10px]'>Capture</span>
-                                 <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleImageUpload} />
-                              </label>
-                           </div>
-                        </div>
-                     </div>
-
-                     {/* Right Side: Cart Summary & Checkout */}
-                     <div className='lg:flex-1 flex flex-col bg-card border border-border/50 rounded-2xl shadow-inner lg:overflow-hidden'>
-                        <div className='bg-secondary/50 p-4 font-bold border-b border-border/50 flex items-center gap-2'>
-                           <FileText className='w-4 h-4' /> 3. Cart Summary
-                        </div>
-
-                        <div className='flex-1 p-4 overflow-y-auto space-y-3 min-h-[200px]'>
-                           {cartItems.length === 0 ? (
-                              <div className='h-full flex flex-col items-center justify-center text-muted-foreground opacity-50'>
-                                 <ShoppingCart className='w-12 h-12 mb-2' />
-                                 <p>Cart is currently empty</p>
-                              </div>
-                           ) : (
-                              cartItems.map((item, idx) => (
-                                 <div key={idx} className='p-3 bg-secondary/20 rounded-[8px] border border-border/50 flex justify-between items-center relative pr-10'>
-                                    <div>
-                                       <p className='font-bold text-sm'>{item.itemName} <span className='text-xs text-muted-foreground uppercase'>({item.metal})</span></p>
-                                       <p className='text-xs text-muted-foreground'>{item.weight}g @ ₹{item.ratePerGram}/g</p>
-                                    </div>
-                                    <div className='font-bold text-amber-500'>₹{item.finalPrice?.toFixed(2) || '0.00'}</div>
-                                    <button onClick={() => removeCartItem(idx)} className='absolute right-3 text-red-500/50 hover:text-red-500 transition-colors'><Trash2 className='w-4 h-4' /></button>
-                                 </div>
-                              ))
-                           )}
-                        </div>
-
-
-                        <div className='border-t border-border/50 bg-secondary/10 p-5 space-y-4'>
-                           {error && <div className='bg-red-500/20 border border-red-500/50 text-red-500 text-sm p-2 rounded-[8px] mb-4 text-center'>{error}</div>}
-                           <div className='flex justify-between items-center font-bold text-xl'>
-                              <span>Grand Total:</span>
-                              <span className='text-foreground'>₹{cartGrandTotal.toFixed(2)}</span>
-                           </div>
-
-                           <div className='grid grid-cols-2 gap-3 pt-2 border-t border-border/30'>
-                              <div className='col-span-2 relative'>
-                                 <span className='absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>Paid Now ₹</span>
-                                 <input type='number' value={paymentDetails.amountPaid} onChange={e => setPaymentDetails({ ...paymentDetails, amountPaid: e.target.value })} className='w-full pl-24 p-3 rounded-[8px] bg-green-500/10 border border-green-500/30 text-green-500 font-bold focus:border-green-500 outline-none placeholder:text-green-500/50' placeholder='0.00' />
-                              </div>
-                              <select value={paymentDetails.paymentMethod} onChange={e => setPaymentDetails({ ...paymentDetails, paymentMethod: e.target.value })} className='col-span-2 p-3 rounded-[8px] bg-input border border-border/50 outline-none'>
-                                 <option value="cash">Cash</option><option value="upi">UPI / Wallet</option><option value="card">Card</option><option value="bank_transfer">Bank Transfer</option>
-                              </select>
-                           </div>
-
-                           {cartBalanceDue > 0 && (
-                              <div className='flex justify-between items-center text-sm font-bold text-red-500 pt-2'>
-                                 <span>Remaining Due:</span>
-                                 <span>₹{cartBalanceDue.toFixed(2)}</span>
-                              </div>
-                           )}
-
-                           <button onClick={handleGenerateBill} disabled={loading || cartItems.length === 0} className='w-full p-4 bg-amber-400 text-black font-bold text-lg rounded-[8px] hover:bg-amber-500 disabled:opacity-50 mt-2 flex justify-center items-center'>
-                              {loading ? 'Processing...' : 'Generate Combined Bill'}
-                           </button>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         )}
-
-         {/* --- VIEW BILL MODAL (INVOICE VIEWER) --- */}
-         {showViewBill && activeBillDetails && (
-            <div className='fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4'>
-               <div className='bg-card w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8 rounded-3xl border border-border/50 shadow-2xl relative'>
-                  <button onClick={() => setShowViewBill(false)} className='absolute top-6 right-6 bg-secondary/50 hover:bg-secondary p-2 rounded-full'><X className='w-5 h-5' /></button>
-
-                  <div className='text-center border-b border-border/50 pb-6 mb-6'>
-                     <h2 className='text-2xl font-bold uppercase tracking-widest text-amber-500'>Invoice</h2>
-                     <p className='text-sm text-muted-foreground mt-1'>Date: {new Date(activeBillDetails.createdAt).toLocaleDateString()}</p>
-                  </div>
-
-                  <div className='mb-6'>
-                     <p className='text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1'>Billed To:</p>
-                     <p className='text-lg font-bold'>{activeBillDetails.customerId?.name}</p>
-                     <p className='text-sm text-muted-foreground'>{activeBillDetails.customerId?.phone}</p>
-                  </div>
-
-                  <div className='bg-secondary/20 rounded-[8px] border border-border/50 overflow-hidden mb-6'>
-                     <div className='bg-secondary/40 p-3 grid grid-cols-12 text-xs font-bold uppercase tracking-wider text-muted-foreground'>
-                        <div className='col-span-6'>Item / Details</div>
-                        <div className='col-span-3 text-right'>Qty/Wt</div>
-                        <div className='col-span-3 text-right'>Total</div>
-                     </div>
-                     <div className='divide-y divide-border/50'>
-
-
-                        <div className='p-3 grid grid-cols-12 text-sm items-center'>
-                           <div className='col-span-6'>
-                              <p className='font-bold'>{activeBillDetails.invoice?.itemName}</p>
-                              <p className='text-xs text-muted-foreground'>{[activeBillDetails.invoice?.purity, activeBillDetails.invoice?.metal].filter(Boolean).join(' ')}</p>
-                           </div>
-                           <div className='col-span-3 text-right text-muted-foreground'>{activeBillDetails.invoice?.weight}g</div>
-                           <div className='col-span-3 text-right font-bold'>₹{activeBillDetails.invoice?.finalPrice?.toFixed(2)}</div>
-                        </div>
-
-                     </div>
-                  </div>
-
-                  <div className='flex flex-col items-end space-y-2 mb-8'>
-                     <div className='flex justify-between w-64 text-sm'>
-                        <span className='text-muted-foreground'>Grand Total:</span>
-                        <span className='font-bold text-lg'>₹{(activeBillDetails.invoice?.grandTotal || activeBillDetails.invoice?.finalPrice)?.toFixed(2)}</span>
-                     </div>
-                     <div className='flex justify-between w-64 text-sm pb-2 border-b border-border/30'>
-                        <span className='text-muted-foreground'>Amount Paid:</span>
-                        <span className='font-bold text-green-500'>₹{activeBillDetails.payment?.amountPaid?.toFixed(2)}</span>
-                     </div>
-                     <div className='flex justify-between w-64 text-sm font-bold'>
-                        <span className='text-muted-foreground'>Balance Due:</span>
-                        <span className='text-red-500'>₹{activeBillDetails.payment?.remainingAmount?.toFixed(2)}</span>
-                     </div>
-                  </div>
-
-                  {activeBillDetails.image && activeBillDetails.image.length > 0 && (
-                     <div className='pt-6 border-t border-border/50'>
-                        <p className='text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3'>Attached Photos</p>
-                        <div className='flex gap-3 overflow-x-auto'>
-                           {activeBillDetails.image.map((img, idx) => (
-                              <img key={idx} src={img} alt='Attachment' onClick={() => setEnlargedImage(img)} className='w-20 h-20 rounded-[8px] object-cover border border-border/50 cursor-pointer hover:opacity-80 transition-opacity' />
-                           ))}
-                        </div>
-                     </div>
-                  )}
-               </div>
-            </div>
-         )}
-
-         {/* --- EDIT PAYMENT MODAL --- */}
-         {showEditPayment && activeBillDetails && (
-            <div className='fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4'>
-               <div className='bg-card w-full max-w-md p-6 rounded-2xl border border-border/50 shadow-2xl'>
-                  <div className='flex justify-between items-center mb-5'>
-                     <h2 className='text-xl font-bold'>Record Payment</h2>
-                     <button onClick={() => setShowEditPayment(false)} className='hover:bg-secondary p-1 rounded-full'><X /></button>
-                  </div>
-
-                  {error && <div className='bg-red-500/20 border border-red-500/50 text-red-500 text-sm p-2 rounded-[8px] mb-4 text-center'>{error}</div>}
-
-                  {/* Current State */}
-                  <div className='bg-secondary/30 rounded-[8px] p-4 mb-5 space-y-1'>
-                     <p className='text-sm font-bold'>{activeBillDetails.customerId?.name}</p>
-                     <p className='text-xs text-muted-foreground'>Items: {activeBillDetails.invoice?.items?.map(i => i.itemName).join(', ') || activeBillDetails.invoice?.itemName}</p>
-                     <div className='flex justify-between text-sm mt-2'>
-                        <span className='text-muted-foreground'>Invoice Total:</span>
-                        <span className='font-bold'>₹{(activeBillDetails.invoice?.grandTotal || activeBillDetails.invoice?.finalPrice)?.toFixed(0)}</span>
-                     </div>
-                     <div className='flex justify-between text-sm'>
-                        <span className='text-muted-foreground'>Already Paid:</span>
-                        <span className='text-green-500 font-bold'>₹{activeBillDetails.payment?.amountPaid?.toFixed(0)}</span>
-                     </div>
-                     <div className='flex justify-between text-sm'>
-                        <span className='text-muted-foreground'>Currently Due:</span>
-                        <span className='text-red-500 font-bold'>₹{activeBillDetails.payment?.remainingAmount?.toFixed(0)}</span>
-                     </div>
-                  </div>
-
-                  <div className='space-y-4'>
-                     {/* Additional Payment */}
-                     <div>
-                        <label className='text-sm font-medium text-muted-foreground mb-1 block'>Additional Payment Now (₹)</label>
-                        <input
-                           type='number'
-                           placeholder='Enter amount customer is paying now...'
-                           value={editPaymentData.additionalPayment}
-                           onChange={e => setEditPaymentData({ ...editPaymentData, additionalPayment: e.target.value })}
-                           className='w-full p-3 rounded-[8px] bg-green-500/10 border border-green-500/30 text-green-400 font-bold outline-none focus:border-green-500'
-                        />
-                     </div>
-
-                     {/* New Remaining Preview */}
-                     {editPaymentData.additionalPayment && (
-                        <div className={`p-3 rounded-[8px] border text-sm font-bold flex justify-between ${remainingAfterBillEdit === 0 ? 'bg-green-500/10 border-green-500/30 text-green-500' : 'bg-amber-500/10 border-amber-500/30 text-amber-500'}`}>
-                           <span>Remaining After Payment:</span>
-                           <span>₹{remainingAfterBillEdit.toFixed(0)}</span>
-                        </div>
-                     )}
-
-                     {/* Payment Method */}
-                     <div>
-                        <label className='text-sm font-medium text-muted-foreground mb-1 block'>Payment Method</label>
-                        <select
-                           value={editPaymentData.paymentMethod}
-                           onChange={e => setEditPaymentData({ ...editPaymentData, paymentMethod: e.target.value })}
-                           className='w-full p-3 rounded-[8px] bg-input border border-border/50 outline-none'
-                        >
-                           <option value='cash'>Cash</option>
-                           <option value='upi'>UPI / Wallet</option>
-                           <option value='card'>Card</option>
-                           <option value='bank_transfer'>Bank Transfer</option>
-                        </select>
-                     </div>
-
-                     <button
-                        onClick={handleRecordBillPayment}
-                        disabled={loading || !editPaymentData.additionalPayment}
-                        className='w-full p-3 bg-amber-400 text-black font-bold rounded-[8px] hover:bg-amber-500 disabled:opacity-50'
-                     >
-                        {loading ? 'Saving...' : 'Save Payment'}
-                     </button>
-                  </div>
-               </div>
-            </div>
-         )}
-
-         {/* --- ENLARGED IMAGE VIEWER MODAL --- */}
-         {enlargedImage && (
-            <div className='fixed inset-0 z-[70] flex items-center justify-center bg-black/95 backdrop-blur-md p-4' onClick={() => setEnlargedImage(null)}>
-               <button className='absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 hover:text-red-500 rounded-full text-white transition-colors'><X className='w-6 h-6' /></button>
-               <img src={enlargedImage} alt="Enlarged" className='max-w-full max-h-[90vh] object-contain rounded-[8px] shadow-2xl' onClick={(e) => e.stopPropagation()} />
-            </div>
-         )}
-         {/* Datalists for custom settings */}
-         <select id="predefined-items">
-            {predefinedItemNames.map((name, idx) => <option key={idx} value={name} />)}
-         </select>
-         <select id="predefined-purities">
-            {predefinedPurities.map((purity, idx) => <option key={idx} value={purity} />)}
-         </select>
       </>
    )
 }

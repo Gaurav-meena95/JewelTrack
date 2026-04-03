@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { User, Store, Phone, Mail, Lock, Save, Shield, CheckCircle, AlertCircle, X, Tag } from 'lucide-react'
+import { Save, CheckCircle, AlertCircle } from 'lucide-react'
 import axios from 'axios'
 import { VITE_API_BASE_KEY, getAuthHeaders } from '../../../utils/apiConfig'
+
+// Shared Utils
+import SectionHeader from '../../../utils/SectionHeader'
+
+// Sub-components
+import ShopInfoSection from './components/ShopInfoSection'
+import PersonalInfoSection from './components/PersonalInfoSection'
+import SecuritySection from './components/SecuritySection'
+import CustomOptionsSection from './components/CustomOptionsSection'
 
 const Settings = () => {
     const header = getAuthHeaders()
@@ -25,7 +34,7 @@ const Settings = () => {
     const [newPurity, setNewPurity] = useState('')
 
     const handleAddItemName = (e) => {
-        e.preventDefault()
+        if (e) e.preventDefault()
         if (newItemName.trim() && !profile.itemNames.includes(newItemName.trim())) {
             setProfile(prev => ({ ...prev, itemNames: [...prev.itemNames, newItemName.trim()] }))
             setNewItemName('')
@@ -37,7 +46,7 @@ const Settings = () => {
     }
 
     const handleAddPurity = (e) => {
-        e.preventDefault()
+        if (e) e.preventDefault()
         if (newPurity.trim() && !profile.purities.includes(newPurity.trim())) {
             setProfile(prev => ({ ...prev, purities: [...prev.purities, newPurity.trim()] }))
             setNewPurity('')
@@ -103,169 +112,77 @@ const Settings = () => {
             }
 
             const res = await axios.patch(`${VITE_API_BASE_KEY}/auth/shopkeeper/setting`, payload, { headers: header })
-            showMessage('success', res.data.message || 'Profile updated successfully')
+            showMessage('success', res.data.message || 'Profile successfully calibrated')
             setProfile(prev => ({ ...prev, password: '', confirmPassword: '' }))
         } catch (err) {
-            showMessage('error', err.response?.data?.message || 'Failed to update profile')
+            showMessage('error', err.response?.data?.message || 'Failed to update preferences')
         }
         setSaving(false)
     }
 
     if (loading) {
-        return <div className="flex h-[80vh] items-center justify-center text-muted-foreground">Loading Settings...</div>
+        return (
+            <div className="flex flex-col h-[70vh] items-center justify-center space-y-4 opacity-50">
+                <div className='w-10 h-10 border-4 border-amber-400/20 border-t-amber-400 rounded-full animate-spin'></div>
+                <p className="text-xs uppercase font-black tracking-widest">Accessing Settings...</p>
+            </div>
+        )
     }
 
     return (
-        <div className='max-w-4xl mx-auto space-y-8 pb-10'>
-            <div>
-                <h1 className='text-3xl font-bold'>Account Settings</h1>
-                <p className='text-muted-foreground mt-1'>Manage your shop details, profile, and security preferences.</p>
-            </div>
+        <div className='max-w-4xl mx-auto space-y-10 pb-32 animate-in fade-in duration-500'>
+            
+            <SectionHeader 
+                title="Account Settings" 
+                subtitle="Calibrate your business identity, personal profile, and secure credentials"
+                titleClassName="text-3xl font-black bg-linear-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent tracking-tight"
+            />
 
             {message.text && (
-                <div className={`p-4 rounded-[8px] flex items-center gap-3 border ${message.type === 'success' ? 'bg-green-500/10 border-green-500/30 text-green-500' : 'bg-red-500/10 border-red-500/30 text-red-500'}`}>
-                    {message.type === 'success' ? <CheckCircle className='w-5 h-5' /> : <AlertCircle className='w-5 h-5' />}
-                    <p className='font-medium'>{message.text}</p>
+                <div className={`p-5 rounded-2xl flex items-center gap-4 border shadow-sm animate-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-green-500/10 border-green-500/30 text-green-500' : 'bg-red-500/10 border-red-500/30 text-red-500'}`}>
+                    {message.type === 'success' ? <CheckCircle className='w-6 h-6' /> : <AlertCircle className='w-6 h-6' />}
+                    <p className='font-bold text-sm uppercase tracking-tight'>{message.text}</p>
                 </div>
             )}
 
-            <form onSubmit={handleSave} className='space-y-8'>
-                {/* Shop Details Section */}
-                <section className='bg-card/40 border border-border/50 rounded-2xl overflow-hidden'>
-                    <div className='bg-secondary/30 px-6 py-4 border-b border-border/50 flex items-center gap-3'>
-                        <div className='p-2 bg-amber-400/20 text-amber-500 rounded'><Store className='w-5 h-5' /></div>
-                        <h2 className='text-xl font-bold'>Shop Information</h2>
-                    </div>
-                    <div className='p-6 grid grid-cols-1 md:grid-cols-2 gap-6'>
-                        <div className='space-y-2 col-span-1 md:col-span-2'>
-                            <label className='text-sm font-medium text-muted-foreground'>Shop Name</label>
-                            <div className='relative'>
-                                <Store className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50' />
-                                <input type="text" name="shopName" value={profile.shopName} onChange={handleChange} required className='w-full pl-12 p-3 bg-input border border-border/50 rounded-[8px] outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 transition-all' placeholder="Enter your shop name" />
-                            </div>
-                        </div>
-                    </div>
-                </section>
+            <form onSubmit={handleSave} className='space-y-10'>
+                <ShopInfoSection 
+                    shopName={profile.shopName} 
+                    handleChange={handleChange} 
+                />
 
-                {/* Profile Details Section */}
-                <section className='bg-card/40 border border-border/50 rounded-2xl overflow-hidden'>
-                    <div className='bg-secondary/30 px-6 py-4 border-b border-border/50 flex items-center gap-3'>
-                        <div className='p-2 bg-amber-400/20 text-amber-500 rounded'><User className='w-5 h-5' /></div>
-                        <h2 className='text-xl font-bold'>Personal Profile</h2>
-                    </div>
-                    <div className='p-6 grid grid-cols-1 md:grid-cols-2 gap-6'>
-                        <div className='space-y-2'>
-                            <label className='text-sm font-medium text-muted-foreground'>Full Name</label>
-                            <div className='relative'>
-                                <User className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50' />
-                                <input type="text" name="name" value={profile.name} onChange={handleChange} required className='w-full pl-12 p-3 bg-input border border-border/50 rounded-[8px] outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 transition-all' placeholder="Your full name" />
-                            </div>
-                        </div>
-                        <div className='space-y-2'>
-                            <label className='text-sm font-medium text-muted-foreground'>Phone Number</label>
-                            <div className='relative'>
-                                <Phone className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50' />
-                                <input type="text" name="phone" value={profile.phone} onChange={handleChange} required pattern="\d{10}" title="Must be exactly 10 digits" className='w-full pl-12 p-3 bg-input border border-border/50 rounded-[8px] outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 transition-all pointer-events-none' placeholder="10-digit mobile number" />
-                            </div>
-                        </div>
-                        <div className='space-y-2 col-span-1 md:col-span-2'>
-                            <label className='text-sm font-medium text-muted-foreground'>Email Address <span className='text-xs text-amber-500/70 ml-2'>(Used for Login)</span></label>
-                            <div className='relative'>
-                                <Mail className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50' />
-                                <input  type="email" name="email" value={profile.email} onChange={handleChange} required className='w-full pl-12 p-3 bg-input border border-border/50 rounded-[8px] outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 transition-all pointer-events-none' placeholder="shop@example.com" />
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <PersonalInfoSection 
+                    profile={profile} 
+                    handleChange={handleChange} 
+                />
 
-                {/* Security Section */}
-                <section className='bg-card/40 border border-border/50 rounded-2xl overflow-hidden'>
-                    <div className='bg-secondary/30 px-6 py-4 border-b border-border/50 flex items-center gap-3'>
-                        <div className='p-2 bg-red-400/20 text-red-500 rounded'><Shield className='w-5 h-5' /></div>
-                        <h2 className='text-xl font-bold'>Security</h2>
-                    </div>
-                    <div className='p-6'>
-                        <p className='text-sm text-muted-foreground mb-6'>Leave these fields blank if you do not want to change your password.</p>
-                        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                            <div className='space-y-2'>
-                                <label className='text-sm font-medium text-muted-foreground'>New Password</label>
-                                <div className='relative'>
-                                    <Lock className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50' />
-                                    <input type="password" name="password" value={profile.password} onChange={handleChange} className='w-full pl-12 p-3 bg-input border border-border/50 rounded-[8px] outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400/50 transition-all' placeholder="Enter new password" />
-                                </div>
-                            </div>
-                            <div className='space-y-2'>
-                                <label className='text-sm font-medium text-muted-foreground'>Confirm New Password</label>
-                                <div className='relative'>
-                                    <Lock className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50' />
-                                    <input type="password" name="confirmPassword" value={profile.confirmPassword} onChange={handleChange} className='w-full pl-12 p-3 bg-input border border-border/50 rounded-[8px] outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400/50 transition-all' placeholder="Re-enter new password" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <SecuritySection 
+                    password={profile.password} 
+                    confirmPassword={profile.confirmPassword} 
+                    handleChange={handleChange} 
+                />
 
-                {/* Custom Options Section */}
-                <section className='bg-card/40 border border-border/50 rounded-2xl overflow-hidden'>
-                    <div className='bg-secondary/30 px-6 py-4 border-b border-border/50 flex items-center gap-3'>
-                        <div className='p-2 bg-indigo-400/20 text-indigo-500 rounded'><Tag className='w-5 h-5' /></div>
-                        <h2 className='text-xl font-bold'>Predefined Dropdown Options</h2>
-                    </div>
-                    <div className='p-6 grid grid-cols-1 md:grid-cols-2 gap-8'>
-                        
-                        {/* Item Names */}
-                        <div className='space-y-4'>
-                            <div>
-                                <label className='text-sm font-medium text-muted-foreground'>Predefined Item Names</label>
-                                <p className='text-xs text-muted-foreground/70 mb-2'>Add common item names (e.g., Ring, Chain) for quick selection in forms.</p>
-                                <div className='flex gap-2'>
-                                    <input type="text" value={newItemName} onChange={e => setNewItemName(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddItemName(e))} className='flex-1 p-3 bg-input border border-border/50 rounded-[8px] outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/50 transition-all' placeholder="e.g., Gold Bangle" />
-                                    <button type="button" onClick={handleAddItemName} className='px-4 py-2 bg-indigo-500 text-white rounded-[8px] hover:bg-indigo-600 transition-all font-medium'>Add</button>
-                                </div>
-                            </div>
-                            <div className='flex flex-wrap gap-2'>
-                                {profile.itemNames.map((item, idx) => (
-                                    <div key={idx} className='flex items-center gap-2 bg-indigo-500/10 text-indigo-500 px-3 py-1 rounded-[8px] border border-indigo-500/20'>
-                                        <span className='text-sm font-medium'>{item}</span>
-                                        <button type="button" onClick={() => handleRemoveItemName(item)} className='hover:bg-indigo-500/20 p-0.5 rounded transition-colors'>
-                                            <X className='w-3 h-3' />
-                                        </button>
-                                    </div>
-                                ))}
-                                {profile.itemNames.length === 0 && <span className='text-sm text-muted-foreground italic'>No item names added yet</span>}
-                            </div>
-                        </div>
+                <CustomOptionsSection 
+                    itemNames={profile.itemNames}
+                    newItemName={newItemName}
+                    setNewItemName={setNewItemName}
+                    handleAddItemName={handleAddItemName}
+                    handleRemoveItemName={handleRemoveItemName}
+                    purities={profile.purities}
+                    newPurity={newPurity}
+                    setNewPurity={setNewPurity}
+                    handleAddPurity={handleAddPurity}
+                    handleRemovePurity={handleRemovePurity}
+                />
 
-                        {/* Purities */}
-                        <div className='space-y-4'>
-                            <div>
-                                <label className='text-sm font-medium text-muted-foreground'>Predefined Purities</label>
-                                <p className='text-xs text-muted-foreground/70 mb-2'>Add common purities (e.g., 22K, 18K) for quick selection.</p>
-                                <div className='flex gap-2'>
-                                    <input type="text" value={newPurity} onChange={e => setNewPurity(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddPurity(e))} className='flex-1 p-3 bg-input border border-border/50 rounded-[8px] outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/50 transition-all' placeholder="e.g., 22K" />
-                                    <button type="button" onClick={handleAddPurity} className='px-4 py-2 bg-indigo-500 text-white rounded-[8px] hover:bg-indigo-600 transition-all font-medium'>Add</button>
-                                </div>
-                            </div>
-                            <div className='flex flex-wrap gap-2'>
-                                {profile.purities.map((purity, idx) => (
-                                    <div key={idx} className='flex items-center gap-2 bg-indigo-500/10 text-indigo-500 px-3 py-1 rounded-[8px] border border-indigo-500/20'>
-                                        <span className='text-sm font-medium'>{purity}</span>
-                                        <button type="button" onClick={() => handleRemovePurity(purity)} className='hover:bg-indigo-500/20 p-0.5 rounded transition-colors'>
-                                            <X className='w-3 h-3' />
-                                        </button>
-                                    </div>
-                                ))}
-                                {profile.purities.length === 0 && <span className='text-sm text-muted-foreground italic'>No purities added yet</span>}
-                            </div>
-                        </div>
-
-                    </div>
-                </section>
-
-                <div className='flex justify-end pt-4 sticky bottom-6 z-10'>
-                    <button type="submit" disabled={saving} className='bg-amber-400 hover:bg-amber-500 text-black font-bold px-8 py-4 rounded-[8px] shadow-lg shadow-amber-400/20 flex items-center gap-3 disabled:opacity-50 transition-all hover:scale-[1.02]'>
-                        <Save className='w-5 h-5' />
-                        {saving ? 'Saving Changes...' : 'Save Settings'}
+                <div className='flex justify-end pt-4 sticky bottom-8 z-20'>
+                    <button 
+                        type="submit" 
+                        disabled={saving} 
+                        className='bg-amber-400 hover:bg-amber-500 text-black font-black px-10 py-4 rounded-2xl shadow-2xl shadow-amber-400/30 flex items-center gap-3 disabled:opacity-50 transition-all hover:scale-[1.05] active:scale-95 uppercase tracking-widest text-xs'
+                    >
+                        <Save className='w-4 h-4' />
+                        {saving ? 'Saving System Preferences...' : 'Apply All Changes'}
                     </button>
                 </div>
             </form>

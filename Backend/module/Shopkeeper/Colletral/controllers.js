@@ -34,6 +34,7 @@ const createCollatral = async (req, res) => {
 const updateCollatral = async (req, res) => {
     try {
         const { phone ,collatral_id} = req.query
+        console.log('dgwgrw',req.body)
         const { weight, jewellery, image, price, interestRate, status, paymentHistory, totalPaid, remainingAmount } = req.body
         const existing = await Customer.findOne({ phone })
         if (!existing) {

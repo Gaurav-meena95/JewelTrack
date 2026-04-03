@@ -94,13 +94,13 @@ const handelLogout = ()=>{
                       relative w-full flex items-center gap-3 px-4 py-3 
                       transition-all duration-300 rounded group overflow-hidden tracking-wide
                       ${isActive
-                          ? 'bg-gradient-to-r from-amber-400/10 to-transparent text-amber-500 font-semibold border border-amber-400/20 shadow-sm'
+                          ? 'bg-linear-to-r from-amber-400/10 to-transparent text-amber-500 font-semibold border border-amber-400/20 shadow-sm'
                           : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground hover:translate-x-1'
                         }
                     `}
                   >
                     {isActive && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 h-3/4 w-1 bg-gradient-to-b from-amber-400 to-amber-600 rounded-r-md"></div>
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 h-3/4 w-1 bg-linear-to-b from-amber-400 to-amber-600 rounded-r-md"></div>
                     )}
                     <Icon className={`h-5 w-5 shrink-0 transition-transform duration-300 ${isActive ? 'scale-110 drop-shadow-md' : 'group-hover:scale-110 group-hover:text-amber-400'}`} />
                     <span className="truncate">{ele.label}</span>
