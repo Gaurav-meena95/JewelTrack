@@ -7,7 +7,7 @@ const SalesReportCard = ({ totalRevenue, avgBillValue, bills }) => {
       <div className='flex items-center justify-between mb-8 px-1'>
         <h3 className='font-black flex items-center gap-2 text-lg uppercase tracking-tight'>
           <div className='p-2 bg-amber-400/10 rounded group-hover:scale-110 transition-transform'>
-            <IndianRupee className='w-5 h-5 text-amber-500' />
+            <IndianRupee className='w-5 h-5 text-amber-400' />
           </div>
           Sales Analytics
         </h3>
@@ -16,7 +16,7 @@ const SalesReportCard = ({ totalRevenue, avgBillValue, bills }) => {
       <div className='grid grid-cols-2 gap-4 mb-8'>
         <div className='p-5 bg-secondary/30 rounded-2xl border border-border/30 hover:bg-secondary/50 transition-colors'>
           <p className='text-[10px] text-muted-foreground uppercase tracking-widest font-black mb-2 opacity-60'>Total Net Revenue</p>
-          <p className='text-2xl font-black text-amber-500 tabular-nums'>₹{totalRevenue.toLocaleString('en-IN')}</p>
+          <p className='text-2xl font-black text-amber-400 tabular-nums'>₹{totalRevenue.toLocaleString('en-IN')}</p>
         </div>
         <div className='p-5 bg-secondary/30 rounded-2xl border border-border/30 hover:bg-secondary/50 transition-colors'>
           <p className='text-[10px] text-muted-foreground uppercase tracking-widest font-black mb-2 opacity-60'>Avg Ticket Size</p>
@@ -27,14 +27,14 @@ const SalesReportCard = ({ totalRevenue, avgBillValue, bills }) => {
       <div className='space-y-6'>
         <div className='flex items-center justify-between text-xs p-4 bg-amber-400/5 rounded-2xl border border-amber-400/20'>
           <span className='font-black uppercase tracking-widest text-muted-foreground opacity-60'>Invoices Generated</span>
-          <span className='font-black text-lg text-amber-500'>{bills.length}</span>
+          <span className='font-black text-lg text-amber-400'>{bills.length}</span>
         </div>
         
         {/* Activity Heatmap (CSS-only Bar Chart) */}
         {bills.length > 0 && (
           <div className='mt-4 p-6 border border-border/30 rounded-2xl bg-secondary/10'>
             <p className='text-[10px] text-muted-foreground mb-6 uppercase font-black tracking-widest flex items-center gap-2 opacity-60'>
-              <TrendingUp className='w-3 h-3 text-amber-500'/> Activity Heatmap (Last 10 Records)
+              <TrendingUp className='w-3 h-3 text-amber-400'/> Activity Heatmap (Last 10 Records)
             </p>
             <div className='flex items-end gap-1.5 h-24'>
               {Object.entries(bills.reduce((acc, b) => {

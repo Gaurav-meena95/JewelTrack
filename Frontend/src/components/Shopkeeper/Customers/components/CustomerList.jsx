@@ -33,7 +33,7 @@ const CustomerList = ({
                 </div>
                 <p className='text-xs font-bold text-muted-foreground uppercase tracking-widest'>Total Customers</p>
             </div>
-            <h3 className='text-3xl font-black text-amber-500'>{customers.length}</h3>
+            <h3 className='text-3xl font-black text-amber-400'>{customers.length}</h3>
         </div>
       </div>
 
@@ -56,10 +56,10 @@ const CustomerList = ({
               <div className='flex justify-between items-start relative z-10'>
                 <div className='flex items-center gap-4'>
                   <div className='h-12 w-12 rounded-2xl bg-linear-to-br from-amber-400/20 to-amber-600/20 flex items-center justify-center border border-amber-400/20 group-hover:from-amber-400 group-hover:to-amber-500 transition-all duration-300'>
-                    <User className='h-6 w-6 text-amber-500 group-hover:text-black transition-colors' />
+                    <User className='h-6 w-6 text-amber-400 group-hover:text-black transition-colors' />
                   </div>
                   <div>
-                    <h3 className='font-bold text-lg group-hover:text-amber-500 transition-colors'>{customer.name}</h3>
+                    <h3 className='font-bold text-lg group-hover:text-amber-400 transition-colors'>{customer.name}</h3>
                     <p className='text-muted-foreground text-xs font-bold uppercase tracking-tighter opacity-70'>S/O {customer.father_name}</p>
                   </div>
                 </div>
@@ -67,17 +67,17 @@ const CustomerList = ({
 
               <div className='space-y-3 bg-secondary/20 p-4 rounded-2xl border border-border/30 group-hover:bg-secondary/40 transition-colors'>
                 <div className='flex items-center gap-3 text-sm'>
-                  <Phone className='h-4 w-4 text-amber-500/70' />
+                  <Phone className='h-4 w-4 text-amber-400/70' />
                   <span className='font-bold tabular-nums'>+91 {customer.phone}</span>
                 </div>
                 {customer.email && (
                     <div className='flex items-center gap-3 text-sm truncate'>
-                        <Mail className='h-4 w-4 text-amber-500/70' />
+                        <Mail className='h-4 w-4 text-amber-400/70' />
                         <span className='opacity-70 font-medium truncate'>{customer.email}</span>
                     </div>
                 )}
                 <div className='flex items-center gap-3 text-sm'>
-                  <MapPin className='h-4 w-4 text-amber-500/70 shrink-0' />
+                  <MapPin className='h-4 w-4 text-amber-400/70 shrink-0' />
                   <span className='opacity-70 font-medium line-clamp-1'>{customer.address}</span>
                 </div>
               </div>

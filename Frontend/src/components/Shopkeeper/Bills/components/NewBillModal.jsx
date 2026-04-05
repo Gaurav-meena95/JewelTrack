@@ -32,7 +32,7 @@ const NewBillModal = ({
         <div className='flex justify-between items-center p-4 md:p-6 border-b border-border/50 shrink-0 bg-secondary/30'>
           <div>
             <h2 className='text-xl font-bold flex items-center gap-2'>
-              <ShoppingCart className='w-5 h-5 text-amber-500' /> New Bill for {customer.name}
+              <ShoppingCart className='w-5 h-5 text-amber-400' /> New Bill for {customer.name}
             </h2>
             <p className='text-sm text-muted-foreground'>{customer.phone}</p>
           </div>
@@ -134,7 +134,7 @@ const NewBillModal = ({
 
               <div className='mt-4 flex items-center justify-between p-3 bg-card border border-border/50 rounded-[8px]'>
                 <span className='text-sm text-muted-foreground'>Item Final Price:</span>
-                <span className='font-bold text-lg text-amber-500'>₹{calcCurrentItemPrice().toFixed(2)}</span>
+                <span className='font-bold text-lg text-amber-400'>₹{calcCurrentItemPrice().toFixed(2)}</span>
               </div>
 
               <button 
@@ -148,7 +148,7 @@ const NewBillModal = ({
             {/* Image Upload Area - Keeping logic here for simplicity although we have shared component, let's use it later if possible */}
             <div className='bg-secondary/20 p-4 rounded-2xl border border-border/50'>
               <label className='text-sm font-bold flex items-center gap-2 mb-3'>
-                <ImageIcon className='w-4 h-4 text-amber-500' /> 2. Add Photos (Optional)
+                <ImageIcon className='w-4 h-4 text-amber-400' /> 2. Add Photos (Optional)
               </label>
               <div className='flex gap-4 overflow-x-auto pb-2'>
                 {images.map((img, idx) => (
@@ -162,7 +162,7 @@ const NewBillModal = ({
                     </button>
                   </div>
                 ))}
-                <label className='flex-shrink-0 w-20 h-20 rounded-[8px] border-2 border-dashed border-border/50 flex flex-col items-center justify-center text-muted-foreground hover:text-amber-500 hover:border-amber-400 cursor-pointer transition-colors'>
+                <label className='flex-shrink-0 w-20 h-20 rounded-[8px] border-2 border-dashed border-border/50 flex flex-col items-center justify-center text-muted-foreground hover:text-amber-400 hover:border-amber-400 cursor-pointer transition-colors'>
                   <Camera className='w-6 h-6 mb-1' />
                   <span className='text-[10px]'>Capture</span>
                   <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleImageUpload} />
@@ -190,7 +190,7 @@ const NewBillModal = ({
                       <p className='font-bold text-sm'>{item.itemName} <span className='text-xs text-muted-foreground uppercase'>({item.metal})</span></p>
                       <p className='text-xs text-muted-foreground'>{item.weight}g @ ₹{item.ratePerGram}/g</p>
                     </div>
-                    <div className='font-bold text-amber-500'>₹{item.finalPrice?.toFixed(2) || '0.00'}</div>
+                    <div className='font-bold text-amber-400'>₹{item.finalPrice?.toFixed(2) || '0.00'}</div>
                     <button 
                       onClick={() => removeCartItem(idx)} 
                       className='absolute right-3 text-red-500/50 hover:text-red-500 transition-colors'

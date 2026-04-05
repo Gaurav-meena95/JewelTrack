@@ -3,13 +3,14 @@ import { IndianRupee, ShoppingCart, Wallet, Users, AlertCircle } from 'lucide-re
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { VITE_API_BASE_KEY, getAuthHeaders } from '../../../utils/apiConfig';
-import Loading from '../../../utils/loading';
+import Loading from '../../../utils/Loading';
 
 // Sub-components
 import QuickActions from './components/QuickActions';
 import StatsGrid from './components/StatsGrid';
 import DomainOverviews from './components/DomainOverviews';
 import RecentActivity from './components/RecentActivity';
+import SectionHeader from '../../../utils/SectionHeader';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -104,24 +105,22 @@ const Dashboard = () => {
         amount: c.price || 0
       });
     });
-    return activities.sort((a, b) => b.date - a.date).slice(0, 10);
+    return activities.sort((a, b) => b.date - a.date).slice(0,4);
   }, [data]);
 
   const topStats = [
-    { title: 'Total Customers', value: data.customers.length, icon: Users, color: 'text-amber-500', bg: 'bg-amber-500/10'},
-    { title: 'Total Revenue', value: `₹${metrics.totalRevenue.toLocaleString('en-IN')}`, icon: IndianRupee, color: 'text-amber-500', bg: 'bg-amber-500/10'},
-    { title: 'Pending Orders', value: metrics.pendingOrdersCount, icon: ShoppingCart, color: 'text-amber-500', bg: 'bg-amber-500/10'},
-    { title: 'Active Girvi', value: metrics.activeCollateralCount, icon: Wallet, color: 'text-amber-500', bg: 'bg-amber-500/10'},
-    { title: 'Low Stock Items', value: metrics.lowStockCount, icon: AlertCircle, color: 'text-amber-500', bg: 'bg-amber-500/10'},
+    { title: 'Total Customers', value: data.customers.length, icon: Users, color: 'text-amber-400', bg: 'bg-amber-500/10'},
+    { title: 'Total Revenue', value: `₹${metrics.totalRevenue.toLocaleString('en-IN')}`, icon: IndianRupee, color: 'text-amber-400', bg: 'bg-amber-500/10'},
+    { title: 'Pending Orders', value: metrics.pendingOrdersCount, icon: ShoppingCart, color: 'text-amber-400', bg: 'bg-amber-500/10'},
+    { title: 'Active Girvi', value: metrics.activeCollateralCount, icon: Wallet, color: 'text-amber-400', bg: 'bg-amber-500/10'},
+    { title: 'Low Stock Items', value: metrics.lowStockCount, icon: AlertCircle, color: 'text-amber-400', bg: 'bg-amber-500/10'},
   ];
 
   if (loading) return <Loading />;
 
   return (
     <div className='p-2 md:p-6 space-y-10 animate-in fade-in duration-500 pb-20'>
-      
       <QuickActions navigate={navigate} />
-
       {error && (
         <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-2xl text-center font-bold tracking-tight">
           {error}

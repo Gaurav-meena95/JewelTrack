@@ -16,7 +16,7 @@ const CustomOptionsSection = ({
   return (
     <section className='bg-card/40 border border-border/50 rounded-2xl overflow-hidden hover:border-amber-400/20 transition-all'>
       <div className='bg-secondary/30 px-6 py-4 border-b border-border/50 flex items-center gap-3'>
-        <div className='p-2 bg-amber-400/20 text-amber-500 rounded'><Tag className='w-5 h-5' /></div>
+        <div className='p-2 bg-amber-400/20 text-amber-400 rounded'><Tag className='w-5 h-5' /></div>
         <h2 className='text-xl font-bold'>Dynamic Form Options</h2>
       </div>
       <div className='p-6 grid grid-cols-1 md:grid-cols-2 gap-10'>

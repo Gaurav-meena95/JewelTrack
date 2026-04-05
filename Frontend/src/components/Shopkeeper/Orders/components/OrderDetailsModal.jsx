@@ -21,7 +21,7 @@ const OrderDetailsModal = ({
         </button>
 
         <div className='text-center border-b border-border/50 pb-6 mb-6'>
-          <h2 className='text-2xl font-bold uppercase tracking-widest text-amber-500'>Order Details</h2>
+          <h2 className='text-2xl font-bold uppercase tracking-widest text-amber-400'>Order Details</h2>
           <p className='text-sm text-muted-foreground mt-1'>Placed: {formatDate(order.createdAt)}</p>
           {order.updatedAt !== order.createdAt && (
             <p className='text-xs text-muted-foreground'>Last Updated: {formatDateTime(order.updatedAt)}</p>
@@ -70,9 +70,9 @@ const OrderDetailsModal = ({
         {/* Delivery Date if any */}
         {order.deliveryDate && (
           <div className='mb-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-[8px] flex items-center gap-2'>
-            <Clock className='w-5 h-5 text-amber-500' />
+            <Clock className='w-5 h-5 text-amber-400' />
             <div>
-              <p className='text-xs text-amber-500 font-bold uppercase'>Expected Delivery</p>
+              <p className='text-xs text-amber-400 font-bold uppercase'>Expected Delivery</p>
               <p className='text-sm font-medium'>{formatDate(order.deliveryDate)}</p>
             </div>
           </div>

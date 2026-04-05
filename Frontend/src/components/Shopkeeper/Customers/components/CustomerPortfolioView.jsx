@@ -81,7 +81,7 @@ const CustomerPortfolioView = ({
           <div className='space-y-1'>
             <p className='text-[10px] text-muted-foreground uppercase font-bold tracking-widest'>Contact Details</p>
             <div className='flex items-center gap-2'>
-              <Phone className='h-4 w-4 text-amber-500' />
+              <Phone className='h-4 w-4 text-amber-400' />
               <span className='font-bold text-lg'>+91 {customer.phone}</span>
             </div>
             {customer.email && (
@@ -94,7 +94,7 @@ const CustomerPortfolioView = ({
           <div className='space-y-1 lg:col-span-1'>
             <p className='text-[10px] text-muted-foreground uppercase font-bold tracking-widest'>Address</p>
             <div className='flex items-start gap-2 max-w-xs'>
-                <MapPin className='h-4 w-4 text-amber-500 shrink-0 mt-0.5' />
+                <MapPin className='h-4 w-4 text-amber-400 shrink-0 mt-0.5' />
                 <p className='text-sm font-medium leading-relaxed'>{customer.address}</p>
             </div>
           </div>
@@ -162,7 +162,7 @@ const CustomerPortfolioView = ({
                 bills.map((bill, i) => (
                   <div key={bill._id} className='flex flex-col lg:flex-row justify-between items-start lg:items-center p-6 bg-secondary/20 rounded-2xl border border-border/50 hover:border-amber-400/40 transition-all gap-6 group'>
                     <div className='space-y-1 w-full lg:w-1/4'>
-                      <p className='text-[10px] font-black text-amber-500 uppercase tracking-widest'>Invoice Reference</p>
+                      <p className='text-[10px] font-black text-amber-400 uppercase tracking-widest'>Invoice Reference</p>
                       <p className='font-bold text-lg'>BILL #{bills.length - i}</p>
                       <p className='text-sm text-muted-foreground font-medium'>{new Date(bill.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
                     </div>

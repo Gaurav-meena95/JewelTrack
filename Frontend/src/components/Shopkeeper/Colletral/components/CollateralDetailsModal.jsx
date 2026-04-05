@@ -107,7 +107,7 @@ const CollateralDetailsModal = ({
                   <div key={i} className='flex justify-between items-center text-sm border-b border-border/20 pb-2 last:border-0'>
                     <div className='space-y-0.5'>
                       <span className='font-medium text-xs text-muted-foreground'>{new Date(pay.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-                      {pay.type === 'adjustment' && <p className='text-[10px] bg-amber-500/10 text-amber-500 px-1.5 py-0.5 rounded-full inline-block font-bold ml-2 uppercase'>Adjustment</p>}
+                      {pay.type === 'adjustment' && <p className='text-[10px] bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded-full inline-block font-bold ml-2 uppercase'>Adjustment</p>}
                       {pay.note && <p className='text-[10px] text-muted-foreground italic'>{pay.note}</p>}
                     </div>
                     <span className='font-bold text-green-500'>+ ₹{pay.amount.toLocaleString('en-IN')}</span>
@@ -122,11 +122,11 @@ const CollateralDetailsModal = ({
         {account.status === 'active' && (
           <div className='bg-amber-400/5 p-6 rounded-3xl border border-amber-400/10 shadow-inner'>
             <h4 className='text-sm font-bold mb-4 flex items-center gap-2'>
-              <IndianRupee className='w-4 h-4 text-amber-500' /> Receive Payment / Settle
+              <IndianRupee className='w-4 h-4 text-amber-400' /> Receive Payment / Settle
             </h4>
             <div className='flex gap-3 mb-4'>
               <div className='relative flex-1'>
-                <IndianRupee className='absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500/40' />
+                <IndianRupee className='absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-400/40' />
                 <input
                   type='number'
                   placeholder='Enter amount received'
@@ -156,7 +156,7 @@ const CollateralDetailsModal = ({
                 <X className={`absolute pointer-events-none w-3.5 h-3.5 left-0.5 top-0.5 text-black ${isAdjustment ? 'opacity-100' : 'opacity-0'}`} />
               </div>
               <label htmlFor='adjustment' className='text-xs text-muted-foreground cursor-pointer group flex items-center gap-1.5 hover:text-foreground transition-colors font-medium'>
-                <AlertCircle className='w-3.5 h-3.5 text-amber-500/80 group-hover:text-amber-500' /> 
+                <AlertCircle className='w-3.5 h-3.5 text-amber-400/80 group-hover:text-amber-400' /> 
                 Final Settlement Adjustment? 
                 <span className='text-[9px] uppercase tracking-tighter opacity-60'>(Closes account with discount)</span>
               </label>

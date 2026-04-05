@@ -64,7 +64,7 @@ const RecordPaymentModal = ({
           </div>
 
           {editPaymentData.additionalPayment && (
-            <div className={`p-3 rounded-[8px] border text-sm font-bold flex justify-between ${remainingAfterBillEdit === 0 ? 'bg-green-500/10 border-green-500/30 text-green-500' : 'bg-amber-500/10 border-amber-500/30 text-amber-500'}`}>
+            <div className={`p-3 rounded-[8px] border text-sm font-bold flex justify-between ${remainingAfterBillEdit === 0 ? 'bg-green-500/10 border-green-500/30 text-green-500' : 'bg-amber-500/10 border-amber-500/30 text-amber-400'}`}>
               <span>Remaining After Payment:</span>
               <span>₹{remainingAfterBillEdit.toFixed(0)}</span>
             </div>

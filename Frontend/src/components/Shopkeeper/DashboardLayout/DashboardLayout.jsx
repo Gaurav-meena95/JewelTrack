@@ -94,7 +94,7 @@ const handelLogout = ()=>{
                       relative w-full flex items-center gap-3 px-4 py-3 
                       transition-all duration-300 rounded group overflow-hidden tracking-wide
                       ${isActive
-                          ? 'bg-linear-to-r from-amber-400/10 to-transparent text-amber-500 font-semibold border border-amber-400/20 shadow-sm'
+                          ? 'bg-linear-to-r from-amber-400/10 to-transparent text-amber-400 font-semibold border border-amber-400/20 shadow-sm'
                           : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground hover:translate-x-1'
                         }
                     `}

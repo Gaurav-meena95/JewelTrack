@@ -35,7 +35,7 @@ const OrderProfileView = ({
       {/* Customer Header */}
       <div className='bg-secondary/30 border border-border/50 p-6 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
         <div className='flex items-center gap-4'>
-          <div className='h-16 w-16 bg-amber-400/20 text-amber-500 rounded-full flex items-center justify-center text-2xl font-bold'>
+          <div className='h-16 w-16 bg-amber-400/20 text-amber-400 rounded-full flex items-center justify-center text-2xl font-bold'>
             {selectedCustomer.name?.charAt(0)?.toUpperCase()}
           </div>
           <div>
@@ -64,7 +64,7 @@ const OrderProfileView = ({
       </div>
 
       <div className='space-y-4'>
-        <h3 className='text-lg font-bold flex items-center gap-2'><History className='w-5 h-5 text-amber-500' /> Order History</h3>
+        <h3 className='text-lg font-bold flex items-center gap-2'><History className='w-5 h-5 text-amber-400' /> Order History</h3>
 
         {loading ? (
           <div className='py-10 text-center'><Loading /></div>
@@ -113,7 +113,7 @@ const OrderProfileView = ({
                 <div className='flex items-center gap-3 pt-3 border-t border-border/30'>
                   <button
                     onClick={() => { setActiveOrderDetails(order); setShowViewOrder(true) }}
-                    className='text-amber-500/80 text-sm hover:underline'
+                    className='text-amber-400/80 text-sm hover:underline'
                   >
                     View Details
                   </button>

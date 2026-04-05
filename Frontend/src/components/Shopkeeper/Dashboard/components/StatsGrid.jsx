@@ -10,12 +10,12 @@ const StatsGrid = ({ topStats }) => {
             <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full ${stat.bg} opacity-10 group-hover:opacity-20 group-hover:scale-150 transition-all duration-700 blur-2xl`}></div>
             <div className='flex items-center justify-between mb-5 relative z-10'>
               <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} shadow-sm group-hover:scale-110 transition-transform`}>
-                <Icon className="h-5 w-5" />
+                <Icon className="h-5 w-5 text-amber-400" />
               </div>
             </div>
             <div className='relative z-10 space-y-1'>
               <h3 className="text-muted-foreground text-[10px] uppercase tracking-widest font-black opacity-70 group-hover:opacity-100 transition-opacity">{stat.title}</h3>
-              <p className='text-2xl font-black truncate tracking-tight group-hover:text-amber-500 transition-colors' title={String(stat.value)}>{stat.value}</p>
+              <p className='text-2xl font-black truncate tracking-tight group-hover:text-amber-400 transition-colors' title={String(stat.value)}>{stat.value}</p>
             </div>
           </div>
         )

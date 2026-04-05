@@ -19,7 +19,7 @@ const CustomerFormModal = ({
         <div className='flex justify-between items-center mb-8'>
           <h2 className='text-2xl font-bold flex items-center gap-3'>
             <div className='p-2 bg-amber-400/20 rounded'>
-              <User className='h-6 w-6 text-amber-500' />
+              <User className='h-6 w-6 text-amber-400' />
             </div>
             {isEditing ? 'Update Customer' : 'Register New Customer'}
           </h2>

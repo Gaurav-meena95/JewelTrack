@@ -334,11 +334,11 @@ const Bills = () => {
                      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
                         {uniqueCustomers.map(customer => (
                            <div key={customer._id} onClick={() => openCustomerProfile(customer)} className='bg-card/40 border border-border/50 p-5 rounded-[8px] hover:border-amber-400/50 transition-colors cursor-pointer group flex items-start gap-4'>
-                              <div className='h-12 w-12 bg-amber-400/10 rounded-full flex items-center justify-center text-amber-500 shrink-0 group-hover:scale-110 transition-transform'>
+                              <div className='h-12 w-12 bg-amber-400/10 rounded-full flex items-center justify-center text-amber-400 shrink-0 group-hover:scale-110 transition-transform'>
                                  <User className='w-6 h-6' />
                               </div>
                               <div className='flex-1'>
-                                 <h3 className='text-lg font-bold group-hover:text-amber-500 transition-colors'>{customer.name}</h3>
+                                 <h3 className='text-lg font-bold group-hover:text-amber-400 transition-colors'>{customer.name}</h3>
                                  <p className='text-sm text-muted-foreground'>{customer.phone}</p>
                                  <div className='mt-3 flex gap-2 text-xs'>
                                     <span className='bg-secondary px-2 py-1 rounded'>{customer.totalBills} Bills</span>
@@ -365,7 +365,7 @@ const Bills = () => {
 
                   <div className='bg-secondary/30 border border-border/50 p-6 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
                      <div className='flex items-center gap-4'>
-                        <div className='h-16 w-16 bg-amber-400/20 text-amber-500 rounded-full flex items-center justify-center text-2xl font-bold'>
+                        <div className='h-16 w-16 bg-amber-400/20 text-amber-400 rounded-full flex items-center justify-center text-2xl font-bold'>
                            {selectedCustomer.name.charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -391,7 +391,7 @@ const Bills = () => {
                   </div>
 
                   <div className='space-y-4'>
-                     <h3 className='text-lg font-bold flex items-center gap-2'><History className='w-5 h-5 text-amber-500' /> Purchase History</h3>
+                     <h3 className='text-lg font-bold flex items-center gap-2'><History className='w-5 h-5 text-amber-400' /> Purchase History</h3>
 
                      {loading ? <div className='py-10 text-center'>Loading History...</div> : currentCustomerBills.length === 0 ? (
                         <div className='text-center py-10 bg-secondary/20 rounded-[8px] border border-border/30'>
@@ -417,7 +417,7 @@ const Bills = () => {
                                        {bill.payment?.remainingAmount > 0 && <p>Due: <span className='text-red-500 font-medium'>₹{bill.payment?.remainingAmount}</span></p>}
                                     </div>
                                     <div className='flex gap-3 justify-end flex-wrap mt-2'>
-                                       <button onClick={() => { setActiveBillDetails(bill); setShowViewBill(true); }} className='text-amber-500 text-sm hover:underline'>View Invoice</button>
+                                       <button onClick={() => { setActiveBillDetails(bill); setShowViewBill(true); }} className='text-amber-400 text-sm hover:underline'>View Invoice</button>
                                        {bill.payment?.paymentStatus !== 'paid' && (
                                           <button onClick={() => openEditBillPayment(bill)} className='text-blue-400 text-sm hover:underline flex items-center gap-1'>
                                              <Edit className='w-3 h-3' /> Record Payment

@@ -31,7 +31,7 @@ const OrderFormModal = ({
         <div className='flex justify-between items-center p-4 md:p-6 border-b border-border/50 shrink-0 bg-secondary/30'>
           <div>
             <h2 className='text-xl font-bold flex items-center gap-2'>
-              <Package className='w-5 h-5 text-amber-500' /> New Order — {customer.name}
+              <Package className='w-5 h-5 text-amber-400' /> New Order — {customer.name}
             </h2>
             <p className='text-sm text-muted-foreground'>{customer.phone}</p>
           </div>

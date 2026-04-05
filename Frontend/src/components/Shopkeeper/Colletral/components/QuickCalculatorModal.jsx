@@ -82,12 +82,12 @@ const QuickCalculatorModal = ({ show, onClose, calcData, handleCalcChange, calcu
 
         {calcResult !== 0 && (
           <div className='mt-6 p-5 bg-amber-400/10 border border-amber-400/30 rounded text-center animate-in zoom-in-95 duration-200'>
-            <p className='text-xs font-bold text-amber-500 uppercase tracking-widest mb-1'>Calculated Interest</p>
+            <p className='text-xs font-bold text-amber-400 uppercase tracking-widest mb-1'>Calculated Interest</p>
             <h3 className='text-3xl font-extrabold text-amber-400'>
               {calcResult === "Invalid Dates" ? "Error" : `₹${calcResult}`}
             </h3>
             {calcResult !== "Invalid Dates" && (
-                <p className='text-[10px] text-amber-500/60 mt-1 uppercase'>Based on 3.33% interest / ₹100 / Month logic</p>
+                <p className='text-[10px] text-amber-400/60 mt-1 uppercase'>Based on 3.33% interest / ₹100 / Month logic</p>
             )}
           </div>
         )}

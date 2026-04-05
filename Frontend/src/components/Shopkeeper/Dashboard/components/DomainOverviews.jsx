@@ -10,15 +10,15 @@ const DomainOverviews = ({ data, pendingOrdersCount, activeCollateralCount, tota
           <div className='flex items-center justify-between mb-8 px-1'>
             <h3 className='font-black flex items-center gap-2 text-lg uppercase tracking-tight'>
               <div className='p-2 bg-amber-400/10 rounded group-hover:scale-110 transition-transform'>
-                <ShoppingBag className='w-5 h-5 text-amber-500' />
-              </div>
+                <ShoppingBag className='w-5 h-5 text-amber-400' />
+              </div> 
               Orders Hub
             </h3>
             <button onClick={() => navigate('/dashboard/orders')} className='text-[10px] font-black text-muted-foreground hover:text-amber-400 flex items-center gap-2 transition-colors uppercase tracking-widest'>View All <ArrowRight className='w-3 h-3' /></button>
           </div>
           <div className='space-y-4 text-sm'>
             <OverviewItem label="Total Volume" value={data.orders.length} />
-            <OverviewItem label="Pending Fulfillment" value={pendingOrdersCount} color="text-amber-500" bg="bg-amber-500/10" border="border-amber-500/20" />
+            <OverviewItem label="Pending Fulfillment" value={pendingOrdersCount} color="text-amber-400" bg="bg-amber-500/10" border="border-amber-500/20" />
             <OverviewItem label="Completed Orders" value={data.orders.filter(o => o.orderStatus === 'Delivered' || o.orderStatus === 'completed').length} />
           </div>
         </div>
@@ -28,14 +28,14 @@ const DomainOverviews = ({ data, pendingOrdersCount, activeCollateralCount, tota
           <div className='flex items-center justify-between mb-8 px-1'>
             <h3 className='font-black flex items-center gap-2 text-lg uppercase tracking-tight'>
                <div className='p-2 bg-amber-400/10 rounded group-hover:scale-110 transition-transform'>
-                <Wallet className='w-5 h-5 text-amber-400' />
+                <Wallet className='w-5 h-5 c' />
               </div>
               Collateral Loans
             </h3>
             <button onClick={() => navigate('/dashboard/colletral')} className='text-[10px] font-black text-muted-foreground hover:text-amber-400 flex items-center gap-2 transition-colors uppercase tracking-widest'>View All <ArrowRight className='w-3 h-3' /></button>
           </div>
           <div className='space-y-4 text-sm'>
-            <OverviewItem label="Active Loans" value={activeCollateralCount} color="text-amber-500" bg="bg-amber-500/10" border="border-amber-500/20" />
+            <OverviewItem label="Active Loans" value={activeCollateralCount} color="text-amber-400" bg="bg-amber-500/10" border="border-amber-500/20" />
             <OverviewItem label="Total Exposure" value={`₹${totalCollateralValue.toLocaleString('en-IN')}`} />
             <OverviewItem label="Closed Accounts" value={data.collaterals.filter(c => c.status === 'closed').length} />
           </div>
@@ -47,7 +47,7 @@ const DomainOverviews = ({ data, pendingOrdersCount, activeCollateralCount, tota
         <div className='flex items-center justify-between mb-8 px-1'>
           <h3 className='font-black flex items-center gap-2 text-lg uppercase tracking-tight'>
             <div className='p-2 bg-amber-400/10 rounded group-hover:scale-110 transition-transform'>
-                <Box className='w-5 h-5 text-amber-500' />
+                <Box className='w-5 h-5 text-amber-400' />
             </div>
             Inventory Snapshot
           </h3>

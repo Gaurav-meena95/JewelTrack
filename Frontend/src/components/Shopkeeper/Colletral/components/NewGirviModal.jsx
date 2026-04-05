@@ -65,7 +65,7 @@ const NewGirviModal = ({
               </div>
             )}
             {customerFound === false && (
-              <div className='text-amber-500 text-sm flex items-center gap-2 bg-amber-500/10 p-3 rounded border border-amber-500/20'>
+              <div className='text-amber-400 text-sm flex items-center gap-2 bg-amber-500/10 p-3 rounded border border-amber-500/20'>
                 <UserX className='w-4 h-4 shrink-0' />
                 <span>New customer! Please enter their registration details.</span>
               </div>

@@ -148,7 +148,7 @@ const Report = () => {
             <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
                <div className="w-16 h-16 border-4 border-amber-400/20 border-t-amber-400 rounded-full animate-spin shadow-2xl"></div>
                <div className='text-center space-y-2'>
-                   <p className="text-xs uppercase font-black tracking-widest text-amber-500">Generating Intelligence Report</p>
+                   <p className="text-xs uppercase font-black tracking-widest text-amber-400">Generating Intelligence Report</p>
                    <p className='text-[10px] uppercase font-bold text-muted-foreground opacity-40'>Aggregating cross-module ledger data...</p>
                </div>
             </div>

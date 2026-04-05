@@ -51,11 +51,11 @@ const OrderDashboardView = ({
               onClick={() => openCustomerProfile(customer)} 
               className='bg-card/40 border border-border/50 p-5 rounded-[8px] hover:border-amber-400/50 transition-colors cursor-pointer group flex items-start gap-4'
             >
-              <div className='h-12 w-12 bg-amber-400/10 rounded-full flex items-center justify-center text-amber-500 shrink-0 group-hover:scale-110 transition-transform'>
+              <div className='h-12 w-12 bg-amber-400/10 rounded-full flex items-center justify-center text-amber-400 shrink-0 group-hover:scale-110 transition-transform'>
                 <User className='w-6 h-6' />
               </div>
               <div className='flex-1 min-w-0'>
-                <h3 className='text-lg font-bold group-hover:text-amber-500 transition-colors truncate'>{customer.name}</h3>
+                <h3 className='text-lg font-bold group-hover:text-amber-400 transition-colors truncate'>{customer.name}</h3>
                 <p className='text-sm text-muted-foreground'>{customer.phone}</p>
                 <div className='mt-3 flex flex-wrap gap-2 text-xs'>
                   <span className='bg-secondary px-2 py-1 rounded'>{customer.totalOrders} Orders</span>

@@ -5,7 +5,7 @@ const InventoryMetrics = ({ totalItems, totalQuantity, uniqueCategories, lowStoc
   return (
     <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
       <div className='bg-card/40 border border-border/50 p-5 rounded-[8px] flex items-center gap-4 hover:border-amber-400/30 transition-colors'>
-        <div className='h-12 w-12 bg-amber-400/10 rounded-full flex items-center justify-center text-amber-500 shrink-0'>
+        <div className='h-12 w-12 bg-amber-400/10 rounded-full flex items-center justify-center text-amber-400 shrink-0'>
           <Package className='w-6 h-6' />
         </div>
         <div>
@@ -18,7 +18,7 @@ const InventoryMetrics = ({ totalItems, totalQuantity, uniqueCategories, lowStoc
       </div>
 
       <div className='bg-card/40 border border-border/50 p-5 rounded-[8px] flex items-center gap-4 hover:border-amber-400/30 transition-colors'>
-        <div className='h-12 w-12 bg-amber-400/10 rounded-full flex items-center justify-center text-amber-500 shrink-0'>
+        <div className='h-12 w-12 bg-amber-400/10 rounded-full flex items-center justify-center text-amber-400 shrink-0'>
           <Layers className='w-6 h-6' />
         </div>
         <div>

@@ -311,12 +311,12 @@ const Colletral = () => {
                 <div key={item._id || index} className='bg-card/40 border border-border/50 p-6 rounded-2xl relative hover:border-amber-400/30 transition-all group'>
                   <div className='flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4'>
                     <div className='flex items-center gap-4'>
-                      <div className='h-12 w-12 flex items-center justify-center rounded-2xl bg-amber-400/10 text-amber-500 font-extrabold shadow-inner'>
+                      <div className='h-12 w-12 flex items-center justify-center rounded-2xl bg-amber-400/10 text-amber-400 font-extrabold shadow-inner'>
                         {index + 1}
                       </div>
                       <div>
-                        <h3 className='text-xl font-bold group-hover:text-amber-500 transition-colors'>{item.customerId?.name || 'New Customer'}</h3>
-                        <p className='text-sm text-muted-foreground flex items-center gap-1.5'><Phone className='h-3.5 w-3.5 text-amber-500/70' /> +91 {item.phone}</p>
+                        <h3 className='text-xl font-bold group-hover:text-amber-400 transition-colors'>{item.customerId?.name || 'New Customer'}</h3>
+                        <p className='text-sm text-muted-foreground flex items-center gap-1.5'><Phone className='h-3.5 w-3.5 text-amber-400/70' /> +91 {item.phone}</p>
                       </div>
                     </div>
                     <div className='flex items-center gap-3 w-full md:w-auto justify-end'>
@@ -328,7 +328,7 @@ const Colletral = () => {
                           </button>
                         )}
                         <button onClick={() => { setSelectedAccount(item); setShowAccount(true); setShowHistory(false) }} className='p-2 hover:bg-amber-400/20 rounded transition-colors group/edit'>
-                          <Edit className='h-4 w-4 text-amber-500 group-hover/edit:scale-110 transition-transform' />
+                          <Edit className='h-4 w-4 text-amber-400 group-hover/edit:scale-110 transition-transform' />
                         </button>
                       </div>
                     </div>
@@ -341,15 +341,15 @@ const Colletral = () => {
                     </div>
                     <div className='space-y-1'>
                       <p className='text-[10px] text-muted-foreground uppercase font-bold tracking-widest'>Weight</p>
-                      <h4 className='font-bold flex items-center gap-1'><WeightIcon className='h-3.5 w-3.5 text-amber-500/50' />{item.weight}g</h4>
+                      <h4 className='font-bold flex items-center gap-1'><WeightIcon className='h-3.5 w-3.5 text-amber-400/50' />{item.weight}g</h4>
                     </div>
                     <div className='space-y-1'>
                       <p className='text-[10px] text-muted-foreground uppercase font-bold tracking-widest'>Principal</p>
-                      <h4 className='font-bold flex items-center gap-1'><IndianRupee className='h-3.5 w-3.5 text-amber-500/50' />{item.price.toLocaleString('en-IN')}</h4>
+                      <h4 className='font-bold flex items-center gap-1'><IndianRupee className='h-3.5 w-3.5 text-amber-400/50' />{item.price.toLocaleString('en-IN')}</h4>
                     </div>
                     <div className='space-y-1'>
-                      <p className='text-[10px] text-amber-500 uppercase font-bold tracking-widest'>Interest ({item.interestRate}%)</p>
-                      <h4 className='font-bold text-amber-500 flex items-center gap-1'>+ <IndianRupee className='h-3.5 w-3.5' />{liveInterest}</h4>
+                      <p className='text-[10px] text-amber-400 uppercase font-bold tracking-widest'>Interest ({item.interestRate}%)</p>
+                      <h4 className='font-bold text-amber-400 flex items-center gap-1'>+ <IndianRupee className='h-3.5 w-3.5' />{liveInterest}</h4>
                     </div>
                     <div className='space-y-1'>
                       <p className='text-[10px] text-green-500 uppercase font-bold tracking-widest'>Total Paid</p>
@@ -368,7 +368,7 @@ const Colletral = () => {
                      </div>
                      <button 
                         onClick={() => { setSelectedAccount(item); setShowAccount(true); }}
-                        className='text-xs font-bold text-amber-500 hover:underline flex items-center gap-1'
+                        className='text-xs font-bold text-amber-400 hover:underline flex items-center gap-1'
                      >
                        Manage Account & Details
                      </button>

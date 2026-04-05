@@ -19,7 +19,7 @@ const InventoryFormModal = ({
       <div className='bg-card w-full max-w-lg p-6 rounded-2xl border border-border/50 shadow-2xl'>
         <div className='flex justify-between items-center mb-6'>
           <h2 className='text-xl font-bold flex items-center gap-2'>
-            <Package className='w-5 h-5 text-amber-500' />
+            <Package className='w-5 h-5 text-amber-400' />
             {isEditing ? 'Edit Inventory Item' : 'Add New Item'}
           </h2>
           <button 

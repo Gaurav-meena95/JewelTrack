@@ -6,7 +6,7 @@ const RecentActivity = ({ recentActivities }) => {
     <div className='col-span-1 border border-border/50 rounded-3xl bg-card/40 p-6 flex flex-col hover:shadow-xl transition-all h-full'>
       <div className='flex items-center justify-between mb-8 px-1'>
         <h3 className='font-black flex items-center gap-2 text-lg uppercase tracking-tight'>
-          <Activity className='w-5 h-5 text-amber-500' /> Live Activity Stream
+          <Activity className='w-5 h-5 text-amber-400' /> Live Activity Stream
         </h3>
       </div>
 
@@ -26,7 +26,7 @@ const RecentActivity = ({ recentActivities }) => {
 
               <div className='bg-secondary/30 p-4 rounded-2xl border border-border/40 ml-1 hover:bg-secondary/60 hover:border-amber-400/20 transition-all cursor-default shadow-sm'>
                 <div className='flex justify-between items-start mb-2'>
-                  <h4 className='text-sm font-bold leading-snug group-hover:text-amber-500 transition-colors'>{act.title}</h4>
+                  <h4 className='text-sm font-bold leading-snug group-hover:text-amber-400 transition-colors'>{act.title}</h4>
                   <span className='text-[10px] text-muted-foreground whitespace-nowrap ml-2 uppercase font-black tracking-widest opacity-60'>
                     {act.date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
                   </span>
@@ -36,7 +36,7 @@ const RecentActivity = ({ recentActivities }) => {
                     <Users className='w-3.5 h-3.5 opacity-50' /> {act.customer}
                   </p>
                   <p className='font-black text-foreground bg-card/60 px-2.5 py-1 rounded border border-border/30 flex items-center gap-1 tabular-nums transition-colors group-hover:border-amber-400/20 shadow-sm'>
-                    <IndianRupee className='w-3 h-3 text-amber-500 opacity-50' /> {act.amount?.toLocaleString('en-IN') || 0}
+                    <IndianRupee className='w-3 h-3 text-amber-400 opacity-50' /> {act.amount?.toLocaleString('en-IN') || 0}
                   </p>
                 </div>
               </div>

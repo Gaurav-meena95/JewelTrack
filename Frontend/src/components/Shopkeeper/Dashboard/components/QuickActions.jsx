@@ -21,13 +21,13 @@ const QuickActions = ({ navigate }) => {
           onClick={() => navigate('/dashboard/orders')} 
           className='px-5 py-2.5 bg-secondary/50 hover:bg-secondary border border-border/50 rounded flex items-center gap-2 transition-all active:scale-95 text-xs font-bold uppercase tracking-widest'
         >
-          <Plus className='w-4 h-4 text-amber-500' /> New Order
+          <Plus className='w-4 h-4 text-amber-400' /> New Order
         </button>
         <button 
           onClick={() => navigate('/dashboard/colletral')} 
           className='px-5 py-2.5 bg-secondary/50 hover:bg-secondary border border-border/50 rounded flex items-center gap-2 transition-all active:scale-95 text-xs font-bold uppercase tracking-widest'
         >
-          <Plus className='w-4 h-4 text-amber-500' /> Add Girvi
+          <Plus className='w-4 h-4 text-amber-400' /> Add Girvi
         </button>
       </div>
     </SectionHeader>

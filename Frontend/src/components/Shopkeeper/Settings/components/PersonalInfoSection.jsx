@@ -5,7 +5,7 @@ const PersonalInfoSection = ({ profile, handleChange }) => {
   return (
     <section className='bg-card/40 border border-border/50 rounded-2xl overflow-hidden hover:border-amber-400/20 transition-all'>
       <div className='bg-secondary/30 px-6 py-4 border-b border-border/50 flex items-center gap-3'>
-        <div className='p-2 bg-amber-400/20 text-amber-500 rounded'><User className='w-5 h-5' /></div>
+        <div className='p-2 bg-amber-400/20 text-amber-400 rounded'><User className='w-5 h-5' /></div>
         <h2 className='text-xl font-bold'>Personal Profile</h2>
       </div>
       <div className='p-6 grid grid-cols-1 md:grid-cols-2 gap-6'>
@@ -42,7 +42,7 @@ const PersonalInfoSection = ({ profile, handleChange }) => {
           </div>
         </div>
         <div className='space-y-2 col-span-1 md:col-span-2'>
-          <label className='text-[10px] uppercase font-bold text-muted-foreground ml-1 tracking-widest'>Login Email Address <span className='text-amber-500/70 ml-2'>(Non-editable)</span></label>
+          <label className='text-[10px] uppercase font-bold text-muted-foreground ml-1 tracking-widest'>Login Email Address <span className='text-amber-400/70 ml-2'>(Non-editable)</span></label>
           <div className='relative'>
             <Mail className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/30' />
             <input 

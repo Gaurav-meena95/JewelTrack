@@ -26,7 +26,7 @@ const InventoryTable = ({ loading, filteredInventory, formatDate, handleOpenEdit
           ) : filteredInventory.length === 0 ? (
             <tr>
               <td colSpan='6' className='p-12 text-center text-muted-foreground'>
-                <Package className='w-12 h-12 mx-auto mb-3 opacity-30 text-amber-500' />
+                <Package className='w-12 h-12 mx-auto mb-3 opacity-30 text-amber-400' />
                 <p>No items found in your inventory.</p>
               </td>
             </tr>
@@ -35,12 +35,12 @@ const InventoryTable = ({ loading, filteredInventory, formatDate, handleOpenEdit
               const isLowStock = item.quantity < 5;
               return (
                 <tr key={item._id} className='hover:bg-secondary/20 transition-colors group'>
-                  <td className='p-4 font-medium group-hover:text-amber-500 transition-colors'>
+                  <td className='p-4 font-medium group-hover:text-amber-400 transition-colors'>
                     {item.jewelleryType}
                   </td>
                   <td className='p-4'>
                     <span className='capitalize inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-secondary/50 text-xs border border-border/50'>
-                      <Tag className='w-3 h-3 text-amber-500' />
+                      <Tag className='w-3 h-3 text-amber-400' />
                       {item.metalType}
                     </span>
                   </td>
@@ -60,7 +60,7 @@ const InventoryTable = ({ loading, filteredInventory, formatDate, handleOpenEdit
                     <div className='flex items-center justify-end gap-3'>
                       <button
                         onClick={() => handleOpenEditModal(item)}
-                        className='text-amber-500 p-1.5 hover:bg-amber-400/10 rounded transition-colors'
+                        className='text-amber-400 p-1.5 hover:bg-amber-400/10 rounded transition-colors'
                         title="Edit Item"
                       >
                         <Edit className='w-4 h-4' />

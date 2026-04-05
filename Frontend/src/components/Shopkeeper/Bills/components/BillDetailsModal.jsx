@@ -17,7 +17,7 @@ const BillDetailsModal = ({
         </button>
 
         <div className='text-center border-b border-border/50 pb-6 mb-6'>
-          <h2 className='text-2xl font-bold uppercase tracking-widest text-amber-500'>Invoice</h2>
+          <h2 className='text-2xl font-bold uppercase tracking-widest text-amber-400'>Invoice</h2>
           <p className='text-sm text-muted-foreground mt-1'>
             Date: {new Date(bill.createdAt).toLocaleDateString()}
           </p>

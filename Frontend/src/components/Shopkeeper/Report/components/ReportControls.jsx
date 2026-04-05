@@ -20,7 +20,7 @@ const ReportControls = ({
     >
       <div className='flex flex-wrap items-center gap-4'>
         <div className='flex items-center gap-2 bg-card p-2 rounded border border-border/50 shadow-sm'>
-          <Calendar className='w-4 h-4 text-amber-500 ml-2' />
+          <Calendar className='w-4 h-4 text-amber-400 ml-2' />
           <select 
             value={dateRange} 
             onChange={(e) => setDateRange(e.target.value)}

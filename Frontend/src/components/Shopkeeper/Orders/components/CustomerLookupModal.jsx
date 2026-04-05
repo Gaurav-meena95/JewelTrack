@@ -48,7 +48,7 @@ const CustomerLookupModal = ({
             </div>
           )}
           {customerFound === false && (
-            <div className='text-amber-500 text-sm flex items-center gap-1'>
+            <div className='text-amber-400 text-sm flex items-center gap-1'>
               <UserX className='w-4 h-4' /> New Customer. Please fill details.
             </div>
           )}

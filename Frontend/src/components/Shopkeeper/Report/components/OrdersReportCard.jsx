@@ -47,7 +47,7 @@ const OrdersReportCard = ({ orders, completedOrders, pendingOrders, totalAdvance
                 <div className='w-2 h-2 rounded-full bg-green-500 animate-pulse'></div>
                 Delivered ({completedOrders.length})
               </div>
-              <div className='flex items-center gap-2 text-amber-500'>
+              <div className='flex items-center gap-2 text-amber-400'>
                 <div className='w-2 h-2 rounded-full bg-amber-500 animate-pulse'></div>
                 Pipeline ({pendingOrders.length})
               </div>
