@@ -10,7 +10,7 @@ const SectionHeader = ({ title, subtitle, buttonText, onButtonClick, className, 
     {buttonText && (
       <button 
         onClick={onButtonClick} 
-        className='p-2 px-4 bg-amber-400/80 text-black rounded-[8px] flex items-center gap-2 hover:bg-amber-400 font-medium transition-colors'
+        className='ActionButton'
       >
         <Plus className='h-4 w-4' /> {buttonText}
       </button>

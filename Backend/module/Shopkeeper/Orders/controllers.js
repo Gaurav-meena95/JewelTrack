@@ -1,3 +1,4 @@
+const { sendResponse } = require('../../../utils/responseHandler')
 const Order = require('../Orders/db')
 const Customer = require('../CustomerRegister/db')
 
@@ -12,20 +13,20 @@ const computePaymentStatus = (total, advancePaid) => {
 const createOrders = async (req, res) => {
     try {
         if (!req.user || !req.user.id) {
-            return res.status(401).json({ message: 'Unauthorized' })
+            return sendResponse(res, 401, false, 'Unauthorized')
         }
         const shopkeeper_id = req.user.id
         const { phone } = req.query
         const { items, image, AdvancePayment, Total, orderStatus, notes, deliveryDate } = req.body
 
-        if (!phone) return res.status(400).json({ message: 'Customer phone is required' })
-        if (!items || items.length === 0) return res.status(400).json({ message: 'Order must have at least one item' })
-        if (!image || image.length === 0) return res.status(400).json({ message: 'At least one image is required for the order' })
-        if (Total === undefined || Total === null) return res.status(400).json({ message: 'Total estimated price is required' })
+        if (!phone) return sendResponse(res, 400, false, 'Customer phone is required')
+        if (!items || items.length === 0) return sendResponse(res, 400, false, 'Order must have at least one item')
+        if (!image || image.length === 0) return sendResponse(res, 400, false, 'At least one image is required for the order')
+        if (Total === undefined || Total === null) return sendResponse(res, 400, false, 'Total estimated price is required')
 
         const existing = await Customer.findOne({ phone })
         if (!existing) {
-            return res.status(404).json({ message: 'Customer not found. Please register the customer first.' })
+            return sendResponse(res, 404, false, 'Customer not found. Please register the customer first.')
         }
 
         const advance = Number(AdvancePayment) || 0
@@ -52,11 +53,11 @@ const createOrders = async (req, res) => {
         })
 
         const populated = await Order.findById(newOrder._id).populate('customerId', 'name phone address')
-        return res.status(201).json({ message: 'Order created successfully', order: populated })
+        return sendResponse(res, 201, true, 'Order created successfully', { order: populated })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ message: 'Internal Server Error' })
+        return sendResponse(res, 500, false, 'Internal Server Error')
     }
 }
 
@@ -64,7 +65,7 @@ const createOrders = async (req, res) => {
 const allOrders = async (req, res) => {
     try {
         if (!req.user || !req.user.id) {
-            return res.status(401).json({ message: 'Unauthorized' })
+            return sendResponse(res, 401, false, 'Unauthorized')
         }
 
         // Find all customers belonging to this shopkeeper
@@ -75,10 +76,10 @@ const allOrders = async (req, res) => {
             .populate('customerId', 'name phone address')
             .sort({ updatedAt: -1 })
 
-        return res.status(200).json({ message: 'Orders fetched successfully', data: orders })
+        return sendResponse(res, 200, true, 'Orders fetched successfully', { data: orders })
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ message: 'Internal Server Error' })
+        return sendResponse(res, 500, false, 'Internal Server Error')
     }
 }
 
@@ -88,15 +89,15 @@ const updateOrders = async (req, res) => {
         const { order_id } = req.query
         const { items, image, AdvancePayment, Total, orderStatus, paymentHistory, notes, deliveryDate ,amount} = req.body
         console.log(req.body)
-        if (!order_id) return res.status(400).json({ message: 'order_id is required' })
+        if (!order_id) return sendResponse(res, 400, false, 'order_id is required')
 
         const existingOrder = await Order.findById(order_id)
-        if (!existingOrder) return res.status(404).json({ message: 'Order not found' })
+        if (!existingOrder) return sendResponse(res, 404, false, 'Order not found')
 
         const advance = Number(AdvancePayment) ?? existingOrder.AdvancePayment
         const total = Number(Total) ?? existingOrder.Total
         if (advance > total) {
-            return res.status(400).json({ message: 'Advance payment cannot exceed total amount' })
+            return sendResponse(res, 400, false, 'Advance payment cannot exceed total amount')
         }
     
         const RemainingAmount = total - advance - amount
@@ -109,10 +110,10 @@ const updateOrders = async (req, res) => {
             { new: true }
         ).populate('customerId', 'name phone address')
 
-        return res.status(200).json({ message: 'Order updated successfully', order: updated })
+        return sendResponse(res, 200, true, 'Order updated successfully', { order: updated })
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ message: 'Internal Server Error' })
+        return sendResponse(res, 500, false, 'Internal Server Error')
     }
 }
 
@@ -120,16 +121,16 @@ const updateOrders = async (req, res) => {
 const deleteOrders = async (req, res) => {
     try {
         const { order_id } = req.query
-        if (!order_id) return res.status(400).json({ message: 'order_id is required' })
+        if (!order_id) return sendResponse(res, 400, false, 'order_id is required')
 
         const existing = await Order.findById(order_id)
-        if (!existing) return res.status(404).json({ message: 'Order not found' })
+        if (!existing) return sendResponse(res, 404, false, 'Order not found')
 
         await Order.deleteOne({ _id: order_id })
-        return res.status(200).json({ message: 'Order deleted successfully' })
+        return sendResponse(res, 200, true, 'Order deleted successfully')
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ message: 'Internal Server Error' })
+        return sendResponse(res, 500, false, 'Internal Server Error')
     }
 }
 

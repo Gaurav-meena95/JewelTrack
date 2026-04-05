@@ -139,8 +139,13 @@ const Inventory = () => {
             await axios.patch(`${VITE_API_BASE_KEY}/shops/inventory/update?inventory_id=${formData._id}`, payload, { headers: header })
             setSuccess('Item updated successfully!')
          } else {
-            await axios.post(`${VITE_API_BASE_KEY}/shops/inventory/create`, payload, { headers: header })
-            setSuccess('Item added successfully!')
+            try {
+               const res = await axios.post(`${VITE_API_BASE_KEY}/shops/inventory/create`, payload, { headers: header })
+               setSuccess(res.data?.message || 'Item created successfully')
+            } catch (error) {
+               setError(error.response?.data?.message || 'Failed to create item')
+               console.log('Error creating inventory item:', error)
+            }
          }
          setShowModal(false)
          fetchInventory()

@@ -1,3 +1,4 @@
+const { sendResponse } = require('../../../utils/responseHandler')
 const { validationInput } = require('../../../utils/utils')
 const Customer = require('../CustomerRegister/db')
 const Bill = require('./db')
@@ -8,12 +9,12 @@ const createBilling = async (req, res) => {
         const { amountPaid, paymentMethod, image, items } = req.body
 
         if (!items || items.length === 0) {
-            return res.status(400).json({ message: "Cart cannot be empty" })
+            return sendResponse(res, 400, false, "Cart cannot be empty")
         }
 
         const existingUser = await Customer.findOne({ phone })
         if (!existingUser) {
-            return res.status(404).json({ message: "Customer not found register user" });
+            return sendResponse(res, 404, false, "Customer not found register user");
         }
 
         let grandTotal = 0;
@@ -28,7 +29,7 @@ const createBilling = async (req, res) => {
         });
 
         if (amountPaid > grandTotal) {
-            return res.status(401).json({ message: 'Amount paid cannot exceed grand total' })
+            return sendResponse(res, 401, false, 'Amount paid cannot exceed grand total')
         }
 
         let paymentStatus = 'unpaid'
@@ -59,16 +60,13 @@ const createBilling = async (req, res) => {
             }
         })
         console.log('Bill Generate SuccessFully', createBill)
-        return res.status(201).json({
-            message: 'Bill Generate SuccessFully',
-            Bill: createBill
-        })
+        return sendResponse(res, 201, true, 'Bill Generate SuccessFully', { Bill: createBill })
 
 
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: "Internal Server Error" })
+        sendResponse(res, 500, false, "Internal Server Error")
     }
 }
 
@@ -78,17 +76,17 @@ const updateBilling = async (req, res) => {
         const { amountPaid, paymentMethod, image, items } = req.body
 
         if (!items || items.length === 0) {
-            return res.status(400).json({ message: "Cart cannot be empty" })
+            return sendResponse(res, 400, false, "Cart cannot be empty")
         }
 
         const existingUser = await Customer.findOne({ phone })
         if (!existingUser) {
-            return res.status(404).json({ message: "Customer not found register user" });
+            return sendResponse(res, 404, false, "Customer not found register user");
         }
 
         const existingBills = await Bill.findById({ _id: bill_id })
         if (!existingBills) {
-            return res.status(400).json({ message: "Bill not exist" })
+            return sendResponse(res, 400, false, "Bill not exist")
         }
 
         let grandTotal = 0;
@@ -103,7 +101,7 @@ const updateBilling = async (req, res) => {
         });
 
         if (amountPaid > grandTotal) {
-            return res.status(401).json({ message: 'Amount paid cannot exceed grand total' })
+            return sendResponse(res, 401, false, 'Amount paid cannot exceed grand total')
         }
 
         let paymentStatus = 'unpaid'
@@ -136,13 +134,10 @@ const updateBilling = async (req, res) => {
             }
         )
         console.log('Bill Generate SuccessFully', updateBill)
-        return res.status(200).json({
-            message: 'Bill Generate SuccessFully',
-            Bill: updateBill
-        })
+        return sendResponse(res, 200, true, 'Bill Generate SuccessFully', { Bill: updateBill })
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: 'Internal Server Error' })
+        sendResponse(res, 500, false, 'Internal Server Error')
     }
 
 }
@@ -152,16 +147,16 @@ const recordBillPayment = async (req, res) => {
         const { bill_id } = req.query
         const { additionalPayment, paymentMethod } = req.body
 
-        if (!bill_id) return res.status(400).json({ message: 'bill_id is required' })
+        if (!bill_id) return sendResponse(res, 400, false, 'bill_id is required')
 
         const existingBill = await Bill.findById(bill_id).lean()
-        if (!existingBill) return res.status(404).json({ message: 'Bill not found' })
+        if (!existingBill) return sendResponse(res, 404, false, 'Bill not found')
 
         const grandTotal = existingBill.invoice.finalPrice || existingBill.invoice.grandTotal
         const newTotalPaid = existingBill.payment.amountPaid + (Number(additionalPayment) || 0)
 
         if (newTotalPaid > grandTotal) {
-            return res.status(400).json({ message: 'Payment exceeds grand total of bill' })
+            return sendResponse(res, 400, false, 'Payment exceeds grand total of bill')
         }
 
         const remainingAmount = grandTotal - newTotalPaid
@@ -181,29 +176,28 @@ const recordBillPayment = async (req, res) => {
             { new: true }
         ).populate('customerId', 'name phone')
 
-        return res.status(200).json({ message: 'Payment recorded successfully', Bill: updated })
+        return sendResponse(res, 200, true, 'Payment recorded successfully', { Bill: updated })
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: 'Internal Server Error' })
+        sendResponse(res, 500, false, 'Internal Server Error')
     }
 }
 
 const getBillingProfile = async (req, res) => {
     try {
         if (!req.user || !req.user.id) {
-            return res.status(401).json({ message: 'Unauthorized' })
+            return sendResponse(res, 401, false, 'Unauthorized')
         }
         const { phone } = req.query
 
         if (phone) {
             const existingUser = await Customer.findOne({ phone })
             if (!existingUser) {
-                return res.status(404).json({ message: "Customer not found register user" });
+                return sendResponse(res, 404, false, "Customer not found register user");
             }
             const bills = await Bill.find({ customerId: existingUser._id }).populate("customerId", "name phone").sort({ createdAt: -1 })
 
-            return res.status(200).json({
-                message: 'Customer profile fetched successfully',
+            return sendResponse(res, 200, true, 'Customer profile fetched successfully', {
                 customer: existingUser,
                 data: bills
             })
@@ -215,14 +209,13 @@ const getBillingProfile = async (req, res) => {
 
             const allBills = await Bill.find({ customerId: { $in: customerIds } }).populate("customerId", "name phone").sort({ createdAt: -1 })
 
-            return res.status(200).json({
-                message: 'All bills fetched successfully',
+            return sendResponse(res, 200, true, 'All bills fetched successfully', {
                 data: allBills
             })
         }
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: "Internal Server Error" })
+        sendResponse(res, 500, false, "Internal Server Error")
 
     }
 }

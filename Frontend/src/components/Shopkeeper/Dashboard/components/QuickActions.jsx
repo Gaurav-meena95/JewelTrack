@@ -13,7 +13,7 @@ const QuickActions = ({ navigate }) => {
       <div className='flex flex-wrap items-center gap-3'>
         <button 
           onClick={() => navigate('/dashboard/bills')} 
-          className='px-5 py-2.5 bg-linear-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black font-black rounded flex items-center gap-2 shadow-lg shadow-amber-400/20 active:scale-95 transition-all text-xs uppercase tracking-widest'
+          className='ActionButton'
         >
           <Plus className='w-4 h-4' /> Create Bill
         </button>

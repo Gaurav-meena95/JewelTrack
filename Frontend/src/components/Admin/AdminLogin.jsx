@@ -37,12 +37,18 @@ const AdminLogin = () => {
                 body: JSON.stringify({ ...formdata ,role}),
                 credentials: 'include'
             })
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.message || 'Signup Failed')
+            let data = await res.json()
+            if (!res.ok) throw new Error(data.message || 'Login Failed')
+            
+            if (data.data) {
+                Object.assign(data, data.data)
+            }
             
             if(data.token) localStorage.setItem('accessToken' ,data.token)
             if(data.refreshToken) localStorage.setItem('refreshToken' ,data.refreshToken)
             if(data.user) localStorage.setItem('user' ,JSON.stringify(data.user))
+            
+            if (data.user?.role === 'admin') negivate('/admin-dashboard')
  
         } catch (error) {
             console.log(error)

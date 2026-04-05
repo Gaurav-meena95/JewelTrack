@@ -34,14 +34,18 @@ const Login = () => {
                 body: JSON.stringify({ ...formdata, role })
             })
 
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.message || 'Signup Failed')
+            let data = await res.json()
+            if (!res.ok) throw new Error(data.message || 'Login Failed')
+            
+            if (data.data) {
+                Object.assign(data, data.data)
+            }
 
             if (data.token) localStorage.setItem('x-access-token', data.token)
             if (data.refreshToken) localStorage.setItem('x-refresh-token', data.refreshToken)
             if (data.user) localStorage.setItem('user', JSON.stringify(data.user))
             setLoading(false)
-            if (data.user.role === 'shopkeeper') negivate('/dashboard')
+            if (data.user?.role === 'shopkeeper') negivate('/dashboard')
 
         } catch (error) {
             console.log(error)

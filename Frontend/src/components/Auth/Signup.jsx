@@ -46,8 +46,12 @@ const Signup = () => {
                 body: JSON.stringify({ ...formdata ,role}),
                 credentials: 'include'
             })
-            const data = await res.json()
+            let data = await res.json()
             if (!res.ok) throw new Error(data.message || 'Signup Failed')
+            
+            if (data.data) {
+                Object.assign(data, data.data)
+            }
             
             if(data.token) localStorage.setItem('accessToken' ,data.token)
             if(data.refreshToken) localStorage.setItem('refreshToken' ,data.refreshToken)

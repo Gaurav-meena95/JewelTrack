@@ -13,7 +13,7 @@ import { Customers } from './components/Shopkeeper/Customers/Customers'
 import { Report } from './components/Shopkeeper/Report/Report'
 import { Settings } from './components/Shopkeeper/Settings/Settings'
 import { Dashboard } from './components/Shopkeeper/Dashboard/Dashboard'
-import Loading from './utils/loading'
+
 
 
 

@@ -1,45 +1,43 @@
+const { sendResponse } = require('../../utils/responseHandler')
 const User = require('./userdb.js')
 const sec_key = process.env.sec_key
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const { validationInput } = require('../../utils/utils.js')
+const { validationInput } = require('../../utils/utils')
 
 const signup = async (req, res) => {
     try {
         const { shopName, name, email, phone, password, role } = req.body
         const value = validationInput({ shopName, name, email, phone, password, role })
         if (value) {
-            return res.status(403).json({ message: `Check missing value ${value}` })
+            return sendResponse(res, 403, false, `Check missing value ${value}`)
         }
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            return res.status(401).json({ message: "Invalid Email Address" })
+            return sendResponse(res, 401, false, "Invalid Email Address")
 
         }
         if (!/^\d{10}$/.test(phone)) {
-            return res.status(400).json({ message: "Phone number must be exactly 10 digits" });
+            return sendResponse(res, 400, false, "Phone number must be exactly 10 digits");
         }
         if (!/(?=.*[!@#$%^&*])(?=.{8,})/.test(password)) {
-            return res.status(400).json({ message: "Password must be at least 8 characters long and contain one special character" });
+            return sendResponse(res, 400, false, "Password must be at least 8 characters long and contain one special character");
         }
 
         const exsiting = await User.findOne({
             $or: [{ email }, { phone }]
         });
         if (exsiting) {
-            return res.status(400).json({ message: 'User is already exists' })
+            return sendResponse(res, 400, false, 'User is already exists')
         }
         const hashedPassword = await bcrypt.hash(password, 10)
         const newUser = await User.create({
             shopName, name, email, phone,
             password: hashedPassword, role,
         });
-        return res.status(201).json({
-            message: 'Signup successful',
-            user: newUser
-        })
+        return sendResponse(res, 201, true, 'Signup successful', { user: newUser })
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ msg: "Internal Server Error" })
+        return sendResponse(res, 500, false, "Internal Server Error")
     }
 }
 
@@ -50,7 +48,7 @@ const login = async (req, res) => {
         
         const value = validationInput({ identifier, password, role })
         if (value) {
-            return res.status(403).json({ message: `Check missing value ${value}` })
+            return sendResponse(res, 403, false, `Check missing value ${value}`)
         }
         let existing ;
         if (identifier.includes('@')){
@@ -62,7 +60,7 @@ const login = async (req, res) => {
         
         if (!existing) {
             console.log('User not found:', { email, role });
-            return res.status(404).json({ message: "User not found or Check your Role " })
+            return sendResponse(res, 404, false, "User not found or Check your Role ")
         } else {
             console.log('User found:', existing.email);
             const isPasswordMatch = bcrypt.compareSync(password, existing.password)
@@ -78,22 +76,21 @@ const login = async (req, res) => {
                     { expiresIn: '7d' }
                 )
                 console.log('Login successful, sending tokens');
-                return res.status(200).json({
-                    message: "Login Successfully",
+                return sendResponse(res, 200, true, "Login Successfully", {
                     user: existing,
                     token: jwtToken,
                     refreshToken
-                });
+                })
 
             } else {
                 console.log('Password mismatch');
-                return res.status(401).json({ message: 'Invalid credentials' })
+                return sendResponse(res, 401, false, 'Invalid credentials')
             }
 
         }
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: 'Login Faild', 'error': error.message })
+        sendResponse(res, 500, false, 'Login Faild', { error: error.message })
     }
 }
 const setting =  async(req,res)=>{
@@ -103,23 +100,23 @@ const setting =  async(req,res)=>{
 
         const user = await User.findById(userId)
         if (!user) {
-            return res.status(404).json({ message: 'User not found' })
+            return sendResponse(res, 404, false, 'User not found')
         }
 
         if (email && email !== user.email) {
             const existingEmail = await User.findOne({ email });
-            if (existingEmail) return res.status(400).json({ message: 'Email already in use' })
+            if (existingEmail) return sendResponse(res, 400, false, 'Email already in use')
         }
         if (phone && phone !== user.phone) {
             const existingPhone = await User.findOne({ phone });
-            if (existingPhone) return res.status(400).json({ message: 'Phone number already in use' })
+            if (existingPhone) return sendResponse(res, 400, false, 'Phone number already in use')
         }
 
         if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            return res.status(400).json({ message: "Invalid Email Address" })
+            return sendResponse(res, 400, false, "Invalid Email Address")
         }
         if (phone && !/^\d{10}$/.test(phone)) {
-            return res.status(400).json({ message: "Phone number must be exactly 10 digits" });
+            return sendResponse(res, 400, false, "Phone number must be exactly 10 digits");
         }
 
         let updatedData = {
@@ -134,20 +131,17 @@ const setting =  async(req,res)=>{
 
         if (password && password.trim() !== '') {
             if (!/(?=.*[!@#$%^&*])(?=.{8,})/.test(password)) {
-                return res.status(400).json({ message: "Password must be at least 8 characters long and contain one special character" });
+                return sendResponse(res, 400, false, "Password must be at least 8 characters long and contain one special character");
             }
             updatedData.password = await bcrypt.hash(password, 10)
         }
 
         const updatedUser = await User.findByIdAndUpdate(userId, updatedData, { new: true })
 
-        return res.status(200).json({
-            message: 'Profile updated successfully',
-            user: updatedUser
-        })
+        return sendResponse(res, 200, true, 'Profile updated successfully', { user: updatedUser })
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ msg: "Internal Server Error" })
+        return sendResponse(res, 500, false, "Internal Server Error")
     }
 }
 
