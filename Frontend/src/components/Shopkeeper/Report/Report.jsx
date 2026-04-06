@@ -29,8 +29,8 @@ const Report = () => {
         try {
             setLoading(true);
             const endpoints = [
-                axios.get(`${VITE_API_BASE_KEY}/shops/billing/allbills`, { headers: header }),
-                axios.get(`${VITE_API_BASE_KEY}/shops/orders/allorders`, { headers: header }),
+                axios.get(`${VITE_API_BASE_KEY}/customers/bills/me`, { headers: header }),
+                axios.get(`${VITE_API_BASE_KEY}/customers/orders/me`, { headers: header }),
                 axios.get(`${VITE_API_BASE_KEY}/customers/collatral/me`, { headers: header }),
                 axios.get(`${VITE_API_BASE_KEY}/shops/inventory/me`, { headers: header })
             ];
