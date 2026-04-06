@@ -43,12 +43,12 @@ const Dashboard = () => {
       const results = await Promise.allSettled(endpoints);
       const [customersRes, billsRes, ordersRes, collateralsRes, inventoryRes] = results;
 
-      const customersRaw = customersRes.status === 'fulfilled' ? (customersRes.value.data.customer || []) : [];
+      const customersRaw = customersRes.status === 'fulfilled' ? (customersRes.value.data?.data?.customer || []) : [];
       const customers = Array.isArray(customersRaw) ? customersRaw : [customersRaw];
-      const bills = billsRes.status === 'fulfilled' ? (billsRes.value.data.data || billsRes.value.data.bills || []) : [];      
-      const orders = ordersRes.status === 'fulfilled' ? (ordersRes.value.data.data || ordersRes.value.data.orders || []) : [];
-      const collaterals = collateralsRes.status === 'fulfilled' ? (collateralsRes.value.data.data || collateralsRes.value.data.collaterals || []) : [];
-      const inventory = inventoryRes.status === 'fulfilled' ? (inventoryRes.value.data.allInventorys || []) : [];
+      const bills = billsRes.status === 'fulfilled' ? (billsRes.value.data?.data?.data || billsRes.value.data?.data?.bills || []) : [];      
+      const orders = ordersRes.status === 'fulfilled' ? (ordersRes.value.data?.data?.data || ordersRes.value.data?.data?.orders || []) : [];
+      const collaterals = collateralsRes.status === 'fulfilled' ? (collateralsRes.value.data?.data?.data || collateralsRes.value.data?.data?.collaterals || []) : [];
+      const inventory = inventoryRes.status === 'fulfilled' ? (inventoryRes.value.data?.data?.allInventorys || []) : [];
 
       setData({ customers, bills, orders, collaterals, inventory });
     } catch (err) {

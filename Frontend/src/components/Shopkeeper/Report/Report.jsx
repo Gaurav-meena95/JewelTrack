@@ -38,10 +38,10 @@ const Report = () => {
             const [billsRes, ordersRes, collateralsRes, inventoryRes] = results;
 
             setRawData({
-                bills: billsRes.status === 'fulfilled' ? (billsRes.value.data.data || billsRes.value.data.bills || []) : [],
-                orders: ordersRes.status === 'fulfilled' ? (ordersRes.value.data.data || ordersRes.value.data.orders || []) : [],
-                collaterals: collateralsRes.status === 'fulfilled' ? (collateralsRes.value.data.data || collateralsRes.value.data.collaterals || []) : [],
-                inventory: inventoryRes.status === 'fulfilled' ? (inventoryRes.value.data.allInventorys || []) : []
+                bills: billsRes.status === 'fulfilled' ? (billsRes.value.data?.data?.data || billsRes.value.data?.data?.bills || []) : [],
+                orders: ordersRes.status === 'fulfilled' ? (ordersRes.value.data?.data?.data || ordersRes.value.data?.data?.orders || []) : [],
+                collaterals: collateralsRes.status === 'fulfilled' ? (collateralsRes.value.data?.data?.data || collateralsRes.value.data?.data?.collaterals || []) : [],
+                inventory: inventoryRes.status === 'fulfilled' ? (inventoryRes.value.data?.data?.allInventorys || []) : []
             });
         } catch (err) {
             setError('System failed to aggregate ledger data.');

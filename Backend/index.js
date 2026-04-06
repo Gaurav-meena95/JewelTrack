@@ -19,6 +19,7 @@ connectDB();
 app.get('/',(req,res)=>{
     res.status(200).json('Hello World!')
 })
+
 app.use('/api/auth',AuthRoutes)
 app.use(verifyUserMiddleware)
 app.use('/api/customers',GenerateBill)

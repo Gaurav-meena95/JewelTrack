@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { Edit, User, Calendar, ArrowLeft, History, IndianRupee } from 'lucide-react'
+import { Edit, User, Calendar, ArrowLeft, History, IndianRupee, Phone, Plus } from 'lucide-react'
 import axios from 'axios'
 import { VITE_API_BASE_KEY, getAuthHeaders } from '../../../utils/apiConfig'
 
@@ -63,8 +63,8 @@ const Bills = () => {
       try {
          setLoading(true)
          const response = await axios.get(`${VITE_API_BASE_KEY}/customers/bills/me`, { headers: header })
-         if (response.data && response.data.data) {
-            setBills(response.data.data)
+         if (response.data?.data?.data) {
+            setBills(response.data.data.data)
          }
       } catch (err) {
          console.error(err)
@@ -76,9 +76,9 @@ const Bills = () => {
    const fetchProfileSettings = async () => {
       try {
          const res = await axios.get(`${VITE_API_BASE_KEY}/auth/me`, { headers: header })
-         if (res.data && res.data.user) {
-            setPredefinedItemNames(res.data.user.itemNames || [])
-            setPredefinedPurities(res.data.user.purities || [])
+         if (res.data?.data && res.data.data.user) {
+            setPredefinedItemNames(res.data.data.user.itemNames || [])
+            setPredefinedPurities(res.data.data.user.purities || [])
          }
       } catch (err) {
          console.error('Failed to load settings', err)
@@ -152,9 +152,9 @@ const Bills = () => {
       try {
          setLoading(true)
          const res = await axios.get(`${VITE_API_BASE_KEY}/customers/register/get?phone=${customerPhone}`, { headers: header })
-         if (res.data && res.data.customer) {
+         if (res.data?.data && res.data.data.customer) {
             setCustomerFound(true)
-            const c = res.data.customer
+            const c = res.data.data.customer
             setCustomerData({ name: c.name, father_name: c.father_name, address: c.address, email: c.email })
          } else {
             setCustomerFound(false)

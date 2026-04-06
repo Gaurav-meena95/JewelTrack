@@ -55,7 +55,7 @@ const Colletral = () => {
     try {
       setLoading(true)
       const response = await axios.get(`${VITE_API_BASE_KEY}/customers/collatral/me`, { headers: header })
-      if (response.data) setCollaterals(response.data.data)
+      if (response.data?.data?.data) setCollaterals(response.data.data.data)
     } catch (err) {
       setError('Failed to fetch collaterals')
     }
@@ -65,8 +65,8 @@ const Colletral = () => {
   const fetchProfileSettings = async () => {
     try {
       const res = await axios.get(`${VITE_API_BASE_KEY}/auth/me`, { headers: header })
-      if (res.data && res.data.user) {
-         setPredefinedItemNames(res.data.user.itemNames || [])
+      if (res.data?.data && res.data.data.user) {
+         setPredefinedItemNames(res.data.data.user.itemNames || [])
       }
     } catch (err) { }
   }
@@ -109,9 +109,9 @@ const Colletral = () => {
     try {
       setLoading(true)
       const res = await axios.get(`${VITE_API_BASE_KEY}/customers/register/get?phone=${customerPhone}`, { headers: header })
-      if (res.data?.customer) {
+      if (res.data?.data?.customer) {
         setCustomerFound(true)
-        const c = res.data.customer
+        const c = res.data.data.customer
         setCustomerData({ name: c.name, father_name: c.father_name, address: c.address, email: c.email })
       } else {
         setCustomerFound(false)

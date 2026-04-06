@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import ThemeToggle from '../ThemeToggle'
 import { ArrowLeft, Eye, EyeOff, Gem } from 'lucide-react'
 import { motion } from 'motion/react'
+import { VITE_API_BASE_KEY } from '../../utils/apiConfig'
 
 const AdminLogin = () => {
  const negivate = useNavigate()
@@ -25,13 +26,9 @@ const AdminLogin = () => {
     const handelSubmit = async (e) => {
         e.preventDefault()
         setError('')
-        if (formdata.phone.length != 10) {
-            setError('Phone number must be exactly 10 digits')
-            return
-        }
         setLoading(true)
         try {
-            const res = await fetch(`http://localhost:3000/api/auth/login`, {
+            const res = await fetch(`${VITE_API_BASE_KEY}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...formdata ,role}),

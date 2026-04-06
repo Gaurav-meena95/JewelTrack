@@ -72,7 +72,7 @@ const Orders = () => {
       try {
          setLoading(true)
          const res = await axios.get(`${VITE_API_BASE_KEY}/customers/orders/me`, { headers: header })
-         if (res.data?.data) setOrders(res.data.data)
+         if (res.data?.data?.data) setOrders(res.data.data.data)
       } catch (err) {
          setError('Failed to fetch orders')
       }
@@ -82,9 +82,9 @@ const Orders = () => {
    const fetchProfileSettings = async () => {
       try {
          const res = await axios.get(`${VITE_API_BASE_KEY}/auth/me`, { headers: header })
-         if (res.data && res.data.user) {
-            setPredefinedItemNames(res.data.user.itemNames || [])
-            setPredefinedPurities(res.data.user.purities || [])
+         if (res.data?.data && res.data.data.user) {
+            setPredefinedItemNames(res.data.data.user.itemNames || [])
+            setPredefinedPurities(res.data.data.user.purities || [])
          }
       } catch (err) { }
    }
@@ -155,9 +155,9 @@ const Orders = () => {
       try {
          setLoading(true)
          const res = await axios.get(`${VITE_API_BASE_KEY}/customers/register/get?phone=${customerPhone}`, { headers: header })
-         if (res.data?.customer) {
+         if (res.data?.data?.customer) {
             setCustomerFound(true)
-            setCustomerData({ name: res.data.customer.name, phone: customerPhone })
+            setCustomerData({ name: res.data.data.customer.name, phone: customerPhone })
          } else {
             setCustomerFound(false)
          }
@@ -331,7 +331,7 @@ const Orders = () => {
                  setPaymentFilter={setPaymentFilter}
                  currentCustomerOrders={currentCustomerOrders}
                  openNewOrderModal={openNewOrderModal}
-                 setActiveOrdehandleProceedToOrderrDetails={setActiveOrderDetails}
+                 setActiveOrderDetails={setActiveOrderDetails}
                  setShowViewOrder={setShowViewOrder}
                  openEditPayment={openEditPayment}
                  loading={loading}

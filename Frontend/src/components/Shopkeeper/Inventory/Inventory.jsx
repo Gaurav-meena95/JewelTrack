@@ -48,8 +48,8 @@ const Inventory = () => {
       try {
          setLoading(true)
          const res = await axios.get(`${VITE_API_BASE_KEY}/shops/inventory/me`, { headers: header })
-         if (res.data?.allInventorys) {
-            setInventory(res.data.allInventorys)
+         if (res.data?.data?.allInventorys) {
+            setInventory(res.data.data.allInventorys)
          }
       } catch (err) {
          setError('Failed to fetch inventory')
@@ -60,8 +60,8 @@ const Inventory = () => {
    const fetchProfileSettings = async () => {
       try {
          const res = await axios.get(`${VITE_API_BASE_KEY}/auth/me`, { headers: header })
-         if (res.data && res.data.user) {
-            setPredefinedItemNames(res.data.user.itemNames || [])
+         if (res.data?.data && res.data.data.user) {
+            setPredefinedItemNames(res.data.data.user.itemNames || [])
          }
       } catch (err) { }
    }

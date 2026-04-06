@@ -43,8 +43,8 @@ const Customers = () => {
     try {
       setLoading(true)
       const response = await axios.get(`${VITE_API_BASE_KEY}/customers/register/get`, { headers: header })
-      if (response.data?.customer) {
-        const data = response.data.customer
+      if (response.data?.data?.customer) {
+        const data = response.data.data.customer
         const customersArray = Array.isArray(data) ? data : [data]
         setCustomers(customersArray)
         setAllCustomers(customersArray)
@@ -60,8 +60,8 @@ const Customers = () => {
       setDetailsLoading(true)
       setSelectedCustomerDetail(null)
       const response = await axios.get(`${VITE_API_BASE_KEY}/customers/register/detail?id=${id}`, { headers: header })
-      if (response.data) {
-        setSelectedCustomerDetail(response.data)
+      if (response.data?.data) {
+        setSelectedCustomerDetail(response.data.data)
         setActiveTab('bills')
       }
     } catch (err) {

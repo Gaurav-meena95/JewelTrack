@@ -4,8 +4,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import ThemeToggle from '../ThemeToggle'
 import { ArrowLeft, Eye, EyeOff, Gem } from 'lucide-react'
 import { motion } from 'motion/react'
+import { VITE_API_BASE_KEY, getAuthHeaders } from '../../utils/apiConfig'
+import axios from 'axios'
 
 const Login = () => {
+    const header = getAuthHeaders()
     const negivate = useNavigate()
     const [role, setRole] = useState('shopkeeper')
     const [error, setError] = useState('')
@@ -13,7 +16,6 @@ const Login = () => {
     const [showPassword, setshowPassword] = useState(false)
 
 
-    const apiUrl = import.meta.env.VITE_API_BASE_KEY
 
     const [formdata, setFormdata] = useState({
         email: '',
@@ -28,24 +30,16 @@ const Login = () => {
         setError('')
         setLoading(true)
         try {
-            const res = await fetch(`${apiUrl}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...formdata, role })
-            })
-
-            let data = await res.json()
-            if (!res.ok) throw new Error(data.message || 'Login Failed')
-            
-            if (data.data) {
-                Object.assign(data, data.data)
-            }
-
-            if (data.token) localStorage.setItem('x-access-token', data.token)
-            if (data.refreshToken) localStorage.setItem('x-refresh-token', data.refreshToken)
-            if (data.user) localStorage.setItem('user', JSON.stringify(data.user))
+            const res = await axios.post(`${VITE_API_BASE_KEY}/auth/login`, {...formdata,role} , {headers:header})
+            const user = res.data.data.user
+            const accessToken = res.data.data.token
+             const refreshToken = res.data.data.refreshToken
+            console.log('object',res)
+            if (accessToken) localStorage.setItem('x-access-token', accessToken)
+            if (refreshToken) localStorage.setItem('x-refresh-token', refreshToken)
+            if (user) localStorage.setItem('user', JSON.stringify(user))
             setLoading(false)
-            if (data.user?.role === 'shopkeeper') negivate('/dashboard')
+            if (user?.role === 'shopkeeper') negivate('/dashboard')
 
         } catch (error) {
             console.log(error)

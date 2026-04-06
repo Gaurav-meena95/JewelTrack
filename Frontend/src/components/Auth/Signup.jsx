@@ -3,8 +3,11 @@ import { ArrowLeft, ClockFading, Eye, EyeOff, Gem } from 'lucide-react'
 import { motion } from 'motion/react'
 import ThemeToggle from '../ThemeToggle'
 import {Link, useNavigate} from 'react-router-dom'
+import { VITE_API_BASE_KEY, getAuthHeaders } from '../../utils/apiConfig'
+import axios from 'axios'
 
 const Signup = () => {
+    const header = getAuthHeaders()
     const negivate = useNavigate()
     const [role,setRole] = useState('shopkeeper')
     const [error, setError] = useState('')
@@ -40,31 +43,21 @@ const Signup = () => {
         }
         setLoading(true)
         try {
-            const res = await fetch(`http://localhost:3000/api/auth/signup`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...formdata ,role}),
-                credentials: 'include'
-            })
-            let data = await res.json()
-            if (!res.ok) throw new Error(data.message || 'Signup Failed')
-            
-            if (data.data) {
-                Object.assign(data, data.data)
-            }
-            
-            if(data.token) localStorage.setItem('accessToken' ,data.token)
-            if(data.refreshToken) localStorage.setItem('refreshToken' ,data.refreshToken)
-            if(data.user) localStorage.setItem('user' ,JSON.stringify(data.user))
+            const res = await axios.post(`${VITE_API_BASE_KEY}/auth/signup`, { ...formdata ,role}, { headers: header })
+            const user = res.data.data.user
+            const accessToken = res.config.headers.Authorization
+             const refreshToken = res.config.headers['x-refresh-token']
 
-            console.log(data)
+            if(accessToken) localStorage.setItem('accessToken' ,accessToken)
+            if(refreshToken) localStorage.setItem('refreshToken' ,refreshToken)
+            if(user) localStorage.setItem('user' ,JSON.stringify(user))
+
             setLoading(false)
-            if(data.user.role === "shopkeeper"){
+            if(user.role === "shopkeeper"){
                 negivate('/dashboard')
             }
  
         } catch (error) {
-            console.log(error)
             setError(error.message)
         }finally{
             setLoading(false)
@@ -136,6 +129,7 @@ const Signup = () => {
                             value={formdata.phone}
                             id='phoneNumber'
                             placeholder="+91 9849408389"
+                            maxLength={10}
                             className='p-2 rounded-[8px] w-full bg-input/90 mt-1 backdrop-blur-sm border border-border/80 focus:border-[#513b01] focus:ring-amber-500 transition-all'
                         />
 

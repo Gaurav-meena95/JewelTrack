@@ -38,6 +38,8 @@ const Settings = () => {
         if (newItemName.trim() && !profile.itemNames.includes(newItemName.trim())) {
             setProfile(prev => ({ ...prev, itemNames: [...prev.itemNames, newItemName.trim()] }))
             setNewItemName('')
+        }else{
+            return showMessage('error', 'Items Already in list')
         }
     }
 
@@ -64,15 +66,15 @@ const Settings = () => {
     const fetchProfile = async () => {
         try {
             const res = await axios.get(`${VITE_API_BASE_KEY}/auth/me`, { headers: header })
-            if (res.data && res.data.user) {
+            if (res.data && res.data.data.user) {
                 setProfile(prev => ({
                     ...prev,
-                    shopName: res.data.user.shopName || '',
-                    name: res.data.user.name || '',
-                    email: res.data.user.email || '',
-                    phone: res.data.user.phone || '',
-                    itemNames: res.data.user.itemNames || [],
-                    purities: res.data.user.purities || []
+                    shopName: res.data.data.user.shopName || '',
+                    name: res.data.data.user.name || '',
+                    email: res.data.data.user.email || '',
+                    phone: res.data.data.user.phone || '',
+                    itemNames: res.data.data.user.itemNames || [],
+                    purities: res.data.data.user.purities || []
                 }))
             }
         } catch (err) {
@@ -83,7 +85,7 @@ const Settings = () => {
 
     const showMessage = (type, text) => {
         setMessage({ type, text })
-        setTimeout(() => setMessage({ type: '', text: '' }), 5000)
+        setTimeout(() => setMessage({ type: '', text: '' }), 10000)
     }
 
     const handleChange = (e) => {
