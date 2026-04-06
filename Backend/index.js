@@ -17,7 +17,7 @@ const { verifyUserMiddleware } = require('./module/Auth/middleware')
 
 connectDB();
 app.get('/',(req,res)=>{
-    res.status(200).json('Hello World!')
+    res.status(200).json('Welcome to Jewel Track')
 })
 
 app.use('/api/auth',AuthRoutes)
