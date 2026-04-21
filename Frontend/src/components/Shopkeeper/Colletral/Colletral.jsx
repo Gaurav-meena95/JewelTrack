@@ -66,7 +66,7 @@ const Colletral = () => {
     try {
       const res = await axios.get(`${VITE_API_BASE_KEY}/auth/me`, { headers: header })
       if (res.data?.data && res.data.data.user) {
-         setPredefinedItemNames(res.data.data.user.itemNames || [])
+        setPredefinedItemNames(res.data.data.user.itemNames || [])
       }
     } catch (err) { }
   }
@@ -85,7 +85,7 @@ const Colletral = () => {
 
   // Interest Logic ---
   const handleCalcChange = (e) => setCalcData({ ...calcData, [e.target.name]: e.target.value })
-  
+
   const calculateInterest = (e) => {
     e.preventDefault()
     if (!calcData.startDate || !calcData.endDate || !calcData.basePrice || !calcData.interest) return
@@ -253,15 +253,17 @@ const Colletral = () => {
     <>
       <div className={`min-h-screen ${hasBlur ? 'blur-[2px] pointer-events-none' : ''}`}>
 
-        <SectionHeader 
-          title="Girvi / Collateral" 
+        <SectionHeader
+          title="Girvi / Collateral"
           subtitle="Manage collateral loans with payments and automatic interest tracking"
           buttonText="New Girvi"
           onButtonClick={() => setShowNewGirvi(true)}
+          className="bg-linear-to-r from-secondary/50 to-transparent p-6 rounded-2xl border border-border/50"
           titleClassName="text-3xl font-bold bg-linear-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent"
+
         >
-          <button 
-            onClick={() => setShowCalculator(true)} 
+          <button
+            onClick={() => setShowCalculator(true)}
             className='p-2 px-4 bg-secondary border border-border/50 rounded flex items-center gap-2 hover:bg-secondary/80 transition-all font-medium'
           >
             <Calculator className='h-4 w-4' /> Quick Calculator
@@ -274,32 +276,32 @@ const Colletral = () => {
         {/* Search & Filters */}
         <div className='flex flex-col md:flex-row gap-4 items-center bg-secondary/30 p-5 rounded-2xl border border-border/50 my-6'>
           <div className='flex-1 w-full'>
-            <SearchBar 
-              value={searchPhone} 
-              onChange={(e) => setSearchPhone(e.target.value)} 
-              placeholder="Search by name or phone number..." 
+            <SearchBar
+              value={searchPhone}
+              onChange={(e) => setSearchPhone(e.target.value)}
+              placeholder="Search by name or phone number..."
             />
           </div>
           <div className='flex gap-2 w-full md:w-auto bg-card p-1.5 rounded border border-border/50'>
             {['all', 'active', 'closed'].map(f => (
-               <button 
-                 key={f}
-                 onClick={() => setFilter(f)} 
-                 className={`px-6 py-2 rounded text-sm font-bold capitalize transition-all ${filter === f ? 'bg-amber-400 text-black shadow-lg shadow-amber-400/20' : 'text-muted-foreground hover:text-foreground'}`}
-               >
-                 {f}
-               </button>
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-6 py-2 rounded text-sm font-bold capitalize transition-all ${filter === f ? 'bg-amber-400 text-black shadow-lg shadow-amber-400/20' : 'text-muted-foreground hover:text-foreground'}`}
+              >
+                {f}
+              </button>
             ))}
           </div>
         </div>
 
         {/* Collateral Cards List */}
         {loading && !showNewGirvi && !showAccount ? (
-           <div className='text-center py-20 opacity-50'><p>Loading collaterals...</p></div>
+          <div className='text-center py-20 opacity-50'><p>Loading collaterals...</p></div>
         ) : displayedCollaterals.length === 0 ? (
-           <div className='text-center py-20 border-2 border-dashed border-border/50 rounded-3xl'>
-              <h2 className='text-muted-foreground text-xl font-medium'>No Girvi accounts found</h2>
-           </div>
+          <div className='text-center py-20 border-2 border-dashed border-border/50 rounded-3xl'>
+            <h2 className='text-muted-foreground text-xl font-medium'>No Girvi accounts found</h2>
+          </div>
         ) : (
           <div className='grid grid-cols-1 gap-6'>
             {displayedCollaterals.map((item, index) => {
@@ -362,16 +364,16 @@ const Colletral = () => {
                   </div>
 
                   <div className='flex justify-between items-center px-1'>
-                     <div className='flex gap-6 text-[10px] text-muted-foreground uppercase font-bold tracking-widest'>
-                        <span>Opening: {new Date(item.createdAt).toLocaleDateString()}</span>
-                        {item.updatedAt !== item.createdAt && <span>Last Activity: {new Date(item.updatedAt).toLocaleDateString()}</span>}
-                     </div>
-                     <button 
-                        onClick={() => { setSelectedAccount(item); setShowAccount(true); }}
-                        className='text-xs font-bold text-amber-400 hover:underline flex items-center gap-1'
-                     >
-                       Manage Account & Details
-                     </button>
+                    <div className='flex gap-6 text-[10px] text-muted-foreground uppercase font-bold tracking-widest'>
+                      <span>Opening: {new Date(item.createdAt).toLocaleDateString()}</span>
+                      {item.updatedAt !== item.createdAt && <span>Last Activity: {new Date(item.updatedAt).toLocaleDateString()}</span>}
+                    </div>
+                    <button
+                      onClick={() => { setSelectedAccount(item); setShowAccount(true); }}
+                      className='text-xs font-bold text-amber-400 hover:underline flex items-center gap-1'
+                    >
+                      Manage Account & Details
+                    </button>
                   </div>
                 </div>
               )
@@ -380,7 +382,7 @@ const Colletral = () => {
         )}
       </div>
 
-      <QuickCalculatorModal 
+      <QuickCalculatorModal
         show={showCalculator}
         onClose={() => setShowCalculator(false)}
         calcData={calcData}
@@ -389,7 +391,7 @@ const Colletral = () => {
         calcResult={calcResult}
       />
 
-      <NewGirviModal 
+      <NewGirviModal
         show={showNewGirvi}
         onClose={() => setShowNewGirvi(false)}
         customerPhone={customerPhone}
@@ -409,7 +411,7 @@ const Colletral = () => {
         predefinedItemNames={predefinedItemNames}
       />
 
-      <CollateralDetailsModal 
+      <CollateralDetailsModal
         show={showAccount}
         onClose={() => setShowAccount(false)}
         account={selectedAccount}
@@ -425,9 +427,9 @@ const Colletral = () => {
         onEnlargeImage={(img) => setEnlargedImage(img)}
       />
 
-      <ImageViewer 
-        image={enlargedImage} 
-        onClose={() => setEnlargedImage(null)} 
+      <ImageViewer
+        image={enlargedImage}
+        onClose={() => setEnlargedImage(null)}
       />
     </>
   )

@@ -9,125 +9,143 @@ import axios from 'axios'
 
 const Login = () => {
     const header = getAuthHeaders()
-    const negivate = useNavigate()
+    const navigate = useNavigate()
     const [role, setRole] = useState('shopkeeper')
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
     const [showPassword, setshowPassword] = useState(false)
 
-
-
     const [formdata, setFormdata] = useState({
-        email: '',
+        identifier: '',
         password: ''
     })
 
     const handelChange = (e) => {
         setFormdata({ ...formdata, [e.target.name]: e.target.value })
     }
+
     const handelSubmit = async (e) => {
         e.preventDefault()
         setError('')
         setLoading(true)
         try {
-            const res = await axios.post(`${VITE_API_BASE_KEY}/auth/login`, {...formdata,role} , {headers:header})
+            const res = await axios.post(`${VITE_API_BASE_KEY}/auth/login`, { ...formdata, role }, { headers: header })
             const user = res.data.data.user
             const accessToken = res.data.data.token
-             const refreshToken = res.data.data.refreshToken
-            console.log('object',res)
+            const refreshToken = res.data.data.refreshToken
+
             if (accessToken) localStorage.setItem('x-access-token', accessToken)
             if (refreshToken) localStorage.setItem('x-refresh-token', refreshToken)
             if (user) localStorage.setItem('user', JSON.stringify(user))
-            setLoading(false)
-            if (user?.role === 'shopkeeper') negivate('/dashboard')
 
+            if (user?.role === 'admin') navigate('/admin-dashboard')
+            else navigate('/dashboard')
         } catch (error) {
-            console.log(error)
-            setError(error.message)
+            setError(error.response?.data?.message || 'Login failed. Please check your credentials.')
         } finally {
             setLoading(false)
         }
     }
 
-
     return (
-
         <div className='min-h-screen bg-background flex items-center justify-center px-6 py-12 relative overflow-hidden'>
             <div className="absolute top-6 right-6">
                 <ThemeToggle />
             </div>
+
             <Link
                 to='/'
-                className="absolute top-6 left-6 flex items-center gap-2 text-muted-foreground hover:text-[#c8b11c] transition-colors"
+                className="absolute top-6 left-6 flex items-center gap-2 text-muted-foreground hover:text-amber-400 transition-colors"
             >
                 <ArrowLeft className="h-5 w-5" />
                 Back to Home
             </Link>
+
             <motion.div
                 initial={{ opacity: 0, y: -40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.9 }}
-                className='backdrop-blur-md bg-card/80   border border-border/50 rounded-[2%] p-10'
-
+                className='backdrop-blur-md bg-card/80 border border-border/50 rounded-3xl p-10 max-w-md w-full shadow-2xl'
             >
-                <div className='flex items-center  justify-center gap-2 mb-5'>
-                    <Gem className='text-[#d2a907] h-7 w-8' />
-                    <span className='text-[#d2a907] text-3xl'>Jewel Track</span>
+                <div className='flex items-center justify-center gap-2 mb-6'>
+                    <Gem className='text-[#d2a907] h-8 w-8' />
+                    <span className='text-[#d2a907] text-3xl font-bold'>Jewel Track</span>
                 </div>
-                <div className='text-center mb-2'>
-                    <h1 className='text-2xl mb-2'>Shopkeeper Login</h1>
-                    <p className='text-muted-foreground'>Welcome back! Please enter your credentials</p>
+
+                <div className='text-center mb-8'>
+                    <h1 className='text-2xl font-bold mb-2'>Welcome Back</h1>
+                    <p className='text-muted-foreground text-sm'>Enter your credentials to access your dashboard</p>
                 </div>
-                <form onSubmit={handelSubmit} className='mt-5'>
-                    <div className='space-y2 my-3'>
-                        <label htmlFor="phoneNumber">Phone or Email</label>
-                        <input type="text"
-                            onChange={handelChange}
+
+                {/* Role Selection Toggle */}
+                <div className="flex bg-secondary/50 p-1 rounded mb-8 border border-border/50">
+                    <button
+                        type="button"
+                        onClick={() => setRole('shopkeeper')}
+                        className={`flex-1 py-2.5 rounded text-xs font-bold uppercase tracking-widest transition-all ${role === 'shopkeeper' ? 'bg-amber-400 text-black shadow-lg' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                        Shopkeeper
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setRole('admin')}
+                        className={`flex-1 py-2.5 rounded text-xs font-bold uppercase tracking-widest transition-all ${role === 'admin' ? 'bg-amber-400 text-black shadow-lg' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                        Administrator
+                    </button>
+                </div>
+
+                <form onSubmit={handelSubmit} className='space-y-5'>
+                    <div className='space-y-1.5'>
+                        <label className='text-xs font-bold uppercase text-muted-foreground ml-1'>Email or Phone</label>
+                        <input
+                            type="text"
+                            required
                             name='identifier'
-                            value={formdata.phone}
-                            id='phoneNumber'
+                            onChange={handelChange}
+                            value={formdata.identifier}
                             placeholder="Email or Phone"
-                            className='p-2 rounded-[8px] w-full bg-input/90 mt-1 backdrop-blur-sm border border-border/80 focus:border-[#513b01] focus:ring-amber-500 transition-all'
+                            className='w-full p-4 rounded-2xl bg-input border border-border focus:border-amber-400/50 outline-none transition-all text-sm'
                         />
-
                     </div>
-                    <div className='space-y2 my-3'>
-                        <label htmlFor="Password">Password</label>
-                        <div className='relative'>
-                            <input type={showPassword ? "text" : 'password'}
 
-                                onChange={handelChange}
+                    <div className='space-y-1.5'>
+                        <label className='text-xs font-bold uppercase text-muted-foreground ml-1'>Password</label>
+                        <div className='relative'>
+                            <input
+                                type={showPassword ? "text" : 'password'}
+                                required
                                 name='password'
+                                onChange={handelChange}
                                 value={formdata.password}
-                                id='Password'
                                 placeholder="•••••••••"
-                                className='p-2 pr-10 rounded-[5px] w-full bg-input/90 mt-1 backdrop-blur-sm border border-border/80 focus:border-[#513b01] focus:ring-amber-500 transition-all'
+                                className='w-full p-4 rounded-2xl bg-input border border-border focus:border-amber-400/50 outline-none transition-all text-sm pr-12'
                             />
                             <button
+                                type="button"
                                 onClick={() => setshowPassword(!showPassword)}
-                                className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer'>
-                                {showPassword ?
-                                    <Eye size={18} /> :
-                                    <EyeOff size={18} />}
+                                className='absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-amber-400 transition-colors'
+                            >
+                                {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
                             </button>
                         </div>
                     </div>
-                    <div className='space-y2 my-5 text-center'>
-                        <button onClick={() => setRole('shopkeeper')} className='w-full p-2 rounded-[8px] bg-[#eab71eec] cursor-pointer'>{loading ? 'Signing in... ' : " Sign In"}</button>
-                    </div>
-                    <div className='text-red-800'>
-                        {error}
-                    </div>
+
+                    {error && <div className='text-rose-500 text-xs font-bold bg-rose-500/10 p-3 rounded border border-rose-500/20 text-center'>{error}</div>}
+
+                    <button
+                        disabled={loading}
+                        className='w-full p-4 bg-amber-400 hover:bg-amber-500 text-black font-black uppercase tracking-widest text-xs rounded-2xl transition-all shadow-lg shadow-amber-400/20 flex items-center justify-center gap-2 mt-4'
+                    >
+                        {loading ? 'Authenticating...' : 'Sign In'}
+                    </button>
                 </form>
-                <div className='mt-5 text-center'>
-                    <span className='text-muted-foreground'>Don't have an account? </span>
-                    <Link to='/signup' className='text-[#e7ba35] cursor-pointer hover:underline'>Create Shop Account</Link>
+
+                <div className='mt-8 text-center'>
+                    <span className='text-muted-foreground text-sm'>Don't have an account? </span>
+                    <Link to='/signup' className='text-amber-400 font-bold hover:underline ml-1'>Join Now</Link>
                 </div>
-
-
             </motion.div>
-
-
         </div>
     )
 }

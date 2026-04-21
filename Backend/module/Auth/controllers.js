@@ -8,7 +8,10 @@ const signup = async (req, res) => {
 
     try {
         const { shopName, name, email, phone, password, role } = req.body
-        const value = validationInput({ shopName, name, email, phone, password, role })
+        const validationFields = { name, email, phone, password, role };
+        if (role === 'shopkeeper') validationFields.shopName = shopName;
+        
+        const value = validationInput(validationFields)
         if (value) {
             return res.status(403).json({ success: false, message: `Check missing value ${value}` })
         }
@@ -59,8 +62,10 @@ const login = async (req, res) => {
         }
         
         if (!existing) {
-            console.log('User not found:', { email, role });
+            console.log('User not found:', { identifier, role });
             return res.status(404).json({ success: false, message: "User not found or Check your Role " })
+        } else if (existing.isBlocked) {
+            return res.status(403).json({ success: false, message: "Your account has been blocked by the Administrator. Please contact support." })
         } else {
             console.log('User found:', existing.email);
             const isPasswordMatch = bcrypt.compareSync(password, existing.password)

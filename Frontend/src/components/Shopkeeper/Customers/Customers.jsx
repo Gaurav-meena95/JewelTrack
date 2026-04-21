@@ -19,11 +19,11 @@ const Customers = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [searchPhone, setSearchPhone] = useState('')
-  
+
   const [showRegisterModal, setShowRegisterModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  
+
   const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [selectedCustomerDetail, setSelectedCustomerDetail] = useState(null)
   const [detailsLoading, setDetailsLoading] = useState(false)
@@ -121,8 +121,8 @@ const Customers = () => {
       setCustomers(allCustomers)
     } else {
       const q = searchPhone.trim().toLowerCase()
-      const filtered = allCustomers.filter(c => 
-        String(c.phone).includes(q) || 
+      const filtered = allCustomers.filter(c =>
+        String(c.phone).includes(q) ||
         c.name?.toLowerCase().includes(q)
       )
       setCustomers(filtered)
@@ -158,35 +158,36 @@ const Customers = () => {
   return (
     <>
       <div className={`min-h-screen ${hasBlur ? 'blur-[4px] pointer-events-none scale-95 opacity-50' : ''} transition-all duration-300`}>
-        
+
         {detailsLoading ? (
-            <div className='flex flex-col items-center justify-center py-52 space-y-6'>
-                <div className='w-14 h-14 border-4 border-amber-400/20 border-t-amber-400 rounded-full animate-spin shadow-2xl'></div>
-                <div className='space-y-1 text-center'>
-                    <h3 className='font-black uppercase tracking-widest text-xs'>Accessing Secure Ledger</h3>
-                    <p className='text-muted-foreground text-[10px] uppercase font-bold tracking-tighter opacity-60'>Please wait while we sync customer portfolio...</p>
-                </div>
+          <div className='flex flex-col items-center justify-center py-52 space-y-6'>
+            <div className='w-14 h-14 border-4 border-amber-400/20 border-t-amber-400 rounded-full animate-spin shadow-2xl'></div>
+            <div className='space-y-1 text-center'>
+              <h3 className='font-black uppercase tracking-widest text-xs'>Accessing Secure Ledger</h3>
+              <p className='text-muted-foreground text-[10px] uppercase font-bold tracking-tighter opacity-60'>Please wait while we sync customer portfolio...</p>
             </div>
+          </div>
         ) : selectedCustomerDetail ? (
-           <CustomerPortfolioView 
-             selectedCustomerDetail={selectedCustomerDetail}
-             setSelectedCustomerDetail={setSelectedCustomerDetail}
-             activeTab={activeTab}
-             setActiveTab={setActiveTab}
-           />
+          <CustomerPortfolioView
+            selectedCustomerDetail={selectedCustomerDetail}
+            setSelectedCustomerDetail={setSelectedCustomerDetail}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
         ) : (
           <div className='space-y-8 animate-in fade-in duration-500'>
-            <SectionHeader 
-              title="Customer Management" 
+            <SectionHeader
+              title="Customer Management"
               subtitle="Register and manage your professional client database"
               buttonText="Register Client"
               onButtonClick={() => { setFormData(initialFormState); setShowRegisterModal(true) }}
-              titleClassName="text-3xl font-black bg-linear-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent tracking-tight"
+              className="bg-linear-to-r from-secondary/50 to-transparent p-6 rounded-2xl border border-border/50"
+              titleClassName="text-3xl font-bold bg-linear-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent"
             />
 
             {success && <div className='bg-green-500/20 border border-green-500/50 text-green-500 p-4 rounded-2xl text-center text-sm font-bold animate-in slide-in-from-top-4'>{success}</div>}
 
-            <CustomerList 
+            <CustomerList
               loading={loading}
               customers={customers}
               searchPhone={searchPhone}
@@ -204,7 +205,7 @@ const Customers = () => {
       </div>
 
       {/* Unified Modals */}
-      <CustomerFormModal 
+      <CustomerFormModal
         show={showRegisterModal}
         onClose={() => setShowRegisterModal(false)}
         isEditing={false}
@@ -215,7 +216,7 @@ const Customers = () => {
         error={error}
       />
 
-      <CustomerFormModal 
+      <CustomerFormModal
         show={showEditModal}
         onClose={() => setShowEditModal(false)}
         isEditing={true}
@@ -231,11 +232,11 @@ const Customers = () => {
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in zoom-in-95 duration-200'>
           <div className='bg-card max-w-sm w-full p-8 rounded-[32px] border border-red-500/30 shadow-2xl text-center space-y-6'>
             <div className='h-20 w-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto ring-8 ring-red-500/5'>
-               <X className='h-10 w-10 text-red-500' />
+              <X className='h-10 w-10 text-red-500' />
             </div>
             <div className='space-y-2'>
-                <h2 className='text-xl font-black uppercase text-red-500'>Confirm Deletion</h2>
-                <p className='text-sm text-muted-foreground font-medium'>Are you sure you want to permanently delete <span className='font-bold text-foreground'>"{selectedCustomer?.name}"</span>? This action cannot be reversed.</p>
+              <h2 className='text-xl font-black uppercase text-red-500'>Confirm Deletion</h2>
+              <p className='text-sm text-muted-foreground font-medium'>Are you sure you want to permanently delete <span className='font-bold text-foreground'>"{selectedCustomer?.name}"</span>? This action cannot be reversed.</p>
             </div>
             <div className='flex gap-3 pt-2'>
               <button onClick={() => setShowDeleteConfirm(false)} className='flex-1 p-4 rounded-2xl bg-secondary hover:bg-secondary/80 font-bold transition-all border border-border/50'>Cancel</button>

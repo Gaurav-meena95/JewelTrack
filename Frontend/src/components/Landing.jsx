@@ -8,7 +8,7 @@ const Landing = () => {
     const [currentslide, setCurrentslide] = useState(0)
 
     const navigate = useNavigate()
-    
+
     // Changed to B2B SaaS features instead of jewelry items
     const coreModules = [
         {
@@ -73,12 +73,15 @@ const Landing = () => {
                         <ThemeToggle />
                         <Link
                             to='/login'
-                            className='hover:text-[#d2a907] hover:bg-[#e6a2046e] px-2 py-1 rounded'
+                            className='text-sm font-medium hover:text-amber-400 transition-colors'
                         >
-                            Shopkeeper login
+                            Sign In
                         </Link>
-                        <Link to='/admin' className='hover:text-[#d2a907] hover:bg-[#e6a2046e] px-2 py-1 rounded'>
-                            Admin
+                        <Link
+                            to='/signup'
+                            className='bg-amber-400 text-black px-4 py-2 rounded text-sm font-bold hover:bg-amber-500 transition-all shadow-lg shadow-amber-400/20'
+                        >
+                            Join Now
                         </Link>
                     </div>
                 </div>
@@ -92,11 +95,11 @@ const Landing = () => {
                             <h1 className='text-5xl md:text-6xl mb-6 font-bold text-white'>
                                 Smart Management for
                                 <br />
-                                <span className='text-[#d2a907]'>Modern Jewelry Shops</span>
+                                <span className='text-amber-400'>Modern Jewelry Shops</span>
                             </h1>
                             <p className='text-lg text-gray-300 mb-8'>The complete SaaS solution to digitize your jewelry business. Manage customer relationships, track inventory, handle Girvi (collateral loans), and generate bills with automated calculations.</p>
                             <div className='flex gap-4 flex-wrap'>
-                                <button onClick={() => navigate('/login')} className='bg-amber-400 text-black px-6 py-3 cursor-pointer shadow-[0_0_20px_var(--gold-glow)] hover:bg-amber-500 rounded-2xl flex items-center font-medium'>
+                                <button onClick={() => navigate('/signup')} className='bg-amber-400 text-black px-8 py-4 cursor-pointer shadow-[0_0_20px_rgba(251,191,36,0.3)] hover:bg-amber-500 rounded-2xl flex items-center font-bold transition-all hover:scale-105'>
                                     Start Managing Now
                                     <ArrowRight className='h-5 w-5 ml-2' />
                                 </button>

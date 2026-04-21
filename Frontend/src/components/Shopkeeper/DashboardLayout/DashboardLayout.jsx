@@ -1,4 +1,4 @@
-import { BarChart3, FileText, Gem, LayoutDashboard, LogOut, Menu, Package, Settings, ShoppingCart, Users, Wallet, X } from 'lucide-react';
+import { BarChart3, FileText, Gem, HelpCircle, LayoutDashboard, LogOut, Menu, Package, Settings, ShoppingCart, Users, Wallet, X } from 'lucide-react';
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import ThemeToggle  from '../../ThemeToggle';
@@ -23,6 +23,7 @@ const DashboardLayout = () => {
     { id: 'bills', icon: FileText, label: 'Bills' },
     { id: 'customers', icon: Users, label: 'Customers' },
     { id: 'reports', icon: BarChart3, label: 'Reports' },
+    { id: 'support', icon: HelpCircle, label: 'Support' },
     { id: 'settings', icon: Settings, label: 'Settings' },
   ];
   //get user details form loacalStorage 

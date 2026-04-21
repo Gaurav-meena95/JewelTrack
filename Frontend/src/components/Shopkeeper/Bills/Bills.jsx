@@ -308,26 +308,28 @@ const Bills = () => {
             {/* --- DASHBOARD VIEW --- */}
             {viewMode === 'dashboard' && (
                <div className='space-y-6'>
-                  <SectionHeader 
-                     title="Customers & Billing" 
+                  <SectionHeader
+                     title="Customers & Billing"
                      subtitle="Manage your customers and their complete billing history"
                      buttonText="New Customer & Bill"
-                     onButtonClick={() => { 
-                        setCustomerPhone(''); 
-                        setCustomerFound(null); 
-                        setCustomerData({ name: '', father_name: '', address: '', email: '' }); 
-                        setShowLookupModal(true); 
+                     onButtonClick={() => {
+                        setCustomerPhone('');
+                        setCustomerFound(null);
+                        setCustomerData({ name: '', father_name: '', address: '', email: '' });
+                        setShowLookupModal(true);
                      }}
-                     titleClassName="text-3xl font-bold"
+
+                     className="bg-linear-to-r from-secondary/50 to-transparent p-6 rounded-2xl border border-border/50"
+                     titleClassName="text-3xl font-bold bg-linear-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent"
                   />
 
                   {success && <div className='bg-green-500/20 border border-green-500/50 text-green-600 dark:text-green-400 p-3 rounded-[8px] text-center'>{success}</div>}
                   {error && <div className='bg-red-500/20 border border-red-500/50 text-red-600 dark:text-red-400 p-3 rounded-[8px] text-center'>{error}</div>}
 
-                  <SearchBar 
-                     value={searchQuery} 
-                     onChange={(e) => setSearchQuery(e.target.value)} 
-                     placeholder="Search customers by name or phone..." 
+                  <SearchBar
+                     value={searchQuery}
+                     onChange={(e) => setSearchQuery(e.target.value)}
+                     placeholder="Search customers by name or phone..."
                   />
 
                   {loading ? <div className='text-center py-10 text-muted-foreground'>Loading Customers...</div> : (
@@ -435,8 +437,8 @@ const Bills = () => {
          </div>
 
          {/* --- MODALS --- */}
-         <CustomerLookupModal 
-            show={showLookupModal} 
+         <CustomerLookupModal
+            show={showLookupModal}
             onClose={() => setShowLookupModal(false)}
             customerPhone={customerPhone}
             setCustomerPhone={setCustomerPhone}
@@ -448,8 +450,8 @@ const Bills = () => {
             onSubmit={handleStartBillWithCustomer}
          />
 
-         <NewBillModal 
-            show={showNewBill} 
+         <NewBillModal
+            show={showNewBill}
             onClose={() => setShowNewBill(false)}
             customer={selectedCustomer}
             predefinedItemNames={predefinedItemNames}
@@ -472,15 +474,15 @@ const Bills = () => {
             error={error}
          />
 
-         <BillDetailsModal 
-            show={showViewBill} 
+         <BillDetailsModal
+            show={showViewBill}
             onClose={() => setShowViewBill(false)}
             bill={activeBillDetails}
             onEnlargeImage={(img) => setEnlargedImage(img)}
          />
 
-         <RecordPaymentModal 
-            show={showEditPayment} 
+         <RecordPaymentModal
+            show={showEditPayment}
             onClose={() => setShowEditPayment(false)}
             bill={activeBillDetails}
             editPaymentData={editPaymentData}
@@ -491,9 +493,9 @@ const Bills = () => {
             error={error}
          />
 
-         <ImageViewer 
-            image={enlargedImage} 
-            onClose={() => setEnlargedImage(null)} 
+         <ImageViewer
+            image={enlargedImage}
+            onClose={() => setEnlargedImage(null)}
          />
 
       </>

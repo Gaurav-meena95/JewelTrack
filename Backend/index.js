@@ -12,6 +12,7 @@ const CustomerRegister = require('./module/Shopkeeper/CustomerRegister/routes')
 const Colletral = require('./module/Shopkeeper/Colletral/routes')
 const JweleOrders = require('./module/Shopkeeper/Orders/routes')
 const JweleInventoryManagment = require('./module/Shopkeeper/Inventory/routes')
+const AdminRoutes = require('./module/Admin/routes')
 const { verifyUserMiddleware } = require('./module/Auth/middleware')
 
 
@@ -27,6 +28,7 @@ app.use('/api/customers',CustomerRegister)
 app.use('/api/customers',Colletral)
 app.use('/api/customers',JweleOrders)
 app.use('/api/shops',JweleInventoryManagment)
+app.use('/api/admin', AdminRoutes)
 
 
 
