@@ -9,12 +9,6 @@ const CollateralDetailsModal = ({
   calculateLiveInterest,
   showHistory,
   setShowHistory,
-  paymentAmount,
-  setPaymentAmount,
-  isAdjustment,
-  setIsAdjustment,
-  handlePayment,
-  loading,
   onEnlargeImage
 }) => {
   if (!show || !account) return null;
@@ -118,51 +112,6 @@ const CollateralDetailsModal = ({
           </div>
         )}
 
-        {/* Payment Action Section */}
-        {account.status === 'active' && (
-          <div className='bg-amber-400/5 p-6 rounded-3xl border border-amber-400/10 shadow-inner'>
-            <h4 className='text-sm font-bold mb-4 flex items-center gap-2'>
-              <IndianRupee className='w-4 h-4 text-amber-400' /> Receive Payment / Settle
-            </h4>
-            <div className='flex gap-3 mb-4'>
-              <div className='relative flex-1'>
-                <IndianRupee className='absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-400/40' />
-                <input
-                  type='number'
-                  placeholder='Enter amount received'
-                  value={paymentAmount}
-                  onChange={(e) => setPaymentAmount(e.target.value)}
-                  className='w-full pl-10 p-4 rounded bg-input border border-amber-400/20 focus:border-amber-400 outline-none placeholder:text-muted-foreground/30 font-bold transition-all'
-                />
-              </div>
-              <button 
-                onClick={handlePayment} 
-                disabled={loading || !paymentAmount} 
-                className='px-8 bg-green-600 hover:bg-green-500 text-white rounded font-bold shadow-lg shadow-green-600/20 disabled:opacity-30 transition-all'
-              >
-                {loading ? '...' : 'Receive'}
-              </button>
-            </div>
-
-            <div className='flex items-center gap-3 px-1'>
-              <div className='relative flex items-center'>
-                <input 
-                  type='checkbox' 
-                  id='adjustment' 
-                  checked={isAdjustment} 
-                  onChange={(e) => setIsAdjustment(e.target.checked)} 
-                  className='appearance-none w-5 h-5 rounded border border-amber-400/40 checked:bg-amber-400 cursor-pointer checked:border-amber-400 transition-all' 
-                />
-                <X className={`absolute pointer-events-none w-3.5 h-3.5 left-0.5 top-0.5 text-black ${isAdjustment ? 'opacity-100' : 'opacity-0'}`} />
-              </div>
-              <label htmlFor='adjustment' className='text-xs text-muted-foreground cursor-pointer group flex items-center gap-1.5 hover:text-foreground transition-colors font-medium'>
-                <AlertCircle className='w-3.5 h-3.5 text-amber-400/80 group-hover:text-amber-400' /> 
-                Final Settlement Adjustment? 
-                <span className='text-[9px] uppercase tracking-tighter opacity-60'>(Closes account with discount)</span>
-              </label>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

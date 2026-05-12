@@ -110,19 +110,19 @@ const OrderProfileView = ({
                   </div>
                 </div>
 
-                <div className='flex items-center gap-3 pt-3 border-t border-border/30'>
+                <div className='flex justify-end items-center gap-3 pt-3 border-t border-border/30'>
                   <button
                     onClick={() => { setActiveOrderDetails(order); setShowViewOrder(true) }}
-                    className='text-amber-400/80 text-sm hover:underline'
+                    className='text-amber-400 text-sm hover:underline'
                   >
                     View Details
                   </button>
                   {order.paymentStatus !== 'paid' && (
                     <button
                       onClick={() => openEditPayment(order)}
-                      className='flex items-center gap-1 text-sm text-amber-400/90 hover:text-amber-300 hover:bg-amber-500/20 p-1 rounded'
+                      className='flex items-center gap-1 text-sm text-blue-400 hover:underline'
                     >
-                      <Edit className='w-3 h-3' /> Record Payment / Update
+                      <Edit className='w-3 h-3' /> Record Payment
                     </button>
                   )}
                 </div>

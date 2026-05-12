@@ -10,7 +10,7 @@ import ImageViewer from '../../../utils/ImageViewer'
 import OrderFormModal from './components/OrderFormModal'
 import OrderDetailsModal from './components/OrderDetailsModal'
 import CustomerLookupModal from './components/CustomerLookupModal'
-import UpdateOrderModal from './components/UpdateOrderModal'
+import RecordOrderPaymentModal from './components/RecordOrderPaymentModal'
 import OrderDashboardView from './components/OrderDashboardView'
 import OrderProfileView from './components/OrderProfileView'
 import ConfirmModal from '../../../utils/ConfirmModal'
@@ -84,7 +84,7 @@ const Orders = () => {
    }
 
    // Edit Payment
-   const [editPaymentData, setEditPaymentData] = useState({ additionalPayment: '', orderStatus: '', notes: '' })
+   const [editPaymentData, setEditPaymentData] = useState({ additionalPayment: '', paymentMethod: 'cash', orderStatus: '', notes: '' })
 
    // API
    const fetchOrders = async () => {
@@ -202,8 +202,6 @@ const Orders = () => {
          try {
             setLoading(true)
             const res = await axios.post(`${VITE_API_BASE_KEY}/customers/register`, customerData, { headers: header })
-            // After registration, update customerData with the newly created customer info if needed,
-            // though the existing customerData already has the fields we need.
             setCustomerFound(true)
          } catch (err) {
             setError(err.response?.data?.message || 'Failed to register customer')
@@ -301,7 +299,7 @@ const Orders = () => {
                image: images,
                Total: total,
                AdvancePayment: advance,
-               orderStatus: orderDetails.orderStatus,
+               orderStatus: orderStatusConfig[orderDetails.orderStatus] ? orderDetails.orderStatus : 'accept',
                notes: orderDetails.notes,
                deliveryDate: orderDetails.deliveryDate || undefined
             },
@@ -320,7 +318,8 @@ const Orders = () => {
       setActiveOrderDetails(order)
       setEditPaymentData({
          additionalPayment: '',
-         orderStatus: order.orderStatus,
+         paymentMethod: 'cash',
+         orderStatus: order.orderStatus || 'accept',
          notes: order.notes || ''
       })
       setShowEditPayment(true)
@@ -331,29 +330,12 @@ const Orders = () => {
       if (!editPaymentData.additionalPayment || isNaN(editPaymentData.additionalPayment)) return setError("Invalid payment amount")
       setLoading(true)
       try {
-         const amount = Number(editPaymentData.additionalPayment)
-         const currentHistory = activeOrderDetails.paymentHistory || []
-
-         const newPayment = {
-            amount,
-            orderStatus: editPaymentData.orderStatus,
-            date: new Date(),
-            notes: editPaymentData.notes
-         }
-
-         const updatedPayload = {
-            ...activeOrderDetails,
-            orderStatus: editPaymentData.orderStatus,
-            paymentHistory: [...currentHistory, newPayment]
-         }
-
          await axios.patch(
-            `${VITE_API_BASE_KEY}/customers/orders/update/?order_id=${activeOrderDetails._id}`,
-            updatedPayload,
+            `${VITE_API_BASE_KEY}/customers/orders/pay?order_id=${activeOrderDetails._id}`,
+            editPaymentData,
             { headers: header }
          )
          setSuccess('Payment recorded successfully!')
-
          setShowEditPayment(false)
          fetchOrders()
       } catch (err) {
@@ -386,8 +368,6 @@ const Orders = () => {
                   loading={loading}
                   openCustomerProfile={openCustomerProfile}
                   setShowLookupModal={setShowLookupModal}
-                  setCustomerPhone={setCustomerPhone}
-                  setCustomerFound={setCustomerFound}
                   success={success}
                   error={error}
                   formatDate={formatDate}
@@ -461,7 +441,7 @@ const Orders = () => {
             onEnlargeImage={(img) => setEnlargedImage(img)}
          />
 
-         <UpdateOrderModal
+         <RecordOrderPaymentModal
             show={showEditPayment}
             onClose={() => setShowEditPayment(false)}
             order={activeOrderDetails}
@@ -469,6 +449,7 @@ const Orders = () => {
             setEditPaymentData={setEditPaymentData}
             handleRecordPayment={handleRecordPayment}
             loading={loading}
+            error={error}
          />
 
          <ImageViewer

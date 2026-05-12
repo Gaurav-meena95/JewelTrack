@@ -137,4 +137,57 @@ const deleteOrders = async (req, res) => {
     }
 }
 
-module.exports = { createOrders, updateOrders, deleteOrders, allOrders }
+const recordOrderPayment = async (req, res) => {
+    try {
+        const { order_id } = req.query
+        const { additionalPayment, paymentMethod, orderStatus, note } = req.body
+
+        if (!order_id) return res.status(400).json({ success: false, message: 'order_id is required' })
+
+        const existingOrder = await Order.findById(order_id)
+        if (!existingOrder) return res.status(404).json({ success: false, message: 'Order not found' })
+
+        const total = Math.round(Number(existingOrder.Total) || 0)
+        const advance = Math.round(Number(existingOrder.AdvancePayment) || 0)
+        const history = existingOrder.paymentHistory || []
+        
+        const totalPaymentsFromHistory = Math.round(history.reduce((sum, p) => sum + Number(p.amount), 0))
+        const currentTotalPaid = advance + totalPaymentsFromHistory
+        
+        const newPaymentAmount = Math.round(Number(additionalPayment) || 0)
+        const newTotalPaid = currentTotalPaid + newPaymentAmount
+
+        if (newTotalPaid > total) {
+            return res.status(400).json({ success: false, message: 'Total payment exceeds order total' })
+        }
+
+        const newRemaining = Math.round(total - newTotalPaid)
+        const newPaymentStatus = computePaymentStatus(total, newTotalPaid)
+
+        // Add to history
+        history.push({
+            amount: newPaymentAmount,
+            method: paymentMethod || 'cash',
+            date: new Date(),
+            note: note || 'Payment recorded'
+        })
+
+        const updated = await Order.findByIdAndUpdate(
+            order_id,
+            {
+                paymentHistory: history,
+                RemainingAmount: newRemaining,
+                paymentStatus: newPaymentStatus,
+                orderStatus: orderStatus || existingOrder.orderStatus
+            },
+            { new: true }
+        ).populate('customerId', 'name phone')
+
+        return res.status(200).json({ success: true, message: 'Payment recorded successfully', data: { order: updated } })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ success: false, message: 'Internal Server Error' })
+    }
+}
+
+module.exports = { createOrders, updateOrders, deleteOrders, allOrders, recordOrderPayment }

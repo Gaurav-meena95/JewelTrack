@@ -109,5 +109,53 @@ const allCollatral = async (req, res) => {
 };
 
 
-module.exports = { createCollatral, updateCollatral, deleteCollatral, allCollatral }
+const recordColletralPayment = async (req, res) => {
+    try {
+        const { collatral_id } = req.query
+        const { additionalPayment, paymentMethod, note } = req.body
+
+        if (!collatral_id) return res.status(400).json({ success: false, message: 'collatral_id is required' })
+
+        const existing = await Collateral.findById(collatral_id)
+        if (!existing) return res.status(404).json({ success: false, message: 'Collateral not found' })
+
+        const totalPrice = Math.round(Number(existing.price) || 0)
+        const currentPaid = Math.round(Number(existing.totalPaid) || 0)
+        
+        const newPaymentAmount = Math.round(Number(additionalPayment) || 0)
+        const newTotalPaid = currentPaid + newPaymentAmount
+
+        if (newTotalPaid > totalPrice) {
+            return res.status(400).json({ success: false, message: 'Payment exceeds total loan amount' })
+        }
+
+        const newRemaining = Math.round(totalPrice - newTotalPaid)
+        const history = existing.paymentHistory || []
+        
+        history.push({
+            amount: newPaymentAmount,
+            method: paymentMethod || 'cash',
+            date: new Date(),
+            note: note || 'Loan repayment recorded'
+        })
+
+        const updated = await Collateral.findByIdAndUpdate(
+            collatral_id,
+            {
+                totalPaid: newTotalPaid,
+                remainingAmount: newRemaining,
+                paymentHistory: history,
+                status: newTotalPaid >= totalPrice ? 'returned' : existing.status
+            },
+            { new: true }
+        ).populate('customerId', 'name phone')
+
+        return res.status(200).json({ success: true, message: 'Payment recorded successfully', data: { updated } })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ success: false, message: 'Internal Server Error' })
+    }
+}
+
+module.exports = { createCollatral, updateCollatral, deleteCollatral, allCollatral, recordColletralPayment }
 
