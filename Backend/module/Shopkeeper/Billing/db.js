@@ -54,6 +54,23 @@ const billingSchema = new mongoose.Schema(
                     }
                 }
             ],
+            oldItems: [
+                {
+                    itemName: String,
+                    metal: {
+                        type: String,
+                        enum: ['gold', 'silver', 'diamond'],
+                    },
+                    purity: String,
+                    weight: Number,
+                    ratePerGram: Number,
+                    totalValue: Number
+                }
+            ],
+            oldItemsTotal: {
+                type: Number,
+                default: 0
+            },
             grandTotal: {
                 type: Number,
                 required: true,

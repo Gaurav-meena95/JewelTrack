@@ -20,7 +20,8 @@ const createCollatral = async (req, res) => {
 
         }
 
-        const newCollatral = await Collateral.create({ phone,shopkeeperId :shopkeeper_id, customerId:existing._id , jewellery, image, price, interestRate, status, remainingAmount: price,weight })
+        const roundedPrice = Math.round(Number(price) || 0)
+        const newCollatral = await Collateral.create({ phone,shopkeeperId :shopkeeper_id, customerId:existing._id , jewellery, image, price: roundedPrice, interestRate, status, remainingAmount: roundedPrice,weight })
         return res.status(200).json({ success: true, message: 'collatral create successfully', data: { newCollatral } })
 
     } catch (error) {
@@ -46,7 +47,17 @@ const updateCollatral = async (req, res) => {
         }
         const updated = await Collateral.updateOne(
             { _id: collatral_id },
-            { weight, jewellery, image, price, interestRate, status, paymentHistory, totalPaid, remainingAmount }
+            { 
+                weight, 
+                jewellery, 
+                image, 
+                price: price !== undefined ? Math.round(Number(price)) : undefined, 
+                interestRate, 
+                status, 
+                paymentHistory, 
+                totalPaid: totalPaid !== undefined ? Math.round(Number(totalPaid)) : undefined, 
+                remainingAmount: remainingAmount !== undefined ? Math.round(Number(remainingAmount)) : undefined 
+            }
         )
         return res.status(200).json({ success: true, message: "Collateral upadate successfully", data: { updated } })
     } catch (error) {

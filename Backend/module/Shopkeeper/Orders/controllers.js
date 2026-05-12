@@ -2,12 +2,11 @@ const Order = require('../Orders/db')
 const Customer = require('../CustomerRegister/db')
 
 // Helper: compute payment status
-const computePaymentStatus = (total, advancePaid) => {
-    if (advancePaid <= 0) return 'unpaid'
-    if (advancePaid >= total) return 'paid'
+const computePaymentStatus = (total, totalPaid) => {
+    if (totalPaid <= 0) return 'unpaid'
+    if (totalPaid >= total) return 'paid'
     return 'partially_paid'
 }
-
 
 const createOrders = async (req, res) => {
     try {
@@ -28,13 +27,13 @@ const createOrders = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Customer not found. Please register the customer first.' })
         }
 
-        const advance = Number(AdvancePayment) || 0
-        const total = Number(Total)
+        const advance = Math.round(Number(AdvancePayment) || 0)
+        const total = Math.round(Number(Total) || 0)
         if (advance > total) {
             return res.status(400).json({ success: false, message: 'Advance payment cannot exceed total amount' })
         }
 
-        const RemainingAmount = total - advance
+        const RemainingAmount = Math.round(total - advance)
         const paymentStatus = computePaymentStatus(total, advance)
 
         const newOrder = await Order.create({
@@ -86,26 +85,31 @@ const allOrders = async (req, res) => {
 const updateOrders = async (req, res) => {
     try {
         const { order_id } = req.query
-        const { items, image, AdvancePayment, Total, orderStatus, paymentHistory, notes, deliveryDate ,amount} = req.body
+        const { items, image, AdvancePayment, Total, orderStatus, paymentHistory, notes, deliveryDate } = req.body
         console.log(req.body)
         if (!order_id) return res.status(400).json({ success: false, message: 'order_id is required' })
 
         const existingOrder = await Order.findById(order_id)
         if (!existingOrder) return res.status(404).json({ success: false, message: 'Order not found' })
 
-        const advance = Number(AdvancePayment) ?? existingOrder.AdvancePayment
-        const total = Number(Total) ?? existingOrder.Total
-        if (advance > total) {
-            return res.status(400).json({ success: false, message: 'Advance payment cannot exceed total amount' })
+        const advance = AdvancePayment !== undefined ? Math.round(Number(AdvancePayment)) : existingOrder.AdvancePayment
+        const total = Total !== undefined ? Math.round(Number(Total)) : existingOrder.Total
+        const history = paymentHistory || existingOrder.paymentHistory || []
+        
+        const totalPaymentsFromHistory = Math.round(history.reduce((sum, payment) => sum + Number(payment.amount), 0))
+        const totalPaid = advance + totalPaymentsFromHistory
+        
+        const RemainingAmount = Math.round(total - totalPaid)
+        
+        if (totalPaid > total) {
+            return res.status(400).json({ success: false, message: `Total paid amount cannot exceed the order total amount remaining amount is ${RemainingAmount}   ` })
         }
     
-        const RemainingAmount = total - advance - amount
-        const paymentStatus = computePaymentStatus(total, advance)
-        console.log('fgerf',RemainingAmount)
+        const paymentStatus = computePaymentStatus(total, totalPaid)
 
         const updated = await Order.findByIdAndUpdate(
             order_id,
-            {items, image, AdvancePayment, Total, orderStatus, paymentHistory, notes, deliveryDate,RemainingAmount,paymentStatus},
+            {items, image, AdvancePayment: advance, Total: total, orderStatus, paymentHistory, notes, deliveryDate,RemainingAmount,paymentStatus},
             { new: true }
         ).populate('customerId', 'name phone address')
 

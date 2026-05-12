@@ -7,6 +7,11 @@ const orderItemSchema = new mongoose.Schema({
     purity: { type: String, default: '' },
     weight: { type: Number, min: 0, default: 0 },
     size: { type: String, default: '' },
+    ratePerGram: { type: Number, min: 0, default: 0 },
+    makingChargePercent: { type: Number, min: 0, default: 0 },
+    gstPercent: { type: Number, min: 0, default: 3 },
+    manualAdjustment: { type: Number, default: 0 },
+    finalPrice: { type: Number, min: 0, default: 0 },
 }, { _id: false })
 
 const orderSchema = new mongoose.Schema(
