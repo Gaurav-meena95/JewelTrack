@@ -68,7 +68,13 @@ const createBilling = async (req, res) => {
                 amountPaid,
                 remainingAmount,
                 paymentStatus,
-                paymentMethod
+                paymentMethod,
+                paymentHistory: amountPaid > 0 ? [{
+                    amount: amountPaid,
+                    method: paymentMethod || 'cash',
+                    date: new Date(),
+                    note: 'Initial payment'
+                }] : []
             }
         })
         console.log('Bill Generate SuccessFully', createBill)
@@ -178,7 +184,8 @@ const recordBillPayment = async (req, res) => {
         if (!existingBill) return res.status(404).json({ success: false, message: 'Bill not found' })
 
         const grandTotal = Math.round(existingBill.invoice.finalPrice || existingBill.invoice.grandTotal)
-        const newTotalPaid = Math.round(existingBill.payment.amountPaid + (Number(additionalPayment) || 0))
+        const additionalAmt = Math.round(Number(additionalPayment) || 0)
+        const newTotalPaid = Math.round(existingBill.payment.amountPaid + additionalAmt)
 
         if (newTotalPaid > grandTotal) {
             return res.status(400).json({ success: false, message: 'Payment exceeds grand total of bill' })
@@ -190,12 +197,22 @@ const recordBillPayment = async (req, res) => {
         else if (newTotalPaid < grandTotal) paymentStatus = 'partially_paid'
         else paymentStatus = 'paid'
 
+        // History update
+        const history = existingBill.payment.paymentHistory || []
+        history.push({
+            amount: additionalAmt,
+            method: paymentMethod || 'cash',
+            date: new Date(),
+            note: req.body.note || 'Payment recorded'
+        })
+
         const updated = await Bill.findByIdAndUpdate(
             bill_id,
             {
                 'payment.amountPaid': newTotalPaid,
                 'payment.remainingAmount': remainingAmount,
                 'payment.paymentStatus': paymentStatus,
+                'payment.paymentHistory': history,
                 ...(paymentMethod ? { 'payment.paymentMethod': paymentMethod } : {})
             },
             { new: true }

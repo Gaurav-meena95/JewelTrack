@@ -98,7 +98,15 @@ const billingSchema = new mongoose.Schema(
                 type: String,
                 enum: ['cash', 'upi', 'card', 'bank_transfer'],
                 default: null
-            }
+            },
+            paymentHistory: [
+                {
+                    amount: Number,
+                    method: String,
+                    date: { type: Date, default: Date.now },
+                    note: String
+                }
+            ]
 
         }
 

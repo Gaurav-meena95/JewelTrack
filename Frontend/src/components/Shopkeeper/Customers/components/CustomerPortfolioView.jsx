@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, User, Phone, Mail, Search, Clock, IndianRupee, MapPin } from 'lucide-react';
+import { ArrowLeft, User, Phone, Mail, Search, Clock, IndianRupee, MapPin, History } from 'lucide-react';
 
 const CustomerPortfolioView = ({
   selectedCustomerDetail,
@@ -175,6 +175,24 @@ const CustomerPortfolioView = ({
                         <p className='capitalize font-bold text-[13px]'>{bill.payment?.paymentStatus?.replace('_', ' ')}</p>
                       </div>
                     </div>
+
+                    {/* Payment History Section */}
+                    {bill.payment?.paymentHistory && bill.payment.paymentHistory.length > 0 && (
+                      <div className='w-full mt-4 pt-4 border-t border-border/30'>
+                        <p className='text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-3 flex items-center gap-2'>
+                          <History className='w-3 h-3' /> Payment Timeline
+                        </p>
+                        <div className='flex flex-wrap gap-3'>
+                          {bill.payment.paymentHistory.map((pay, idx) => (
+                            <div key={idx} className='bg-card/60 px-4 py-2 rounded-xl border border-border/50 flex flex-col gap-1'>
+                              <p className='text-[10px] font-bold text-green-500'>+ ₹{pay.amount}</p>
+                              <p className='text-[9px] text-muted-foreground'>{new Date(pay.date).toLocaleDateString()}</p>
+                              {pay.note && <p className='text-[8px] text-muted-foreground italic truncate max-w-[100px]'>{pay.note}</p>}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))
               )}

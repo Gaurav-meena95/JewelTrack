@@ -84,6 +84,16 @@ const RecordPaymentModal = ({
             </select>
           </div>
 
+          <div>
+            <label className='text-sm font-medium text-muted-foreground mb-1 block'>Payment Note (Optional)</label>
+            <textarea
+              placeholder='Add a note about this payment...'
+              value={editPaymentData.note}
+              onChange={e => setEditPaymentData({ ...editPaymentData, note: e.target.value })}
+              className='w-full p-3 rounded-[8px] bg-input border border-border/50 outline-none min-h-[80px]'
+            />
+          </div>
+
           <button
             onClick={handleRecordBillPayment}
             disabled={loading || !editPaymentData.additionalPayment}

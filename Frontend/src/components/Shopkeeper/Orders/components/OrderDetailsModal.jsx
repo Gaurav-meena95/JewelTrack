@@ -54,14 +54,16 @@ const OrderDetailsModal = ({
           <div className='bg-secondary/40 p-3 text-xs font-bold uppercase tracking-wider text-muted-foreground'>Jewelry Items Ordered</div>
           <div className='divide-y divide-border/50'>
             {order.items?.map((item, idx) => (
-              <div key={idx} className='p-4'>
-                <p className='font-bold'>{item.itemName} <span className='text-xs text-muted-foreground uppercase'>({item.metal})</span></p>
-                <div className='flex flex-wrap gap-4 mt-1 text-xs text-muted-foreground'>
-                  {item.purity && <span>Purity: {item.purity}</span>}
-                  {item.weight && <span>Weight: {item.weight}g</span>}
-                  {item.size && <span>Size: {item.size}</span>}
+              <div key={idx} className='p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2'>
+                <div>
+                  <p className='font-bold text-sm sm:text-base'>{item.itemName} <span className='text-[10px] sm:text-xs text-muted-foreground uppercase font-normal'>({item.metal})</span></p>
+                  <div className='flex flex-wrap gap-2 sm:gap-4 mt-1 text-[10px] sm:text-xs text-muted-foreground'>
+                    {item.purity && <span>Purity: {item.purity}</span>}
+                    {item.weight && <span>Weight: {item.weight}g</span>}
+                    {item.size && <span>Size: {item.size}</span>}
+                  </div>
+                  {item.description && <p className='text-[10px] sm:text-xs text-muted-foreground italic mt-1'>"{item.description}"</p>}
                 </div>
-                {item.description && <p className='text-xs text-muted-foreground italic mt-1'>"{item.description}"</p>}
               </div>
             ))}
           </div>
@@ -105,16 +107,16 @@ const OrderDetailsModal = ({
             <div className='flex gap-1 bg-secondary/50 p-3 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b rounded-t'>
               <BadgeIndianRupeeIcon className='w-4 h-4' /> Payment details
             </div>
-            <div className='bg-secondary/20 border border-border/40 p-4 rounded-b space-y-2'>
-              <div className='flex justify-between text-sm'>
+            <div className='bg-secondary/20 border border-border/40 p-3 sm:p-4 rounded-b space-y-2'>
+              <div className='flex justify-between text-xs sm:text-sm'>
                 <span className='text-muted-foreground'>Estimated Total:</span>
                 <span className='font-bold'>₹{order.Total?.toFixed(0)}</span>
               </div>
-              <div className='flex justify-between text-sm'>
+              <div className='flex justify-between text-xs sm:text-sm'>
                 <span className='text-muted-foreground'>Advance Paid:</span>
                 <span className='font-bold text-green-500'>₹{order.AdvancePayment?.toFixed(0)}</span>
               </div>
-              <div className='flex justify-between text-sm font-bold pt-2 border-t border-border/30'>
+              <div className='flex justify-between text-xs sm:text-sm font-bold pt-2 border-t border-border/30'>
                 <span className='text-muted-foreground'>Remaining:</span>
                 <span className='text-red-500'>₹{order.RemainingAmount?.toFixed(0)}</span>
               </div>
