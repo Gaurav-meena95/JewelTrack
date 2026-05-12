@@ -54,6 +54,11 @@ const Bills = () => {
    // Cart System for New Bill
    const [cartItems, setCartItems] = useState([])
    const [currentItem, setCurrentItem] = useState({ itemName: '', metal: 'gold', purity: '', weight: '', ratePerGram: '', makingChargePercent: '', gstPercent: '3', manualAdjustment: '0' })
+   
+   // Old Jewellery Exchange System
+   const [oldJewelleryItems, setOldJewelleryItems] = useState([])
+   const [currentOldItem, setCurrentOldItem] = useState({ itemName: '', metal: 'gold', purity: '', weight: '', ratePerGram: '' })
+
    const [paymentDetails, setPaymentDetails] = useState({ amountPaid: '', paymentMethod: 'cash' })
    const [images, setImages] = useState([])
    const [enlargedImage, setEnlargedImage] = useState(null)
@@ -186,7 +191,9 @@ const Bills = () => {
 
    const openCartModal = () => {
       setCartItems([])
+      setOldJewelleryItems([])
       setCurrentItem({ itemName: '', metal: 'gold', purity: '', weight: '', ratePerGram: '', makingChargePercent: '', gstPercent: '3', manualAdjustment: '0' })
+      setCurrentOldItem({ itemName: '', metal: 'gold', purity: '', weight: '', ratePerGram: '' })
       setPaymentDetails({ amountPaid: '', paymentMethod: 'cash' })
       setImages([])
       setShowNewBill(true)
@@ -252,6 +259,7 @@ const Bills = () => {
       try {
          const billPayload = {
             items: cartItems,
+            oldItems: oldJewelleryItems,
             amountPaid: Number(paymentDetails.amountPaid || 0),
             paymentMethod: paymentDetails.paymentMethod,
             image: images
@@ -462,6 +470,13 @@ const Bills = () => {
             addItemToCart={addItemToCart}
             removeCartItem={removeCartItem}
             calcCurrentItemPrice={calcCurrentItemPrice}
+            
+            // Old Jewelry Props
+            oldJewelleryItems={oldJewelleryItems}
+            setOldJewelleryItems={setOldJewelleryItems}
+            currentOldItem={currentOldItem}
+            setCurrentOldItem={setCurrentOldItem}
+
             paymentDetails={paymentDetails}
             setPaymentDetails={setPaymentDetails}
             images={images}

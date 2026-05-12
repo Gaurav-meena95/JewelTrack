@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import axios from 'axios'
 import { VITE_API_BASE_KEY, getAuthHeaders } from '../../../utils/apiConfig'
+import { useNotification } from '../../../context/NotificationContext'
 
 // Shared Utils
 import SectionHeader from '../../../utils/SectionHeader'
@@ -14,6 +15,7 @@ import InventoryFormModal from './components/InventoryFormModal'
 const METAL_OPTIONS = ['gold', 'silver', 'diamond', 'platinum', 'other']
 
 const Inventory = () => {
+   const { confirm, showToast } = useNotification()
    const header = getAuthHeaders()
 
    // App State
@@ -137,11 +139,11 @@ const Inventory = () => {
 
          if (isEditing) {
             await axios.patch(`${VITE_API_BASE_KEY}/shops/inventory/update?inventory_id=${formData._id}`, payload, { headers: header })
-            setSuccess('Item updated successfully!')
+            showToast('Item updated successfully!', 'success')
          } else {
             try {
                const res = await axios.post(`${VITE_API_BASE_KEY}/shops/inventory/create`, payload, { headers: header })
-               setSuccess(res.data?.message || 'Item created successfully')
+               showToast(res.data?.message || 'Item created successfully', 'success')
             } catch (error) {
                setError(error.response?.data?.message || 'Failed to create item')
                console.log('Error creating inventory item:', error)
@@ -156,14 +158,15 @@ const Inventory = () => {
    }
 
    const handleDelete = async (id) => {
-      if (!window.confirm('Are you sure you want to delete this item?')) return
+      const ok = await confirm('Are you sure you want to delete this inventory item? This action cannot be undone.', 'Delete Item', 'danger')
+      if (!ok) return
       setLoading(true)
       try {
          await axios.delete(`${VITE_API_BASE_KEY}/shops/inventory/delete?inventory_id=${id}`, { headers: header })
-         setSuccess('Item deleted successfully!')
+         showToast('Item deleted successfully!', 'success')
          fetchInventory()
       } catch (err) {
-         setError(err.response?.data?.message || 'Failed to delete item')
+         showToast(err.response?.data?.message || 'Failed to delete item', 'danger')
       }
       setLoading(false)
    }

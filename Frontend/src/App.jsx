@@ -21,11 +21,12 @@ import AdminFeedback from './components/Admin/Views/AdminFeedback'
 
 
 
+import { NotificationProvider } from './context/NotificationContext'
 
 function App() {
 
   return (
-    <>
+    <NotificationProvider>
       <Routes>
         {/* <Route path='/loading' element={<Loading/>}/> */}
         <Route path='/' element={<Landing />} />
@@ -53,8 +54,7 @@ function App() {
           <Route path='feedback' element={<AdminFeedback />} />
         </Route>
       </Routes>
-
-    </>
+    </NotificationProvider>
   )
 }
 

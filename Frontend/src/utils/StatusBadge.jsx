@@ -4,6 +4,8 @@ const paymentStatusColors = {
    paid: 'bg-green-500/10 text-green-500 border-green-500/30',
    partially_paid: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
    unpaid: 'bg-red-500/10 text-red-500 border-red-500/30',
+   active: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30',
+   closed: 'bg-rose-500/10 text-rose-500 border-rose-500/30',
 };
 
 const StatusBadge = ({ status, className }) => {

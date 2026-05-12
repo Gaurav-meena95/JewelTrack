@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Save, CheckCircle, AlertCircle } from 'lucide-react'
+import { Save } from 'lucide-react'
 import axios from 'axios'
 import { VITE_API_BASE_KEY, getAuthHeaders } from '../../../utils/apiConfig'
+import { useNotification } from '../../../context/NotificationContext'
 
 // Shared Utils
 import SectionHeader from '../../../utils/SectionHeader'
@@ -13,11 +14,11 @@ import SecuritySection from './components/SecuritySection'
 import CustomOptionsSection from './components/CustomOptionsSection'
 
 const Settings = () => {
+    const { showToast } = useNotification()
     const header = getAuthHeaders()
 
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
-    const [message, setMessage] = useState({ type: '', text: '' })
 
     const [profile, setProfile] = useState({
         shopName: '',
@@ -38,7 +39,7 @@ const Settings = () => {
         if (newItemName.trim() && !profile.itemNames.includes(newItemName.trim())) {
             setProfile(prev => ({ ...prev, itemNames: [...prev.itemNames, newItemName.trim()] }))
             setNewItemName('')
-        }else{
+        } else {
             return showMessage('error', 'Items Already in list')
         }
     }
@@ -84,8 +85,7 @@ const Settings = () => {
     }
 
     const showMessage = (type, text) => {
-        setMessage({ type, text })
-        setTimeout(() => setMessage({ type: '', text: '' }), 10000)
+        showToast(text, type === 'success' ? 'success' : 'danger')
     }
 
     const handleChange = (e) => {
@@ -133,38 +133,32 @@ const Settings = () => {
 
     return (
         <div className='max-w-4xl mx-auto space-y-10 pb-32 animate-in fade-in duration-500'>
-            
-            <SectionHeader 
-                title="Account Settings" 
+
+            <SectionHeader
+                title="Account Settings"
                 subtitle="Calibrate your business identity, personal profile, and secure credentials"
                 titleClassName="text-3xl font-black bg-linear-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent tracking-tight"
             />
 
-            {message.text && (
-                <div className={`p-5 rounded-2xl flex items-center gap-4 border shadow-sm animate-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-green-500/10 border-green-500/30 text-green-500' : 'bg-red-500/10 border-red-500/30 text-red-500'}`}>
-                    {message.type === 'success' ? <CheckCircle className='w-6 h-6' /> : <AlertCircle className='w-6 h-6' />}
-                    <p className='font-bold text-sm uppercase tracking-tight'>{message.text}</p>
-                </div>
-            )}
 
             <form onSubmit={handleSave} className='space-y-10'>
-                <ShopInfoSection 
-                    shopName={profile.shopName} 
-                    handleChange={handleChange} 
+                <ShopInfoSection
+                    shopName={profile.shopName}
+                    handleChange={handleChange}
                 />
 
-                <PersonalInfoSection 
-                    profile={profile} 
-                    handleChange={handleChange} 
+                <PersonalInfoSection
+                    profile={profile}
+                    handleChange={handleChange}
                 />
 
-                <SecuritySection 
-                    password={profile.password} 
-                    confirmPassword={profile.confirmPassword} 
-                    handleChange={handleChange} 
+                <SecuritySection
+                    password={profile.password}
+                    confirmPassword={profile.confirmPassword}
+                    handleChange={handleChange}
                 />
 
-                <CustomOptionsSection 
+                <CustomOptionsSection
                     itemNames={profile.itemNames}
                     newItemName={newItemName}
                     setNewItemName={setNewItemName}
@@ -178,9 +172,9 @@ const Settings = () => {
                 />
 
                 <div className='flex justify-end pt-4 sticky bottom-8 z-20'>
-                    <button 
-                        type="submit" 
-                        disabled={saving} 
+                    <button
+                        type="submit"
+                        disabled={saving}
                         className='bg-amber-400 hover:bg-amber-500 text-black font-black px-10 py-4 rounded-2xl shadow-2xl shadow-amber-400/30 flex items-center gap-3 disabled:opacity-50 transition-all hover:scale-[1.05] active:scale-95 uppercase tracking-widest text-xs'
                     >
                         <Save className='w-4 h-4' />

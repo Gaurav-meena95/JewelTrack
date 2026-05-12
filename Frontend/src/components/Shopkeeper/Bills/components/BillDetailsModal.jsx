@@ -35,32 +35,65 @@ const BillDetailsModal = ({
             <div className='col-span-3 text-right'>Qty/Wt</div>
             <div className='col-span-3 text-right'>Total</div>
           </div>
+          
+          {/* New Items Section */}
           <div className='divide-y divide-border/50'>
-            <div className='p-3 grid grid-cols-12 text-sm items-center'>
-              <div className='col-span-6'>
-                <p className='font-bold'>{bill.invoice?.itemName}</p>
-                <p className='text-xs text-muted-foreground'>
-                  {[bill.invoice?.purity, bill.invoice?.metal].filter(Boolean).join(' ')}
-                </p>
+            {(bill.invoice?.items || (bill.invoice?.itemName ? [bill.invoice] : [])).map((item, idx) => (
+              <div key={idx} className='p-3 grid grid-cols-12 text-sm items-center'>
+                <div className='col-span-6'>
+                  <p className='font-bold'>{item.itemName}</p>
+                  <p className='text-xs text-muted-foreground'>
+                    {[item.purity, item.metal].filter(Boolean).join(' ')}
+                  </p>
+                </div>
+                <div className='col-span-3 text-right text-muted-foreground'>{item.weight}g</div>
+                <div className='col-span-3 text-right font-bold'>₹{item.finalPrice?.toFixed(2)}</div>
               </div>
-              <div className='col-span-3 text-right text-muted-foreground'>{bill.invoice?.weight}g</div>
-              <div className='col-span-3 text-right font-bold'>₹{bill.invoice?.finalPrice?.toFixed(2)}</div>
-            </div>
+            ))}
           </div>
+
+          {/* Old Items Section */}
+          {bill.invoice?.oldItems && bill.invoice.oldItems.length > 0 && (
+            <div className='border-t border-border/50 bg-blue-500/5'>
+              <div className='px-3 py-1 text-[10px] font-bold text-blue-400 uppercase tracking-widest'>Old Exchange</div>
+              <div className='divide-y divide-border/50'>
+                {bill.invoice.oldItems.map((item, idx) => (
+                  <div key={idx} className='p-3 grid grid-cols-12 text-sm items-center'>
+                    <div className='col-span-6'>
+                      <p className='font-bold text-blue-400'>{item.itemName}</p>
+                      <p className='text-xs text-muted-foreground'>
+                        {[item.purity, item.metal].filter(Boolean).join(' ')}
+                      </p>
+                    </div>
+                    <div className='col-span-3 text-right text-muted-foreground'>{item.weight}g</div>
+                    <div className='col-span-3 text-right font-bold text-blue-400'>- ₹{item.totalValue?.toFixed(2)}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className='flex flex-col items-end space-y-2 mb-8'>
           <div className='flex justify-between w-64 text-sm'>
-            <span className='text-muted-foreground'>Grand Total:</span>
-            <span className='font-bold text-lg'>
-              ₹{(bill.invoice?.grandTotal || bill.invoice?.finalPrice)?.toFixed(2)}
-            </span>
+            <span className='text-muted-foreground'>New Total:</span>
+            <span className='font-bold'>₹{((bill.invoice?.items || []).reduce((acc, i) => acc + (i.finalPrice || 0), 0) || bill.invoice?.finalPrice || 0).toFixed(2)}</span>
           </div>
-          <div className='flex justify-between w-64 text-sm pb-2 border-b border-border/30'>
+          {bill.invoice?.oldItemsTotal > 0 && (
+            <div className='flex justify-between w-64 text-sm text-blue-400'>
+              <span>Exchange Credit:</span>
+              <span className='font-bold'>- ₹{bill.invoice.oldItemsTotal.toFixed(2)}</span>
+            </div>
+          )}
+          <div className='flex justify-between w-64 text-sm pt-2 border-t border-border/30'>
+            <span className='text-muted-foreground font-bold'>Grand Total:</span>
+            <span className='font-bold text-lg'>₹{bill.invoice?.grandTotal?.toFixed(2)}</span>
+          </div>
+          <div className='flex justify-between w-64 text-sm'>
             <span className='text-muted-foreground'>Amount Paid:</span>
             <span className='font-bold text-green-500'>₹{bill.payment?.amountPaid?.toFixed(2)}</span>
           </div>
-          <div className='flex justify-between w-64 text-sm font-bold'>
+          <div className='flex justify-between w-64 text-sm font-bold border-t border-dashed border-border/50 pt-2'>
             <span className='text-muted-foreground'>Balance Due:</span>
             <span className='text-red-500'>₹{bill.payment?.remainingAmount?.toFixed(2)}</span>
           </div>

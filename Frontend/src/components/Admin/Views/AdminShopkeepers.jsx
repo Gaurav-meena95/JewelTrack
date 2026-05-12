@@ -18,8 +18,10 @@ import {
 } from 'lucide-react';
 import { VITE_API_BASE_KEY, getAuthHeaders } from '../../../utils/apiConfig';
 import { GlassCard } from '../../GlassCard';
+import { useNotification } from '../../../context/NotificationContext';
 
 const AdminShopkeepers = () => {
+    const { confirm, showToast } = useNotification();
     const [shopkeepers, setShopkeepers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -65,7 +67,12 @@ const AdminShopkeepers = () => {
     }, [shopkeepers, searchQuery, statusFilter]);
 
     const handleBlockToggle = async (skId, currentStatus) => {
-        if (!window.confirm(`Are you sure you want to ${currentStatus ? 'unblock' : 'block'} this shopkeeper?`)) return;
+        const ok = await confirm(
+            `Are you sure you want to ${currentStatus ? 'unblock' : 'block'} this shopkeeper?`, 
+            'Security Update', 
+            currentStatus ? 'confirm' : 'danger'
+        );
+        if (!ok) return;
 
         try {
             setActionLoading(true);
@@ -74,8 +81,9 @@ const AdminShopkeepers = () => {
                 { headers: getAuthHeaders() }
             );
             fetchShopkeepers();
+            showToast("Shopkeeper status updated successfully", "success");
         } catch (error) {
-            alert("Failed to update status");
+            showToast("Failed to update status", "danger");
         } finally {
             setActionLoading(false);
         }
@@ -91,9 +99,9 @@ const AdminShopkeepers = () => {
             );
             setAlertModal({ show: false, skId: null, skName: '' });
             setAlertMessage('');
-            alert("Alert sent successfully");
+            showToast("Alert broadcasted successfully", "success");
         } catch (error) {
-            alert("Failed to send alert");
+            showToast("Failed to send alert", "danger");
         } finally {
             setActionLoading(false);
         }

@@ -13,18 +13,37 @@ const NewBillModal = ({
   addItemToCart,
   removeCartItem,
   calcCurrentItemPrice,
-  paymentDetails,
-  setPaymentDetails,
-  images,
-  handleImageUpload,
-  removeImage,
-  cartGrandTotal,
-  cartBalanceDue,
-  handleGenerateBill,
-  loading,
-  error
-}) => {
-  if (!show || !customer) return null;
+   oldJewelleryItems,
+   setOldJewelleryItems,
+   currentOldItem,
+   setCurrentOldItem,
+   paymentDetails,
+   setPaymentDetails,
+   images,
+   handleImageUpload,
+   removeImage,
+   cartGrandTotal,
+   cartBalanceDue,
+   handleGenerateBill,
+   loading,
+   error
+ }) => {
+   if (!show || !customer) return null;
+
+   const oldItemsTotal = oldJewelleryItems.reduce((acc, item) => acc + (Number(item.weight || 0) * Number(item.ratePerGram || 0)), 0);
+   const finalGrandTotal = Math.max(0, cartGrandTotal - oldItemsTotal);
+   const finalBalanceDue = Math.max(0, finalGrandTotal - Number(paymentDetails.amountPaid || 0));
+
+   const addOldItem = () => {
+     if (!currentOldItem.itemName || !currentOldItem.weight || !currentOldItem.ratePerGram) return;
+     const value = Number(currentOldItem.weight) * Number(currentOldItem.ratePerGram);
+     setOldJewelleryItems([...oldJewelleryItems, { ...currentOldItem, totalValue: value }]);
+     setCurrentOldItem({ itemName: '', metal: 'gold', purity: '', weight: '', ratePerGram: '' });
+   };
+
+   const removeOldItem = (idx) => {
+     setOldJewelleryItems(oldJewelleryItems.filter((_, i) => i !== idx));
+   };
 
   return (
     <div className='fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4'>
@@ -139,16 +158,72 @@ const NewBillModal = ({
 
               <button 
                 onClick={addItemToCart} 
-                className='w-full mt-4 p-3 bg-secondary hover:bg-secondary/80 text-foreground font-bold rounded-[8px] border border-border flex items-center justify-center gap-2'
+                className='w-full mt-4 p-3 bg-amber-400 hover:bg-amber-500 text-black font-bold rounded-[8px] border border-border flex items-center justify-center gap-2'
               >
                 <Plus className='w-4 h-4' /> Add to Cart
+              </button>
+            </div>
+
+            {/* Old Jewellery Exchange Section */}
+            <div className='bg-blue-500/5 p-5 rounded-2xl border border-blue-500/20'>
+              <h3 className='font-bold mb-4 flex items-center gap-2 text-blue-400'>2. Exchange Old Jewellery</h3>
+              <div className='grid grid-cols-2 gap-3'>
+                <input 
+                  type='text' 
+                  placeholder='Old Item Name' 
+                  value={currentOldItem.itemName} 
+                  onChange={e => setCurrentOldItem({ ...currentOldItem, itemName: e.target.value })} 
+                  className='col-span-2 p-3 rounded-[8px] bg-input border border-border/50' 
+                />
+                <select 
+                  value={currentOldItem.metal} 
+                  onChange={e => setCurrentOldItem({ ...currentOldItem, metal: e.target.value })} 
+                  className='p-3 rounded-[8px] bg-input border border-border/50 outline-none'
+                >
+                  <option value="gold">Gold</option>
+                  <option value="silver">Silver</option>
+                  <option value="diamond">Diamond</option>
+                </select>
+                <input 
+                  type='text' 
+                  placeholder='Purity' 
+                  value={currentOldItem.purity} 
+                  onChange={e => setCurrentOldItem({ ...currentOldItem, purity: e.target.value })} 
+                  className='p-3 rounded-[8px] bg-input border border-border/50' 
+                />
+                <div className='relative'>
+                  <span className='absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-xs'>grams</span>
+                  <input 
+                    type='number' 
+                    placeholder='Weight' 
+                    value={currentOldItem.weight} 
+                    onChange={e => setCurrentOldItem({ ...currentOldItem, weight: e.target.value })} 
+                    className='w-full p-3 rounded-[8px] bg-input border border-border/50' 
+                  />
+                </div>
+                <div className='relative'>
+                  <span className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs'>₹</span>
+                  <input 
+                    type='number' 
+                    placeholder='Rate / g' 
+                    value={currentOldItem.ratePerGram} 
+                    onChange={e => setCurrentOldItem({ ...currentOldItem, ratePerGram: e.target.value })} 
+                    className='w-full pl-8 p-3 rounded-[8px] bg-input border border-border/50' 
+                  />
+                </div>
+              </div>
+              <button 
+                onClick={addOldItem} 
+                className='w-full mt-4 p-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-bold rounded-[8px] border border-blue-500/30 flex items-center justify-center gap-2'
+              >
+                <Plus className='w-4 h-4' /> Add Old Jewelry
               </button>
             </div>
 
             {/* Image Upload Area - Keeping logic here for simplicity although we have shared component, let's use it later if possible */}
             <div className='bg-secondary/20 p-4 rounded-2xl border border-border/50'>
               <label className='text-sm font-bold flex items-center gap-2 mb-3'>
-                <ImageIcon className='w-4 h-4 text-amber-400' /> 2. Add Photos (Optional)
+                <ImageIcon className='w-4 h-4 text-amber-400' /> 3. Add Photos (Optional)
               </label>
               <div className='flex gap-4 overflow-x-auto pb-2'>
                 {images.map((img, idx) => (
@@ -174,14 +249,15 @@ const NewBillModal = ({
           {/* Right Side: Cart Summary & Checkout */}
           <div className='lg:flex-1 flex flex-col bg-card border border-border/50 rounded-2xl shadow-inner lg:overflow-hidden'>
             <div className='bg-secondary/50 p-4 font-bold border-b border-border/50 flex items-center gap-2'>
-              <FileText className='w-4 h-4' /> 3. Cart Summary
+              <FileText className='w-4 h-4' /> 4. Cart & Exchange Summary
             </div>
 
             <div className='flex-1 p-4 overflow-y-auto space-y-3 min-h-[200px]'>
+              {/* New Items Section */}
+              <p className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground'>New Purchase</p>
               {cartItems.length === 0 ? (
-                <div className='h-full flex flex-col items-center justify-center text-muted-foreground opacity-50'>
-                  <ShoppingCart className='w-12 h-12 mb-2' />
-                  <p>Cart is currently empty</p>
+                <div className='flex flex-col items-center justify-center py-4 text-muted-foreground opacity-50'>
+                  <p className='text-xs'>No new items added</p>
                 </div>
               ) : (
                 cartItems.map((item, idx) => (
@@ -200,13 +276,48 @@ const NewBillModal = ({
                   </div>
                 ))
               )}
+
+              {/* Old Items Section */}
+              <div className='pt-2 border-t border-border/30'>
+                <p className='text-[10px] font-bold uppercase tracking-wider text-blue-400'>Old Exchange</p>
+                {oldJewelleryItems.length === 0 ? (
+                   <p className='text-xs text-center py-2 text-muted-foreground opacity-50'>No exchange items</p>
+                ) : (
+                  oldJewelleryItems.map((item, idx) => (
+                    <div key={idx} className='p-3 bg-blue-500/5 rounded-[8px] border border-blue-500/20 flex justify-between items-center relative pr-10 mt-2'>
+                      <div>
+                        <p className='font-bold text-sm'>{item.itemName} <span className='text-xs text-muted-foreground uppercase'>({item.metal})</span></p>
+                        <p className='text-xs text-muted-foreground'>{item.weight}g @ ₹{item.ratePerGram}/g</p>
+                      </div>
+                      <div className='font-bold text-blue-400'>- ₹{item.totalValue?.toFixed(2)}</div>
+                      <button 
+                        onClick={() => removeOldItem(idx)} 
+                        className='absolute right-3 text-red-500/50 hover:text-red-500 transition-colors'
+                      >
+                        <Trash2 className='w-4 h-4' />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
 
             <div className='border-t border-border/50 bg-secondary/10 p-5 space-y-4'>
               {error && <div className='bg-red-500/20 border border-red-500/50 text-red-500 text-sm p-2 rounded-[8px] mb-4 text-center'>{error}</div>}
-              <div className='flex justify-between items-center font-bold text-xl'>
+              <div className='space-y-1 text-sm'>
+                <div className='flex justify-between items-center text-muted-foreground'>
+                  <span>New Purchase Total:</span>
+                  <span>₹{cartGrandTotal.toFixed(2)}</span>
+                </div>
+                <div className='flex justify-between items-center text-blue-400'>
+                  <span>Old Purchase Credit:</span>
+                  <span>- ₹{oldItemsTotal.toFixed(2)}</span>
+                </div>
+              </div>
+
+              <div className='flex justify-between items-center font-bold text-xl pt-2 border-t border-border/50'>
                 <span>Grand Total:</span>
-                <span className='text-foreground'>₹{cartGrandTotal.toFixed(2)}</span>
+                <span className='text-foreground'>₹{finalGrandTotal.toFixed(2)}</span>
               </div>
 
               <div className='grid grid-cols-2 gap-3 pt-2 border-t border-border/30'>
@@ -232,10 +343,10 @@ const NewBillModal = ({
                 </select>
               </div>
 
-              {cartBalanceDue > 0 && (
+              {finalBalanceDue > 0 && (
                 <div className='flex justify-between items-center text-sm font-bold text-red-500 pt-2'>
                   <span>Remaining Due:</span>
-                  <span>₹{cartBalanceDue.toFixed(2)}</span>
+                  <span>₹{finalBalanceDue.toFixed(2)}</span>
                 </div>
               )}
 

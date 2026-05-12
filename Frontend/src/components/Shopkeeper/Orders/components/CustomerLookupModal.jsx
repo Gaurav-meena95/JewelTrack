@@ -82,7 +82,7 @@ const CustomerLookupModal = ({
             </div>
           )}
           <button
-            onClick={handleProceedToOrder}
+            type="submit"
             disabled={customerFound === null} 
             className='w-full p-3 bg-amber-400/90 text-black font-bold rounded-[8px] disabled:opacity-40 hover:bg-amber-400'
           >

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import axios from 'axios'
 import { VITE_API_BASE_KEY, getAuthHeaders } from '../../../utils/apiConfig'
+import { useNotification } from '../../../context/NotificationContext'
 
 // Shared Utils
 import SectionHeader from '../../../utils/SectionHeader'
@@ -11,6 +12,7 @@ import CustomerPortfolioView from './components/CustomerPortfolioView'
 import CustomerList from './components/CustomerList'
 
 const Customers = () => {
+  const { confirm, showToast } = useNotification()
   const header = getAuthHeaders()
 
   const [customers, setCustomers] = useState([])
@@ -22,7 +24,6 @@ const Customers = () => {
 
   const [showRegisterModal, setShowRegisterModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [selectedCustomerDetail, setSelectedCustomerDetail] = useState(null)
@@ -75,12 +76,12 @@ const Customers = () => {
     setLoading(true)
     try {
       await axios.post(`${VITE_API_BASE_KEY}/customers/register`, formData, { headers: header })
-      setSuccess('Customer registered successfully!')
+      showToast('Customer registered successfully!', 'success')
       setShowRegisterModal(false)
       setFormData(initialFormState)
       fetchCustomers()
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed')
+      showToast(err.response?.data?.message || 'Registration failed', 'danger')
     }
     setLoading(false)
   }
@@ -90,27 +91,29 @@ const Customers = () => {
     setLoading(true)
     try {
       await axios.patch(`${VITE_API_BASE_KEY}/customers/register/update`, formData, { headers: header })
-      setSuccess('Customer updated successfully!')
+      showToast('Customer updated successfully!', 'success')
       setShowEditModal(false)
       setFormData(initialFormState)
       fetchCustomers()
     } catch (err) {
-      setError(err.response?.data?.message || 'Update failed')
+      showToast(err.response?.data?.message || 'Update failed', 'danger')
     }
     setLoading(false)
   }
 
   const handelDelete = async () => {
     if (!selectedCustomer) return
+    const ok = await confirm(`Are you sure you want to permanently delete "${selectedCustomer.name}"? This action cannot be reversed.`, 'Confirm Deletion', 'danger')
+    if (!ok) return
+
     setLoading(true)
     try {
       await axios.delete(`${VITE_API_BASE_KEY}/customers/register/delete?phone=${selectedCustomer.phone}`, { headers: header })
-      setSuccess('Customer deleted successfully!')
-      setShowDeleteConfirm(false)
+      showToast('Customer deleted successfully!', 'success')
       setSelectedCustomer(null)
       fetchCustomers()
     } catch (err) {
-      setError('Delete failed')
+      showToast('Delete failed', 'danger')
     }
     setLoading(false)
   }
@@ -133,12 +136,7 @@ const Customers = () => {
     fetchCustomers()
   }, [])
 
-  useEffect(() => {
-    if (success || error) {
-      const timer = setTimeout(() => { setSuccess(''); setError('') }, 5000)
-      return () => clearTimeout(timer)
-    }
-  }, [success, error])
+
 
   // Helpers ---
   const openEditModal = (customer) => {
@@ -153,7 +151,7 @@ const Customers = () => {
     setShowEditModal(true)
   }
 
-  const hasBlur = showRegisterModal || showEditModal || showDeleteConfirm
+  const hasBlur = showRegisterModal || showEditModal
 
   return (
     <>
@@ -185,7 +183,7 @@ const Customers = () => {
               titleClassName="text-3xl font-bold bg-linear-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent"
             />
 
-            {success && <div className='bg-green-500/20 border border-green-500/50 text-green-500 p-4 rounded-2xl text-center text-sm font-bold animate-in slide-in-from-top-4'>{success}</div>}
+
 
             <CustomerList
               loading={loading}
@@ -194,7 +192,7 @@ const Customers = () => {
               setSearchPhone={setSearchPhone}
               fetchCustomerDetail={fetchCustomerDetail}
               openEditModal={openEditModal}
-              openDeleteConfirm={(c) => { setSelectedCustomer(c); setShowDeleteConfirm(true) }}
+              openDeleteConfirm={(c) => { setSelectedCustomer(c); handelDelete() }}
               setShowRegisterModal={setShowRegisterModal}
               resetForm={() => setFormData(initialFormState)}
               setFormData={setFormData}
@@ -227,24 +225,7 @@ const Customers = () => {
         error={error}
       />
 
-      {/* Delete Confirmation */}
-      {showDeleteConfirm && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in zoom-in-95 duration-200'>
-          <div className='bg-card max-w-sm w-full p-8 rounded-[32px] border border-red-500/30 shadow-2xl text-center space-y-6'>
-            <div className='h-20 w-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto ring-8 ring-red-500/5'>
-              <X className='h-10 w-10 text-red-500' />
-            </div>
-            <div className='space-y-2'>
-              <h2 className='text-xl font-black uppercase text-red-500'>Confirm Deletion</h2>
-              <p className='text-sm text-muted-foreground font-medium'>Are you sure you want to permanently delete <span className='font-bold text-foreground'>"{selectedCustomer?.name}"</span>? This action cannot be reversed.</p>
-            </div>
-            <div className='flex gap-3 pt-2'>
-              <button onClick={() => setShowDeleteConfirm(false)} className='flex-1 p-4 rounded-2xl bg-secondary hover:bg-secondary/80 font-bold transition-all border border-border/50'>Cancel</button>
-              <button onClick={handelDelete} className='flex-1 p-4 rounded-2xl bg-red-500 hover:bg-red-600 text-white font-bold transition-all shadow-lg shadow-red-500/20'>Delete</button>
-            </div>
-          </div>
-        </div>
-      )}
+
     </>
   )
 }

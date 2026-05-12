@@ -13,6 +13,7 @@ import CustomerLookupModal from './components/CustomerLookupModal'
 import UpdateOrderModal from './components/UpdateOrderModal'
 import OrderDashboardView from './components/OrderDashboardView'
 import OrderProfileView from './components/OrderProfileView'
+import ConfirmModal from '../../../utils/ConfirmModal'
 
 const orderStatusConfig = {
    accept: { label: 'Accepted', color: 'bg-amber-500/10 text-green-400 border-green-500/30', Icon: Package },
@@ -50,6 +51,7 @@ const Orders = () => {
    const [showNewOrder, setShowNewOrder] = useState(false)
    const [showViewOrder, setShowViewOrder] = useState(false)
    const [showEditPayment, setShowEditPayment] = useState(false)
+   const [showConfirmModal, setShowConfirmModal] = useState(false)
    const [activeOrderDetails, setActiveOrderDetails] = useState(null)
 
    // Customer Lookup
@@ -59,10 +61,27 @@ const Orders = () => {
 
    // Cart System
    const [cartItems, setCartItems] = useState([])
-   const [currentItem, setCurrentItem] = useState({ itemName: '', metal: 'gold', purity: '', weight: '', size: '', description: '' })
+   const [currentItem, setCurrentItem] = useState({
+      itemName: '', metal: 'gold', purity: '',
+      weight: '', size: '', description: '',
+      ratePerGram: '', makingChargePercent: '', gstPercent: '3', manualAdjustment: ''
+   })
    const [orderDetails, setOrderDetails] = useState({ Total: '', AdvancePayment: '', notes: '', deliveryDate: '', orderStatus: 'accept' })
    const [images, setImages] = useState([])
    const [enlargedImage, setEnlargedImage] = useState(null)
+
+   const calcCurrentItemPrice = () => {
+      const w = Number(currentItem.weight) || 0;
+      const r = Number(currentItem.ratePerGram) || 0;
+      const m = Number(currentItem.makingChargePercent) || 0;
+      const g = Number(currentItem.gstPercent) || 0;
+      const base = w * r;
+      const making = base * (m / 100);
+      const subtotal = base + making;
+      const gst = subtotal * (g / 100);
+      const adj = Number(currentItem.manualAdjustment) || 0;
+      return subtotal + gst - adj;
+   }
 
    // Edit Payment
    const [editPaymentData, setEditPaymentData] = useState({ additionalPayment: '', orderStatus: '', notes: '' })
@@ -157,39 +176,89 @@ const Orders = () => {
          const res = await axios.get(`${VITE_API_BASE_KEY}/customers/register/get?phone=${customerPhone}`, { headers: header })
          if (res.data?.data?.customer) {
             setCustomerFound(true)
-            setCustomerData({ name: res.data.data.customer.name, phone: customerPhone })
+            setCustomerData({
+               name: res.data.data.customer.name,
+               father_name: res.data.data.customer.father_name || '',
+               address: res.data.data.customer.address || '',
+               phone: customerPhone
+            })
          } else {
             setCustomerFound(false)
+            setCustomerData({ name: '', father_name: '', address: '', phone: customerPhone })
          }
       } catch (err) {
          setError(err.response?.data?.message || 'Failed to check customer')
          setCustomerFound(false)
+         setCustomerData({ name: '', father_name: '', address: '', phone: customerPhone })
       }
       setLoading(false)
    }
 
-   const handleProceedToOrder = () => {
-      if (!customerFound) return
+   const handleProceedToOrder = async (e) => {
+      if (e) e.preventDefault()
+      if (customerFound === null) return
+
+      if (customerFound === false) {
+         try {
+            setLoading(true)
+            const res = await axios.post(`${VITE_API_BASE_KEY}/customers/register`, customerData, { headers: header })
+            // After registration, update customerData with the newly created customer info if needed,
+            // though the existing customerData already has the fields we need.
+            setCustomerFound(true)
+         } catch (err) {
+            setError(err.response?.data?.message || 'Failed to register customer')
+            setLoading(false)
+            return
+         }
+      }
+
       setSelectedCustomer(customerData)
       setShowLookupModal(false)
       openNewOrderModal()
+      setLoading(false)
    }
 
    const openNewOrderModal = () => {
       setCartItems([])
-      setCurrentItem({ itemName: '', metal: 'gold', purity: '', weight: '', size: '', description: '' })
-      setOrderDetails({ Total: '', AdvancePayment: '', notes: '', deliveryDate: '', orderStatus: 'accept' })
+      setCurrentItem({
+         itemName: '', metal: 'gold', purity: '',
+         weight: '', size: '', description: '',
+         ratePerGram: '', makingChargePercent: '', gstPercent: '3', manualAdjustment: ''
+      })
+      setOrderDetails({ Total: '', discount: '0', AdvancePayment: '', notes: '', deliveryDate: '', orderStatus: 'accept' })
       setImages([])
       setShowNewOrder(true)
    }
 
    const addItemToCart = () => {
       if (!currentItem.itemName) return setError('Please enter an item name')
-      setCartItems([...cartItems, { ...currentItem }])
-      setCurrentItem({ itemName: '', metal: 'gold', purity: '', weight: '', size: '', description: '' })
+      if (!currentItem.weight) return setError('Please enter weight to calculate order correctly.')
+      if (!currentItem.ratePerGram) return setError('Please enter a rate per gram.')
+
+      const finalPrice = calcCurrentItemPrice()
+      if (finalPrice <= 0) return setError('Item final price must be greater than 0.')
+
+      setCartItems([...cartItems, { ...currentItem, finalPrice }])
+      setCurrentItem({
+         itemName: '', metal: 'gold', purity: '',
+         weight: '', size: '', description: '',
+         ratePerGram: '', makingChargePercent: '', gstPercent: '3', manualAdjustment: ''
+      })
    }
 
    const removeCartItem = (idx) => setCartItems(cartItems.filter((_, i) => i !== idx))
+
+   // Derived Total
+   const cartGrandTotal = useMemo(() => cartItems.reduce((sum, item) => sum + (item.finalPrice || 0), 0), [cartItems])
+
+   useEffect(() => {
+     setOrderDetails(prev => {
+       const discountValue = Number(prev.discount) || 0;
+       const finalTotal = Math.max(0, cartGrandTotal - discountValue);
+       if (prev.Total === finalTotal.toString()) return prev;
+       return { ...prev, Total: finalTotal.toString() };
+     });
+   }, [cartGrandTotal, orderDetails.discount])
 
    const handleImageUpload = (e) => {
       const file = e.target.files[0]
@@ -274,9 +343,8 @@ const Orders = () => {
 
          const updatedPayload = {
             ...activeOrderDetails,
-            amount,
-            paymentHistory: [...currentHistory, newPayment],
-            RemainingAmount: activeOrderDetails.Total - amount
+            orderStatus: editPaymentData.orderStatus,
+            paymentHistory: [...currentHistory, newPayment]
          }
 
          await axios.patch(
@@ -285,6 +353,7 @@ const Orders = () => {
             { headers: header }
          )
          setSuccess('Payment recorded successfully!')
+
          setShowEditPayment(false)
          fetchOrders()
       } catch (err) {
@@ -310,41 +379,41 @@ const Orders = () => {
          <div className={`min-h-screen ${hasBlur ? 'blur-[2px] pointer-events-none' : ''}`}>
 
             {viewMode === 'dashboard' ? (
-               <OrderDashboardView 
-                 uniqueCustomers={uniqueCustomers}
-                 searchQuery={searchQuery}
-                 setSearchQuery={setSearchQuery}
-                 loading={loading}
-                 openCustomerProfile={openCustomerProfile}
-                 setShowLookupModal={setShowLookupModal}
-                 setCustomerPhone={setCustomerPhone}
-                 setCustomerFound={setCustomerFound}
-                 success={success}
-                 error={error}
-                 formatDate={formatDate}
+               <OrderDashboardView
+                  uniqueCustomers={uniqueCustomers}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  loading={loading}
+                  openCustomerProfile={openCustomerProfile}
+                  setShowLookupModal={setShowLookupModal}
+                  setCustomerPhone={setCustomerPhone}
+                  setCustomerFound={setCustomerFound}
+                  success={success}
+                  error={error}
+                  formatDate={formatDate}
                />
             ) : (
-               <OrderProfileView 
-                 selectedCustomer={selectedCustomer}
-                 setViewMode={setViewMode}
-                 paymentFilter={paymentFilter}
-                 setPaymentFilter={setPaymentFilter}
-                 currentCustomerOrders={currentCustomerOrders}
-                 openNewOrderModal={openNewOrderModal}
-                 setActiveOrderDetails={setActiveOrderDetails}
-                 setShowViewOrder={setShowViewOrder}
-                 openEditPayment={openEditPayment}
-                 loading={loading}
-                 success={success}
-                 error={error}
-                 orderStatusConfig={orderStatusConfig}
-                 formatDate={formatDate}
-                 formatDateTime={formatDateTime}
+               <OrderProfileView
+                  selectedCustomer={selectedCustomer}
+                  setViewMode={setViewMode}
+                  paymentFilter={paymentFilter}
+                  setPaymentFilter={setPaymentFilter}
+                  currentCustomerOrders={currentCustomerOrders}
+                  openNewOrderModal={openNewOrderModal}
+                  setActiveOrderDetails={setActiveOrderDetails}
+                  setShowViewOrder={setShowViewOrder}
+                  openEditPayment={openEditPayment}
+                  loading={loading}
+                  success={success}
+                  error={error}
+                  orderStatusConfig={orderStatusConfig}
+                  formatDate={formatDate}
+                  formatDateTime={formatDateTime}
                />
             )}
          </div>
 
-         <CustomerLookupModal 
+         <CustomerLookupModal
             show={showLookupModal}
             onClose={() => setShowLookupModal(false)}
             customerPhone={customerPhone}
@@ -354,12 +423,12 @@ const Orders = () => {
             checkCustomer={checkCustomer}
             customerData={customerData}
             handleProceedToOrder={handleProceedToOrder}
-            setCustomerData = {setCustomerData}
+            setCustomerData={setCustomerData}
             loading={loading}
          />
 
-         <OrderFormModal 
-            show={showNewOrder} 
+         <OrderFormModal
+            show={showNewOrder}
             onClose={() => setShowNewOrder(false)}
             customer={selectedCustomer}
             cartItems={cartItems}
@@ -367,6 +436,7 @@ const Orders = () => {
             setCurrentItem={setCurrentItem}
             addItemToCart={addItemToCart}
             removeCartItem={removeCartItem}
+            calcCurrentItemPrice={calcCurrentItemPrice}
             images={images}
             handleImageUpload={handleImageUpload}
             removeImage={removeImage}
@@ -376,10 +446,13 @@ const Orders = () => {
             loading={loading}
             error={error}
             METAL_OPTIONS={METAL_OPTIONS}
+            predefinedItemNames={predefinedItemNames}
+            predefinedPurities={predefinedPurities}
+            cartGrandTotal={cartGrandTotal}
          />
 
-         <OrderDetailsModal 
-            show={showViewOrder} 
+         <OrderDetailsModal
+            show={showViewOrder}
             onClose={() => setShowViewOrder(false)}
             order={activeOrderDetails}
             orderStatusConfig={orderStatusConfig}
@@ -388,7 +461,7 @@ const Orders = () => {
             onEnlargeImage={(img) => setEnlargedImage(img)}
          />
 
-         <UpdateOrderModal 
+         <UpdateOrderModal
             show={showEditPayment}
             onClose={() => setShowEditPayment(false)}
             order={activeOrderDetails}
@@ -398,9 +471,9 @@ const Orders = () => {
             loading={loading}
          />
 
-         <ImageViewer 
-            image={enlargedImage} 
-            onClose={() => setEnlargedImage(null)} 
+         <ImageViewer
+            image={enlargedImage}
+            onClose={() => setEnlargedImage(null)}
          />
       </>
    )

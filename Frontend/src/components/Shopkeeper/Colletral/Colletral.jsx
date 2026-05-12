@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { Plus, Phone, IndianRupee, Trash2, WeightIcon, Edit, Calculator } from 'lucide-react'
 import axios from 'axios'
 import { VITE_API_BASE_KEY, getAuthHeaders } from '../../../utils/apiConfig'
+import { useNotification } from '../../../context/NotificationContext'
 
 // Shared Utils
 import SectionHeader from '../../../utils/SectionHeader'
@@ -15,6 +16,7 @@ import NewGirviModal from './components/NewGirviModal'
 import CollateralDetailsModal from './components/CollateralDetailsModal'
 
 const Colletral = () => {
+  const { confirm, showToast } = useNotification()
   const header = getAuthHeaders()
 
   const [collaterals, setCollaterals] = useState([])
@@ -144,7 +146,7 @@ const Colletral = () => {
       }
       await axios.post(`${VITE_API_BASE_KEY}/customers/collatral/create?phone=${customerPhone}`, collatPayload, { headers: header })
 
-      setSuccess("Girvi created successfully!")
+      showToast("Girvi created successfully!", "success")
       setShowNewGirvi(false)
       resetGirviForm()
       fetchCollaterals()
@@ -183,14 +185,15 @@ const Colletral = () => {
   const removeImage = (idx) => setImages(images.filter((_, i) => i !== idx))
 
   const handleDeleteCollateral = async (id, phone) => {
-    if (!window.confirm("Are you sure you want to delete this closed collateral?")) return
+    const ok = await confirm("Are you sure you want to delete this closed collateral? This action cannot be undone.", "Delete Account", "danger")
+    if (!ok) return
     setLoading(true)
     try {
       await axios.delete(`${VITE_API_BASE_KEY}/customers/collatral/delete?phone=${phone}&collatral_id=${id}`, { headers: header })
-      setSuccess("Collateral deleted successfully!")
+      showToast("Collateral deleted successfully!", "success")
       fetchCollaterals()
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to delete collateral")
+      showToast("Failed to delete collateral", "danger")
     }
     setLoading(false)
   }
