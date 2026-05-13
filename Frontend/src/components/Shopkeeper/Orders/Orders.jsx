@@ -368,6 +368,8 @@ const Orders = () => {
                   loading={loading}
                   openCustomerProfile={openCustomerProfile}
                   setShowLookupModal={setShowLookupModal}
+                  setCustomerPhone={setCustomerPhone}
+                  setCustomerFound={setCustomerFound}
                   success={success}
                   error={error}
                   formatDate={formatDate}

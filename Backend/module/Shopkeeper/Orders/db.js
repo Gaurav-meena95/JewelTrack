@@ -68,9 +68,15 @@ const orderSchema = new mongoose.Schema(
             enum: ['unpaid', 'partially_paid', 'paid'],
             default: 'unpaid'
         },
+        orderStatus: {
+            type: String,
+            enum: ['request', 'accept', 'progress', 'complete'],
+            default: 'accept'
+        },
         paymentHistory: [
             {
                 amount: { type: Number, required: true },
+                method: { type: String, default: 'cash' },
                 date: { type: Date, default: Date.now },
                 orderStatus: {
                     type: String,
