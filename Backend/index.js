@@ -18,17 +18,17 @@ const { verifyUserMiddleware } = require('./module/Auth/middleware')
 
 
 connectDB();
-app.get('/',(req,res)=>{
+app.get('/', (req, res) => {
     res.status(200).json('Welcome to Jewel Track')
 })
 
-app.use('/api/auth',AuthRoutes)
+app.use('/api/auth', AuthRoutes)
 app.use(verifyUserMiddleware)
-app.use('/api/customers',GenerateBill)
-app.use('/api/customers',CustomerRegister)
-app.use('/api/customers',Colletral)
-app.use('/api/customers',JweleOrders)
-app.use('/api/shops',JweleInventoryManagment)
+app.use('/api/customers', GenerateBill)
+app.use('/api/customers', CustomerRegister)
+app.use('/api/customers', Colletral)
+app.use('/api/customers', JweleOrders)
+app.use('/api/shops', JweleInventoryManagment)
 app.use('/api/admin', AdminRoutes)
 
 
@@ -38,7 +38,7 @@ app.use('/api/admin', AdminRoutes)
 
 
 const PORT = process.env.PORT || 3000
-app.listen(PORT ,()=>{
+app.listen(PORT, () => {
     console.log(`server is running on port ${PORT}`)
 })
 
