@@ -5,13 +5,13 @@ exports.verifyUserMiddleware = (req, res, next) => {
         const Authheader = req.headers.authorization
         const refreshToken = req.headers['x-refresh-token']
 
-        if (!Authheader) {
+        if (!Authheader || Authheader === 'JWT null' || Authheader === 'JWT undefined') {
             return res.status(401).json({ message: "Authorization header missing" });
         }
 
 
         const [prefix, token] = Authheader.split(' ')
-        if (!token) {
+        if (!token || token === 'null' || token === 'undefined') {
             return res.status(401).json({ message: "Token is Absent" })
             
         }
