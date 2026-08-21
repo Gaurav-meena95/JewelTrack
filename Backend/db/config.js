@@ -1,17 +1,11 @@
-const dotenv = require("dotenv");
-
-dotenv.config({ path: "../.env" });
-
-const url = process.env.MONGO_URI;
-
-if (!url) {
-  throw new Error("MONGO_URI is undefined. Check your .env file location.");
-}
-
 const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
+    const url = process.env.MONGO_URI?.trim();
+    if (!url) {
+      throw new Error("MONGO_URI is undefined. Check your .env file location.");
+    }
     await mongoose.connect(url, {
       dbName: "JewelTrack",
     });
