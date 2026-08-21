@@ -1,6 +1,6 @@
 const User = require('./userdb.js')
 const sec_key = process.env.sec_key
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const { validationInput } = require('../../utils/utils')
 
