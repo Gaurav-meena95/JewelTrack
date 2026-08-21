@@ -1,5 +1,5 @@
 const User = require('./userdb.js')
-const sec_key = process.env.sec_key
+const sec_key = process.env.sec_key || process.env.SEC_KEY || process.env.JWT_SECRET || 'Jeweltrackbygauravmeena'
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const { validationInput } = require('../../utils/utils')
@@ -38,10 +38,10 @@ const signup = async (req, res) => {
             shopName, name, email, phone,
             password: hashedPassword, role,
         });
-        return res.status(201).json({ success: true, message: 'Signup successful', data: { user: newUser } })
+        return res.status(201).json({ success: true, message: 'Signup Successfully', data: newUser })
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ success: false, message: "Internal Server Error" })
+        res.status(500).json({ success: false, message: 'Singup Faild' })
     }
 }
 
@@ -54,11 +54,11 @@ const login = async (req, res) => {
         if (value) {
             return res.status(403).json({ success: false, message: `Check missing value ${value}` })
         }
-        let existing ;
+        let existing;
         if (identifier.includes('@')){
              existing = await User.findOne({ email:identifier, role })
         }else{
-            const existing = await User.findOne({ phone:identifier, role })
+            existing = await User.findOne({ phone:identifier, role })
         }
         
         if (!existing) {

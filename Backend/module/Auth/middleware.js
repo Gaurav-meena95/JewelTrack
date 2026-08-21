@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const sec_key = process.env.sec_key
+const sec_key = process.env.sec_key || process.env.SEC_KEY || process.env.JWT_SECRET || 'Jeweltrackbygauravmeena'
 exports.verifyUserMiddleware = (req, res, next) => {
     try {
         const Authheader = req.headers.authorization
