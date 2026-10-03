@@ -1,35 +1,46 @@
 # 💎 JewelTrack
 
-**JewelTrack** is a comprehensive, modern, and high-performance jewelry store management platform designed to streamline daily operations for jewelry business owners. It provides a robust suite of tools to manage custom orders, inventory, billing, customer relationships, and collaterals all from a beautifully crafted user interface.
+**JewelTrack** is a comprehensive, modern, and high-performance jewelry store management platform designed to streamline daily operations for jewelry business owners. It provides a robust suite of tools to manage custom orders, inventory, billing, customer relationships, and collaterals (mortgages) all from a beautifully crafted, responsive user interface.
+
+---
+
+## 📺 Video Demo & Tutorial
+
+Watch the complete walkthrough and video tutorial of **JewelTrack** in action:
+
+🎬 **[Watch Video Tutorial on Google Drive](https://drive.google.com/file/d/1P6Tl2Tb6x1aiibYFl6aNkrCCbHhAEl9R/view?usp=sharing)**
 
 ---
 
 ## ✨ Key Features
 
 - **🛍️ Custom Jewelry Orders:** Seamlessly create, update, and track custom jewelry orders. Upload reference photos, specify metals (gold, silver, diamond, platinum), purities, weights, and detailed price breakdowns (making charges, GST).
-- **👥 Customer Management:** Register and manage customers securely. Keep track of user profiles, order histories, and outstanding balances.
-- **🧾 Billing & Invoicing:** Generate professional invoices and bills for purchases quickly and efficiently.
-- **📦 Inventory Management:** Keep track of live stock, metals, quantities, and real-time inventory adjustments.
-- **🏦 Collateral (Mortgage) Management:** Manage and track pawn/mortgage records easily with a dedicated collateral module.
-- **💳 Payment Tracking:** Record full, partial, and advance payments. Easily see paid vs unpaid statuses for every order.
+- **👥 Customer Management:** Register and manage customers securely. Keep track of user profiles, order histories, and outstanding balances with comprehensive customer portfolios.
+- **🧾 Billing & Invoicing:** Generate professional invoices and bills for purchases quickly and efficiently with detailed metal breakdowns.
+- **📦 Inventory Management:** Keep track of live stock, metals, purities, quantities, and real-time inventory adjustments.
+- **🏦 Collateral (Mortgage / Girvi) Management:** Record, manage, and track collateral/mortgage items with flexible valuation and status tracking.
+- **💳 Payment Tracking:** Record full, partial, and advance payments across orders and collaterals with dedicated modal workflows.
+- **📊 Business Analytics & Visuals:** Integrated charts and visual summaries for financial tracking and shop health.
 - **🔒 Role-Based Access Control:** Secure platform with tailored modules for `Admin` and `Shopkeeper`.
-- **📱 Responsive & Premium UI:** Built with modern design principles (glassmorphism, interactive components, dynamic search) ensuring a stunning and intuitive user experience.
+- **📱 Responsive & Premium UI:** Built with modern design principles (glassmorphism, micro-animations, interactive modals, dynamic search) ensuring an intuitive user experience across devices.
 
 ---
 
 ## 🛠️ Technology Stack
 
-**Frontend**
-- **React.js** with **Vite** for blazing fast performance.
-- **Tailwind CSS** for sleek, modern, and highly responsive styling.
-- **Lucide React** for beautiful iconography.
-- **Axios** for API communication.
+### Frontend
+- **React.js 19** with **Vite** for lightning-fast performance and hot module replacement.
+- **Tailwind CSS v4** for clean, modern, and responsive styling.
+- **Motion (Framer Motion)** for smooth animations and transitions.
+- **AG Charts React** for responsive visual analytics.
+- **Lucide React** for icons.
+- **Axios** & **React Router v7** for API interaction and client-side routing.
 
-**Backend**
+### Backend
 - **Node.js** & **Express.js** providing a fast and scalable RESTful API.
-- **MongoDB** & **Mongoose** for flexible and secure data storage.
-- Expanded JSON payload limits for seamless high-quality image uploads.
-- **JWT (JSON Web Tokens)** for robust user authentication.
+- **MongoDB** & **Mongoose** for flexible, schema-driven data persistence.
+- **Bcryptjs** & **JWT (JSON Web Tokens)** for secure authentication and authorization.
+- Expanded JSON payload limits for seamless high-resolution image uploads.
 
 ---
 
@@ -40,14 +51,17 @@ Follow these instructions to get a copy of the project up and running on your lo
 ### Prerequisites
 
 Ensure you have the following installed:
-- [Node.js](https://nodejs.org/) (v16.0.0 or higher)
-- [MongoDB](https://www.mongodb.com/) (Local instance or MongoDB Atlas cluster)
+- [Node.js](https://nodejs.org/) (v18.0.0 or higher recommended)
+- [MongoDB](https://www.mongodb.com/) (Local MongoDB Community Server or MongoDB Atlas cluster)
+- [Git](https://git-scm.com/)
 
-### Installation
+---
+
+### Installation & Setup
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/JewelTrack.git
+   git clone https://github.com/Gaurav-meena95/JewelTrack.git
    cd JewelTrack
    ```
 
@@ -56,11 +70,12 @@ Ensure you have the following installed:
    cd Backend
    npm install
    ```
-   *Create a `.env` file in the `Backend` directory and add the following variables:*
+   *Create a `.env` file in the `Backend` directory (you can copy `.env.example`):*
    ```env
    PORT=3000
-   MONGO_URI=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret
+   MONGO_URI=mongodb://127.0.0.1:27017/JewelTrack
+   sec_key=your_secret_key_here
+   FRONTEND_URL=http://localhost:5173
    ```
 
 3. **Frontend Setup**
@@ -68,28 +83,32 @@ Ensure you have the following installed:
    cd ../Frontend
    npm install
    ```
-   *Create a `.env` file (or `.env.development`) in the `Frontend` directory and add:*
+   *Create a `.env` file in the `Frontend` directory (you can copy `.env.example`):*
    ```env
    VITE_API_BASE_KEY=http://localhost:3000/api
    ```
 
+---
+
 ### Running the Application
 
-You will need two separate terminal windows/tabs to run the backend and frontend simultaneously.
+You will need two separate terminal windows or tabs to run both services:
 
-**Terminal 1 (Backend)**
+**Terminal 1 (Backend API)**
 ```bash
 cd Backend
 npm run dev
 ```
+> The API server will start on `http://localhost:3000`.
 
-**Terminal 2 (Frontend)**
+**Terminal 2 (Frontend Client)**
 ```bash
 cd Frontend
 npm run dev
 ```
+> The Vite dev server will start on `http://localhost:5173`.
 
-The application frontend will typically be running on `http://localhost:5173` while the backend runs on `http://localhost:3000`.
+Open [http://localhost:5173](http://localhost:5173) in your browser to access the app.
 
 ---
 
@@ -98,32 +117,35 @@ The application frontend will typically be running on `http://localhost:5173` wh
 ```
 JewelTrack/
 ├── Backend/                 # Express API server
-│   ├── db/                  # MongoDB config
-│   ├── module/              # Business logic (Auth, Shopkeeper, Admin)
-│   │   ├── Auth/
+│   ├── db/                  # MongoDB connection configuration
+│   ├── module/              # Business logic modules
+│   │   ├── Auth/            # Authentication & authorization (JWT)
 │   │   ├── Shopkeeper/      # Billing, Orders, Inventory, CustomerRegister, Colletral
-│   │   └── Admin/
-│   └── index.js             # Entry point
+│   │   └── Admin/           # Admin controls
+│   ├── .env.example         # Example environment template
+│   └── index.js             # Express app entry point
 │
-└── Frontend/                # React Vite application
-    ├── public/
-    └── src/
-        ├── components/      # UI Components (Modals, Views, Forms)
-        ├── pages/           # Application Views
-        ├── utils/           # Reusable components & API configs
-        ├── App.jsx
-        └── main.jsx
+└── Frontend/                # React Vite web application
+    ├── public/              # Static assets
+    ├── src/
+    │   ├── components/      # Feature components (Modals, Views, Forms)
+    │   ├── pages/           # Primary application routes
+    │   ├── utils/           # Shared utilities, auth helpers, API configs
+    │   ├── App.jsx          # Route declarations
+    │   └── main.jsx         # React DOM mount point
+    ├── .env.example         # Example environment template
+    └── vite.config.js       # Vite build configuration
 ```
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request if you have any ideas to improve the platform.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+3. Commit your Changes (`git commit -m 'feat: Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 

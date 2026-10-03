@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
 
-let isConnected = false;
-
 const connectDB = async () => {
-  if (isConnected || mongoose.connection.readyState >= 1) {
+  // readyState: 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
+  if (mongoose.connection.readyState >= 1) {
     return;
   }
 
@@ -17,13 +16,15 @@ const connectDB = async () => {
     }
     await mongoose.connect(url, {
       dbName: "JewelTrack",
+      serverSelectionTimeoutMS: 5000,
     });
 
-    isConnected = true;
     console.log("MongoDB connected successfully");
   } catch (error) {
     console.error("MongoDB connection failed:", error.message);
+    throw error;
   }
 };
 
 module.exports = connectDB;
+
